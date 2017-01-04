@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>content/LoginPage.qml</file>
+        <file>images/LLogo.png</file>
+        <file>content/InputLine.qml</file>
+        <file>images/button_default.png</file>
+        <file>images/button_pressed.png</file>
+        <file>images/navigation_next_item.png</file>
+        <file>images/navigation_previous_item.png</file>
+        <file>images/quit.png</file>
+        <file>images/tabs_standard.png</file>
+        <file>images/textinput.png</file>
+        <file>content/GrayButton.qml</file>
+        <file>images/password.png</file>
+        <file>images/user.png</file>
+        <file>images/passworddown.png</file>
+        <file>images/userdown.png</file>
+        <file>images/passwordall.png</file>
+        <file>images/slash.png</file>
+        <file>images/userall.png</file>
+        <file>content/GrayDialog.qml</file>
+    </qresource>
+</RCC>
