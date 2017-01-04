@@ -35,13 +35,16 @@ signals:
     void sendData(const DataStruct &data);
 public slots:
     void readData(const DataStruct &data);
+    void tryLoginOrRegister();
+private:
     void tryLogin();
     void tryRegister();
-private:
     SocketThread *thread;
     QString m_name;
     QString m_password;
     Language m_language;
+    QChar seg_char;
+    MessageType connectType; // 登录或注册 ?
 };
 
 #endif // QMLINTERFACE_H

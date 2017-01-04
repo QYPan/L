@@ -18,14 +18,14 @@ Rectangle {
         source: "../images/LLogo.png"
         fillMode: Image.PreserveAspectFit
         anchors.top: parent.top
-        anchors.topMargin: parent.height * 0.3
+        //anchors.topMargin: parent.height * 0.3
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
     Column {
         id: uandp // user and password
         anchors.top: logo.bottom
-        anchors.topMargin: 150
+        //anchors.topMargin: 150
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 40
         Row {
@@ -162,40 +162,66 @@ Rectangle {
         onButtonClicked: {
             visible = false;
             setUnLockAll(true);
-            if(loginButton.visible && loginButton.text === "连接中..."){
-                loginButton.text = "登 录";
-            }
+            checkButtonBusy();
+        }
+    }
+
+    Connections {
+        target: qmlInterface
+        onQmlReadData: {
+            console.log(type);
+            console.log(message);
+            requestResult(type, message); // 处理登录或注册返回的结果
         }
     }
 
     Connections {
         target: qmlInterface
         onDisplayError: {
-            messageDialog.dialogMessage.text = message;
-            var minWidth = messageDialog.dialogMessage.width + 20;
-            messageDialog.width = minWidth > root.width / 2 ? minWidth : root.width / 2;
-            messageDialog.visible = true;
-            setUnLockAll(false);
+            showMessage(message);
         }
+    }
+
+    function checkButtonBusy(){
+        if(loginButton.visible && loginButton.text === qsTr("连接中...")){
+            loginButton.text = qsTr("登 录");
+        }
+        if(registerButton.visible && registerButton.text === qsTr("正在注册...")){
+            registerButton.text = qsTr("注 册");
+        }
+    }
+
+    function requestResult(type, message){
+        showMessage(message);
+        /*
+        if(type === QmlInterface.REGISTER_SUCCESSED || // 注册结果
+           type === QmlInterface.REGISTER_FAILURE){
+            showMessage(message);
+        }else{ // 登录结果
+            showMessage(message);
+        }
+        */
+    }
+
+    function showMessage(message){
+        messageDialog.dialogMessage.text = message;
+        var minWidth = messageDialog.dialogMessage.width + 20;
+        messageDialog.width = minWidth > root.width / 2 ? minWidth : root.width / 2;
+        messageDialog.visible = true;
+        setUnLockAll(false);
     }
 
     function judgeUser(){
         var ok = true;
         if(inputName.length === 0 && inputPassword.length === 0){
-            messageDialog.dialogMessage.text = qsTr("请输入用户名和密码");
+            showMessage(qsTr("请输入用户名和密码"));
             ok = false;
         }else if(inputName.length === 0){
-            messageDialog.dialogMessage.text = qsTr("请输入用户名");
+            showMessage(qsTr("请输入用户名"));
             ok = false;
         }else if(inputPassword.length === 0){
-            messageDialog.dialogMessage.text = qsTr("请输入密码");
+            showMessage(qsTr("请输入密码"));
             ok = false;
-        }
-        if(ok === false){
-            var minWidth = messageDialog.dialogMessage.width + 20;
-            messageDialog.width = minWidth > root.width / 2 ? minWidth : root.width / 2;
-            messageDialog.visible = true;
-            setUnLockAll(false);
         }
         return ok;
     }
@@ -252,6 +278,7 @@ Rectangle {
         english.buttonPressed = false;
         inputName.text = "";
         inputPassword.text = "";
+        qmlInterface.clientLanguage = QmlInterface.CHINESE;
         registerButton.text = qsTr("确认注册");
     }
 
