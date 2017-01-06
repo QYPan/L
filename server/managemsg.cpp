@@ -74,9 +74,27 @@ void ManageMsg::handle(int fd, const DataStruct &data){
 		tryLogin(fd, data.name, data.message);
 	}else if(data.mark == ADD_ONE){
 		tryAddOne(data.name, data.message);
+	}else if(data.mark == SEARCH_REQUEST){
+		trySearch(fd, data.name, data.message);
 	}else if(data.mark == TRANSPOND){
 		tryTranspond(data.name, data.message);
 	}
+}
+
+void ManageMsg::trySearch(int fd, const string &name, const string &oppName){
+	DataStruct data;
+	char language[5];
+	bool ok = clientdb.checkClient(oppName.data(), NULL, language);
+	data.name = name;
+	data.message = string(language);
+	if(ok){
+		cout << "search successed" << endl;
+		data.mark = SEARCH_SUCCESSED;
+	}else{
+		cout << "search failure" << endl;
+		data.mark = SEARCH_FAILURE;
+	}
+	writeData(fd, data);
 }
 
 void ManageMsg::addToMap(int fd, const string &name){
@@ -187,7 +205,7 @@ void ManageMsg::tryAddAll(int fd, const string &name){
 void ManageMsg::tryLogin(int fd, const string &name, const string &password){
 	DataStruct data;
 	data.name = name;
-	bool ok = clientdb.checkClient(name.data(), password.data());
+	bool ok = clientdb.checkClient(name.data(), password.data(), NULL);
 	cout << "check: " << ok << endl;
 	if(!ok){
 		data.mark = LOGIN_FAILURE;

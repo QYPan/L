@@ -36,7 +36,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: textitem.right
         anchors.leftMargin: 30
-        visible: messageNumber.text === "0" ? false : true
+        visible: (messageNumber.text === "0" || // 如果没有缓存消息或者这是一个网络链接出错消息
+                  messageNumber.text === "-") ? false : true
         source: "../images/messageBox.png"
         fillMode: Image.PreserveAspectFit
         Text {

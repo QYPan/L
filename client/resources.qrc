@@ -27,5 +27,7 @@
         <file>content/MessageList.qml</file>
         <file>content/MsgDelegate.qml</file>
         <file>content/SearchFriendsPage.qml</file>
+        <file>images/messageBox.png</file>
+        <file>content/AddFriendPage.qml</file>
     </qresource>
 </RCC>

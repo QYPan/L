@@ -8,9 +8,11 @@ Item {
     id: root
     width: parent.width
     height: parent.height
+
     FileOperator {
         id: fileOperator
     }
+
     ListView {
         id: friendsListView
         clip: true
@@ -24,17 +26,18 @@ Item {
             onClicked:{}
         }
     }
+
     Component.onCompleted: { // 从本地加载好友列表
         var fileName = qmlInterface.clientName + "-friends.txt";
         if(fileOperator.openFile(fileName)){
             var friends = fileOperator.readFriends();
             if(friends === ""){
                 fileOperator.addFriend(qmlInterface.clientName, qmlInterface.clientLanguage);
+                friends = fileOperator.readFriends();
             }
-            friends = fileOperator.readFriends();
+            fileOperator.closeFile();
             console.log("in qml: " + friends);
             addFriends(friends);
-            fileOperator.closeFile();
         }
     }
 

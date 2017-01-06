@@ -47,11 +47,11 @@ bool Clientdb::tryInsertClient(const char *name, const char *password, int langu
 	}
 }
 
-bool Clientdb::checkClient(const char *name, const char *password){
+bool Clientdb::checkClient(const char *name, const char *password, char *language){
 	MYSQL_RES *res_ptr;
 	MYSQL_ROW sqlrow;
 	char sql_sentence[200];
-	sprintf(sql_sentence, "SELECT password FROM clients WHERE cname = '%s'", name);
+	sprintf(sql_sentence, "SELECT password, language FROM clients WHERE cname = '%s'", name);
 	int res = mysql_query(&client_conn, sql_sentence);
 	if(res){
 		printf("SELECT error: %s\n", mysql_error(&client_conn));
@@ -60,8 +60,9 @@ bool Clientdb::checkClient(const char *name, const char *password){
 		res_ptr = mysql_use_result(&client_conn);
 		if(res_ptr){
 			bool ok = false;
+			printf("out\n");
 			while((sqlrow = mysql_fetch_row(res_ptr))){ // 其实这里只有一条或没有记录
-				ok = checkData(sqlrow, password);
+				ok = checkData(sqlrow, password, language);
 				if(!ok) break;
 			}
 			if(mysql_errno(&client_conn)){
@@ -74,12 +75,21 @@ bool Clientdb::checkClient(const char *name, const char *password){
 	return false;
 }
 
-bool Clientdb::checkData(MYSQL_ROW &sqlrow, const char *password){
+bool Clientdb::checkData(MYSQL_ROW &sqlrow, const char *password, char *language){
 	unsigned int field_count = 0;
-	while(field_count < mysql_field_count(&client_conn)){ // 其实只有一列，即密码列
-		printf("%s compare with %s\n", sqlrow[field_count], password);
-		if(strcmp(sqlrow[field_count], password))
-			return false;
+	while(field_count < mysql_field_count(&client_conn)){ // 提取列
+		if(field_count == 0){ // 密码列
+			if(password != NULL){ // 需要核对密码
+				printf("%s compare with %s\n", sqlrow[field_count], password);
+				if(strcmp(sqlrow[field_count], password))
+					return false;
+			}
+		}else if(field_count == 1){ // 语言列
+			if(language != NULL){
+				printf("int check: %s\n", sqlrow[field_count]);
+				strcpy(language, sqlrow[field_count]);
+			}
+		}
 		field_count++;
 	}
 	return true;

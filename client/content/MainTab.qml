@@ -74,9 +74,9 @@ Item {
         width: parent.width * 0.5;
         height: topView.height
         anchors.top: topView.bottom
-        anchors.topMargin: 5
+        anchors.topMargin: 10
         anchors.right: parent.right
-        anchors.rightMargin: 5
+        anchors.rightMargin: 20
         visible: false;
         color: "#212126"
         z: 20
@@ -167,6 +167,16 @@ Item {
         onQmlReadData: {
             console.log(type);
             console.log("maintab: " + message);
+            deal(type, message);
+        }
+    }
+
+    function deal(type, message){
+        var top = stackView.depth-1;
+        if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
+            if(stackView.get(top).pageName === "searchFriendsPage"){ // 栈顶为查找好友页面
+                stackView.get(top).searchResult(type, message); // 交给查找页面处理
+            }
         }
     }
 

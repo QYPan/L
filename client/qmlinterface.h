@@ -17,7 +17,8 @@ public:
     enum MessageType {LOGIN, ADD_ONE, ADD_ONE_SUCCESSED, ADD_ONE_FAILURE, ADD_ALL, TRANSPOND
                       , ADD_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED
                       , OFFLINE, TRANSPOND_SUCCESSED, REGISTER
-                      , REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT};
+                      , REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT, SEARCH_REQUEST, SEARCH_SUCCESSED,
+                        SEARCH_FAILURE};
     enum Language {CHINESE, ENGLISH};
     Q_INVOKABLE void qmlSendData(int type, const QString &message);
     Q_INVOKABLE void tryConnect(MessageType type);

@@ -24,7 +24,7 @@ Item {
         id: receiveError
         target: qmlInterface
         onDisplayError: {
-            messageListView.model.append({"title" : message, "numbervalue" : "0"})
+            messageListView.model.insert(0, {"title" : message, "numberValue" : "-"})
         }
     }
 

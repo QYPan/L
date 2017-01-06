@@ -25,10 +25,21 @@ Item {
     Text {
         id: nameitem
         color: "white"
+        width: downLine.x - 5
         font.pixelSize: 55
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: 50
+        elide: Text.ElideRight
+    }
+
+    Rectangle {
+        id: downLine
+        x: parent.width * 0.6
+        width: 2
+        height: parent.height * 0.6
+        anchors.verticalCenter: parent.verticalCenter
+        color: "#424246"
     }
 
     Text {
@@ -36,8 +47,8 @@ Item {
         color: "white"
         font.pixelSize: 50
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: nameitem.right
-        anchors.leftMargin: 70
+        anchors.left: downLine.right
+        anchors.leftMargin: 20
     }
 
     Rectangle {

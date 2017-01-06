@@ -19,7 +19,8 @@ public:
 	enum MessageType {LOGIN, ADD_ONE, ADD_ONE_SUCCESSED, ADD_ONE_FAILURE, ADD_ALL, TRANSPOND,
 	                  ADD_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED,
 	                  OFFLINE, TRANSPOND_SUCCESSED, REGISTER,
-				      REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT};
+				      REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT, SEARCH_REQUEST, SEARCH_SUCCESSED,
+	                  SEARCH_FAILURE};
 	enum Language {CHINESE, ENGLISH};
 	struct DataStruct {
 		DataStruct()
@@ -40,6 +41,7 @@ private:
 	void tryAddOne(const string &name, const string &oppName);
 	void tryLogin(int fd, const string &name, const string &password);
 	void tryAddAll(int fd, const string &name);
+	void trySearch(int fd, const string &name, const string &oppName);
 	void tryTranspond(const string &name, const string &message);
 	void readData(int fd, DataStruct &data);
 	void writeData(int fd, const DataStruct &data);
