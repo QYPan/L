@@ -17,9 +17,24 @@ bool Clientdb::init(){
 	}
 }
 
-bool Clientdb::tryInsert(const char *name, const char *password, int language){
+bool Clientdb::tryInsertFriend(const char *name, const char *friendName){
 	char sql_sentence[200];
-	sprintf(sql_sentence, "INSERT INTO clients(name, password, language) VALUES('%s', '%s', %d)", name, password, language);
+	sprintf(sql_sentence, "INSERT INTO friends(cname, fname) VALUES('%s', '%s')", name, friendName);
+	printf("try %s\n", sql_sentence);
+	int res = mysql_query(&client_conn, sql_sentence);
+	if(!res){
+		printf("Inserted %lu rows\n", (unsigned long)mysql_affected_rows(&client_conn));
+		return true;
+	}else{
+		fprintf(stderr, "Insert err %d: %s\n", mysql_errno(&client_conn),
+											mysql_error(&client_conn));
+		return false;
+	}
+}
+
+bool Clientdb::tryInsertClient(const char *name, const char *password, int language){
+	char sql_sentence[200];
+	sprintf(sql_sentence, "INSERT INTO clients(cname, password, language) VALUES('%s', '%s', %d)", name, password, language);
 	printf("try %s\n", sql_sentence);
 	int res = mysql_query(&client_conn, sql_sentence);
 	if(!res){
@@ -36,7 +51,7 @@ bool Clientdb::checkClient(const char *name, const char *password){
 	MYSQL_RES *res_ptr;
 	MYSQL_ROW sqlrow;
 	char sql_sentence[200];
-	sprintf(sql_sentence, "SELECT password FROM clients WHERE name = '%s'", name);
+	sprintf(sql_sentence, "SELECT password FROM clients WHERE cname = '%s'", name);
 	int res = mysql_query(&client_conn, sql_sentence);
 	if(res){
 		printf("SELECT error: %s\n", mysql_error(&client_conn));

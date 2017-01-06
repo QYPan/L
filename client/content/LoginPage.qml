@@ -7,9 +7,7 @@ Rectangle {
     width: parent.width
     height: parent.height
     color: "black"
-    //property alias userName: inputName.text
-    //property alias dialogVisible: loginDialog.visible
-    //property alias dialogMessage: loginDialog.dialogMessage
+    signal loginSuccessed()
 
     Image {
         id: logo
@@ -158,7 +156,7 @@ Rectangle {
         visible: false
         height: parent.height / 5
         anchors.centerIn: parent
-        dialogMessage.font.pixelSize: 50
+        textSize: 50
         onButtonClicked: {
             visible = false;
             setUnLockAll(true);
@@ -167,15 +165,17 @@ Rectangle {
     }
 
     Connections {
+        id: receiveMessage
         target: qmlInterface
         onQmlReadData: {
             console.log(type);
-            console.log(message);
+            console.log("login: " + message);
             requestResult(type, message); // 处理登录或注册返回的结果
         }
     }
 
     Connections {
+        id: receiveError
         target: qmlInterface
         onDisplayError: {
             showMessage(message);
@@ -192,21 +192,17 @@ Rectangle {
     }
 
     function requestResult(type, message){
-        showMessage(message);
-        /*
-        if(type === QmlInterface.REGISTER_SUCCESSED || // 注册结果
-           type === QmlInterface.REGISTER_FAILURE){
-            showMessage(message);
-        }else{ // 登录结果
+        if(type === QmlInterface.LOGIN_SUCCESSED){
+            receiveMessage.enabled = false;
+            receiveError.enabled = false;
+            loginSuccessed();
+        }else{
             showMessage(message);
         }
-        */
     }
 
     function showMessage(message){
-        messageDialog.dialogMessage.text = message;
-        var minWidth = messageDialog.dialogMessage.width + 20;
-        messageDialog.width = minWidth > root.width / 2 ? minWidth : root.width / 2;
+        messageDialog.setMessageText(message);
         messageDialog.visible = true;
         setUnLockAll(false);
     }

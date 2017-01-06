@@ -54,7 +54,7 @@ void QmlInterface::qmlSendData(int type, const QString &message){
     data.name = m_name;
     data.mark = type;
     data.message = message;
-    qDebug() << m_name << " try to send data :" << message;
+    qDebug() << m_name << " try to send data :" << type << message;
     emit sendData(data);
 }
 

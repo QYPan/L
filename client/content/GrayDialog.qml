@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
 Rectangle {
-    id: dialog
-    property alias dialogMessage: dialogMessage
+    id: root
+    property alias textSize: dialogMessage.font.pixelSize
     signal buttonClicked()
     z: 20
     gradient: Gradient {
@@ -32,5 +32,10 @@ Rectangle {
                 buttonClicked();
             }
         }
+    }
+    function setMessageText(message){
+        dialogMessage.text = message;
+        var minWidth = dialogMessage.width + 20;
+        root.width = minWidth > root.parent.width / 2 ? minWidth : root.parent.width / 2;
     }
 }

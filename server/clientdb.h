@@ -1,3 +1,6 @@
+#ifndef CLIENTDB_H
+#define CLIENTDB_H
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -7,9 +10,13 @@ class Clientdb {
 public:
 	Clientdb();
 	bool init();
-	bool tryInsert(const char *name, const char *password, int language);
+	bool tryInsertClient(const char *name, const char *password, int language);
+	bool tryInsertFriend(const char *name, const char *friendName);
 	bool checkClient(const char *name, const char *password);
 private:
 	bool checkData(MYSQL_ROW &sqlrow, const char *password);
 	MYSQL client_conn;
 };
+
+
+#endif

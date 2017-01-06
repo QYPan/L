@@ -6,11 +6,13 @@
 #include "qmlinterface.h"
 #include "clientmap.h"
 #include "myeventfilter.h"
+#include "fileoperator.h"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     qmlRegisterType<QmlInterface>("QmlInterface", 1, 0, "QmlInterface"); // 注册 socket 接口类
+    qmlRegisterType<FileOperator>("FileOperator", 1, 0, "FileOperator"); // 注册文件操作接口类
     qmlRegisterType<ClientMap>("ClientMap", 1, 0, "ClientMap");
 
     QQmlApplicationEngine engine;

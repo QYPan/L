@@ -20,5 +20,12 @@
         <file>images/slash.png</file>
         <file>images/userall.png</file>
         <file>content/GrayDialog.qml</file>
+        <file>content/MainTab.qml</file>
+        <file>images/toolbar.png</file>
+        <file>content/FriendsList.qml</file>
+        <file>content/ItemDelegate.qml</file>
+        <file>content/MessageList.qml</file>
+        <file>content/MsgDelegate.qml</file>
+        <file>content/SearchFriendsPage.qml</file>
     </qresource>
 </RCC>

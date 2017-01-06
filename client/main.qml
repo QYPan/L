@@ -12,5 +12,24 @@ ApplicationWindow {
 
     LoginPage {
         id: loginpage
+        anchors.fill: parent
+        onLoginSuccessed: {
+            visible = false;
+            stackView.push(Qt.resolvedUrl("content/MainTab.qml"));
+        }
+    }
+
+    StackView {
+        id: stackView // 实现翻页
+        anchors.fill: parent
+        // Implements back key navigation
+        focus: true
+        /*
+        Keys.onReleased: if (event.key === Qt.Key_Back) {
+                             //stackView.pop();
+                             if(stackView.depth)
+                                 event.accepted = true;
+                         }
+                         */
     }
 }

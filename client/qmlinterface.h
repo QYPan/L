@@ -14,7 +14,7 @@ class QmlInterface : public QObject
     Q_ENUMS(MessageType)
     Q_ENUMS(Language)
 public:
-    enum MessageType {LOGIN, ADD_ONE, ADD_ALL, TRANSPOND
+    enum MessageType {LOGIN, ADD_ONE, ADD_ONE_SUCCESSED, ADD_ONE_FAILURE, ADD_ALL, TRANSPOND
                       , ADD_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED
                       , OFFLINE, TRANSPOND_SUCCESSED, REGISTER
                       , REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT};

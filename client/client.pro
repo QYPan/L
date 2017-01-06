@@ -11,7 +11,8 @@ SOURCES += main.cpp \
     datastruct.cpp \
     myeventfilter.cpp \
     qmlinterface.cpp \
-    socketthread.cpp
+    socketthread.cpp \
+    fileoperator.cpp
 
 RESOURCES += resources.qrc
 
@@ -27,4 +28,5 @@ HEADERS += \
     datastruct.h \
     myeventfilter.h \
     qmlinterface.h \
-    socketthread.h
+    socketthread.h \
+    fileoperator.h
