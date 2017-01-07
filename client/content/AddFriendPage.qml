@@ -78,6 +78,7 @@ Rectangle {
             font.pixelSize: 55
             maximumLength: 15
             horizontalAlignment: TextInput.AlignHCenter
+            placeholderText: qsTr("非必须");
             focus: false
         }
     }
@@ -91,6 +92,7 @@ Rectangle {
         onButtonClicked: {
             visible = false;
             root.setUnLockAll(true);
+            addButton.enabled = false;
         }
     }
 
@@ -104,11 +106,12 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             root.setUnLockAll(false);
-            messageDialog.setMessageText("已发送信息，等待对方回复！");
-            messageDialog.visible = true;
             if(oppName != ""){
-                var message = root.oppName + "#" + inputMessage.text;
+                var language = qmlInterface.clientLanguage;
+                var message = root.oppName + "#" + language.toString() + "#" +inputMessage.text;
                 qmlInterface.qmlSendData(QmlInterface.ADD_ONE, message);
+                messageDialog.setMessageText("请求已发送，等待对方回复！");
+                messageDialog.visible = true;
             }
         }
     }

@@ -174,10 +174,6 @@ Rectangle {
         var fileName = qmlInterface.clientName + "-friends.txt";
         if(fileOperator.openFile(fileName)){
             var friends = fileOperator.readFriends();
-            if(friends === ""){
-                fileOperator.addFriend(qmlInterface.clientName, qmlInterface.clientLanguage);
-                friends = fileOperator.readFriends();
-            }
             fileOperator.closeFile();
             console.log("in qml: " + friends);
             return checkFriends(name, friends);

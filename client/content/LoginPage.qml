@@ -195,6 +195,10 @@ Rectangle {
         if(type === QmlInterface.LOGIN_SUCCESSED){
             receiveMessage.enabled = false;
             receiveError.enabled = false;
+            var language = parseInt(message);
+            if(!isNaN(language)){
+                qmlInterface.clientLanguage = parseInt(message);
+            }
             loginSuccessed();
         }else{
             showMessage(message);

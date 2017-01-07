@@ -74,6 +74,8 @@ void ManageMsg::handle(int fd, const DataStruct &data){
 		tryLogin(fd, data.name, data.message);
 	}else if(data.mark == ADD_ONE){
 		tryAddOne(data.name, data.message);
+	}else if(data.mark == ADD_ALL){
+		tryAddAll(fd, data.name);
 	}else if(data.mark == SEARCH_REQUEST){
 		trySearch(fd, data.name, data.message);
 	}else if(data.mark == TRANSPOND){
@@ -128,20 +130,26 @@ void ManageMsg::disconnect(int fd){
 	}
 }
 
-void ManageMsg::tryAddOne(const string &name, const string &oppName){
-	/*
-	if(name == oppName){ // 添加自己为朋友
-		auto it = nameMapFd.find(name);
-		if(it != nameMapFd.end()){ // 自己在线
-			DataStruct data;
-			data.name = name;
-			data.mark = ADD_ONE_SUCCESSED;
-			data.message = oppName;
-			writeData(it->second, data);
-			cout << "add " << oppName << " successed" << endl;
-		}
+void ManageMsg::tryAddOne(const string &name, const string &message){
+	string oppName;
+	string str_language;
+	string checkMessage;
+	splitData(message, 0, oppName);
+	splitData(message, 1, str_language);
+	splitData(message, 2, checkMessage);
+	cout << name << " in " << str_language << " want to add " << oppName << " as a friend with message '" << checkMessage << "'" << endl;
+	auto it = nameMapFd.find(oppName);
+	if(it != nameMapFd.end()){ // 如果对方在线
+		DataStruct data;
+		data.name = oppName;
+		data.mark = ADD_ONE;
+		data.message.append(name);
+		data.message.append(1u, seg_char);
+		data.message.append(str_language);
+		data.message.append(1u, seg_char);
+		data.message.append(checkMessage);
+		writeData(it->second, data);
 	}
-	*/
 }
 
 void ManageMsg::tryRegister(int fd, const string &name, const string &message){
@@ -156,7 +164,7 @@ void ManageMsg::tryRegister(int fd, const string &name, const string &message){
 	if(ok){
 		data.mark = REGISTER_SUCCESSED;
 		data.message = "注册成功！";
-		clientdb.tryInsertFriend(name.data(), name.data()); // 把自己添加进好友关系表
+		clientdb.tryInsertFriend(name.data(), name.data(), ilanguage); // 把自己添加进好友关系表
 	}else{
 		data.mark = REGISTER_FAILURE;
 		data.message = "用户名已存在！";
@@ -184,28 +192,19 @@ void ManageMsg::tryTranspond(const string &name, const string &message){
 void ManageMsg::tryAddAll(int fd, const string &name){
 	DataStruct data;
 	data.name = name;
-	for(auto it=nameMapFd.begin(); it != nameMapFd.end(); it++){
-		if(it->first != name){
-			DataStruct sub;
-			sub.name = it->first;
-			sub.mark = ADD_SUCCESSED;
-			sub.message = name;
-			writeData(it->second, sub); // 向其他用户发送新用户信息
-		}
-		data.message += it->first; // 向新用户添加其他用户信息
-		auto tmp_it = it;
-		tmp_it++;
-		if(tmp_it != nameMapFd.end())
-			data.message.append(1u, seg_char); // 添加分隔符
-	}
-	data.mark = ADD_SUCCESSED;
+	char friends[2000] = {0};
+	clientdb.getFriends(name.data(), friends);
+	data.mark = ADD_ALL_SUCCESSED;
+	data.message = string(friends);
+	cout << "get friends: " << friends << endl;
 	writeData(fd, data);
 }
 
 void ManageMsg::tryLogin(int fd, const string &name, const string &password){
 	DataStruct data;
 	data.name = name;
-	bool ok = clientdb.checkClient(name.data(), password.data(), NULL);
+	char language[5] = {0};
+	bool ok = clientdb.checkClient(name.data(), password.data(), language);
 	cout << "check: " << ok << endl;
 	if(!ok){
 		data.mark = LOGIN_FAILURE;
@@ -218,7 +217,7 @@ void ManageMsg::tryLogin(int fd, const string &name, const string &password){
 		addToMap(fd, name);
 		cout << name << " online" << endl;
 		data.mark = LOGIN_SUCCESSED;
-		data.message = "登录成功！";
+		data.message = string(language);
 	}else{
 		data.mark = LOGIN_FAILURE;
 		data.message = "该用户已登录！";

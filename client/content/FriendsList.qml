@@ -9,10 +9,6 @@ Item {
     width: parent.width
     height: parent.height
 
-    FileOperator {
-        id: fileOperator
-    }
-
     ListView {
         id: friendsListView
         clip: true
@@ -27,35 +23,24 @@ Item {
         }
     }
 
-    Component.onCompleted: { // 从本地加载好友列表
+    FileOperator {
+        id: fileOperator
+    }
+
+    Component.onCompleted: {
+        getFriends();
+    }
+
+    function getFriends(){ // 从本地获取好友信息
         var fileName = qmlInterface.clientName + "-friends.txt";
         if(fileOperator.openFile(fileName)){
             var friends = fileOperator.readFriends();
             fileOperator.closeFile();
-            if(friends === ""){ // 好友列表尚未保存在本地
-                //fileOperator.addFriend(qmlInterface.clientName, qmlInterface.clientLanguage);
-                qmlInterface.qmlSendData(QmlInterface.ADD_ALL, ""); // 发送获取好友列表请求
-            }else{
-                console.log("in qml: " + friends);
+            if(friends !== ""){
                 addFriends(friends);
+            }else{
+                console.log("好友尚未储存在本地");
             }
-        }
-    }
-
-    function getFriends(friends){
-        var fileName = qmlInterface.clientName + "-friends.txt";
-        if(fileOperator.openFile(fileName)){
-            var splitFriends = friends.split("#");
-            var i;
-            for(i = 0; i < splitFriends.length; i++){
-                var two = splitFriends[i].split(":");
-                var name = two[0];
-                var language = parseInt(two[1]);
-                fileOperator.addFriend(name, language); // 把服务器发送来的好友名单保存在本地文件
-            }
-            addFriends(friends); // 添加到应用中的好友列表
-        }else{
-            console.log("打开好友列表文件失败");
         }
     }
 

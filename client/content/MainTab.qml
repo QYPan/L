@@ -3,11 +3,13 @@ import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
 import QtQuick.Window 2.0
 import QmlInterface 1.0
+import FileOperator 1.0
 
 Item {
     id: root
     width: parent.width
     height: parent.height
+    signal friendsListDeal(string message) // 通讯录页面管理
 
     Rectangle {
         color: "#212126"
@@ -93,6 +95,7 @@ Item {
     }
 
     TabView {
+        id: tabView
         anchors.top: topView.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -111,6 +114,12 @@ Item {
             FriendsList {
                 id: friendsList
                 anchors.fill: parent
+                Connections {
+                    target: root
+                    onFriendsListDeal: {
+                        //addFriends(message);
+                    }
+                }
             }
         }
         Tab {
@@ -171,12 +180,47 @@ Item {
         }
     }
 
+    FileOperator {
+        id: fileOperator
+    }
+
+    Component.onCompleted: { // 从本地加载好友列表
+        var fileName = qmlInterface.clientName + "-friends.txt";
+        if(fileOperator.openFile(fileName)){
+            var friends = fileOperator.readFriends();
+            fileOperator.closeFile();
+            if(friends === ""){ // 好友列表尚未保存在本地
+                qmlInterface.qmlSendData(QmlInterface.ADD_ALL, ""); // 发送获取好友列表请求
+            }
+        }
+    }
+
     function deal(type, message){
         var top = stackView.depth-1;
         if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
             if(stackView.get(top).pageName === "searchFriendsPage"){ // 栈顶为查找好友页面
                 stackView.get(top).searchResult(type, message); // 交给查找页面处理
             }
+        }else if(type === QmlInterface.ADD_ALL_SUCCESSED){ // 从服务器获取好友列表成功
+            setFriends(message); // 把好友信息写入本地
+        }else if(type === QmlInterface.ADD_ONE){ // 是一个好友请求
+            console.log("opp: " + message);
+        }
+    }
+
+    function setFriends(friends){
+        var fileName = qmlInterface.clientName + "-friends.txt";
+        if(fileOperator.openFile(fileName)){
+            var splitFriends = friends.split("#");
+            var i;
+            for(i = 0; i < splitFriends.length; i++){
+                var two = splitFriends[i].split(":");
+                var name = two[0];
+                var language = parseInt(two[1]);
+                fileOperator.addFriend(name, language); // 把服务器发送来的好友名单保存在本地
+            }
+        }else{
+            console.log("打开好友列表文件失败");
         }
     }
 

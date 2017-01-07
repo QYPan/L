@@ -39,6 +39,8 @@ bool FileOperator::seek(qint64 pos){
 
 void FileOperator::closeFile(){
     m_file->close();
+    delete m_file;
+    m_file = NULL;
 }
 
 bool FileOperator::openFile(const QString &fileName){
@@ -47,6 +49,8 @@ bool FileOperator::openFile(const QString &fileName){
     m_file = new QFile(path);
     if(m_file && !m_file->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Append)){
         qDebug() << "try open file: " << m_file->fileName() << " error";
+        delete m_file;
+        m_file = NULL;
         return false;
     }
     qDebug() << "try open file: " << fileName << " successed";

@@ -17,7 +17,7 @@ class ManageMsg{
 public:
 	friend class Server;
 	enum MessageType {LOGIN, ADD_ONE, ADD_ONE_SUCCESSED, ADD_ONE_FAILURE, ADD_ALL, TRANSPOND,
-	                  ADD_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED,
+	                  ADD_ALL_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED,
 	                  OFFLINE, TRANSPOND_SUCCESSED, REGISTER,
 				      REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT, SEARCH_REQUEST, SEARCH_SUCCESSED,
 	                  SEARCH_FAILURE};
@@ -38,7 +38,7 @@ private:
 	void handle(int fd, const DataStruct &data);
 	void splitData(const string &str, int k, string &sub);
 	void tryRegister(int fd, const string &name, const string &message);
-	void tryAddOne(const string &name, const string &oppName);
+	void tryAddOne(const string &name, const string &message);
 	void tryLogin(int fd, const string &name, const string &password);
 	void tryAddAll(int fd, const string &name);
 	void trySearch(int fd, const string &name, const string &oppName);

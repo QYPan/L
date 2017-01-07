@@ -7,6 +7,7 @@ Item {
     id: root
     width: parent.width
     height: parent.height
+
     ListView {
         id: messageListView
         clip: true
@@ -29,5 +30,7 @@ Item {
     }
 
     Component.onCompleted: { // 从本地加载消息列表
+        messageListView.model.insert(0, {"title" : "simple1", "numberValue" : "23"})
+        messageListView.model.insert(0, {"title" : "simple2", "numberValue" : "3"})
     }
 }

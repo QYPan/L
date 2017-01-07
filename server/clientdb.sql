@@ -7,8 +7,12 @@ CREATE TABLE clients (
 CREATE TABLE friends (
 	cname VARCHAR(16) NOT NULL,
 	fname VARCHAR(16) NOT NULL,
+	language INT NOT NULL,
 	PRIMARY KEY(cname, fname),
 	FOREIGN KEY(cname) REFERENCES clients(cname)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	FOREIGN KEY(fname) REFERENCES clients(cname)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
