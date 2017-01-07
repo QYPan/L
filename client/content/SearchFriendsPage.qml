@@ -81,6 +81,7 @@ Rectangle {
             width: root.width * 0.50
             font.pixelSize: 55
             maximumLength: 15
+            inputMethodHints: Qt.ImhNoPredictiveText
             focus: false
         }
     }
@@ -95,6 +96,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         property string preName: ""
         onClicked: {
+            focus = true;
             if(inputName.length && inputName.text != preName){
                 qmlInterface.qmlSendData(QmlInterface.SEARCH_REQUEST, inputName.text);
                 preName = inputName.text;

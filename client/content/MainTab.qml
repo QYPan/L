@@ -51,7 +51,7 @@ Item {
                 id: add
                 width: parent.width
                 height: parent.height
-                source: "../images/quit.png"
+                source: "../images/add.png"
                 fillMode: Image.PreserveAspectFit
             }
             MouseArea {

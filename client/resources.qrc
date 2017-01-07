@@ -29,5 +29,6 @@
         <file>content/SearchFriendsPage.qml</file>
         <file>images/messageBox.png</file>
         <file>content/AddFriendPage.qml</file>
+        <file>images/add.png</file>
     </qresource>
 </RCC>
