@@ -43,6 +43,7 @@ private:
 	void tryAddAll(int fd, const string &name);
 	void trySearch(int fd, const string &name, const string &oppName);
 	void tryTranspond(const string &name, const string &message);
+	void dealAddOneAnswer(const string &name, const string &message, MessageType type);
 	void readData(int fd, DataStruct &data);
 	void writeData(int fd, const DataStruct &data);
 	void addToMap(int fd, const string &name);

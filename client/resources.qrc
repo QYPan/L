@@ -30,5 +30,6 @@
         <file>images/messageBox.png</file>
         <file>content/AddFriendPage.qml</file>
         <file>images/add.png</file>
+        <file>content/DealRequestPage.qml</file>
     </qresource>
 </RCC>

@@ -4,12 +4,15 @@ import QtQuick.Controls.Styles 1.3
 import QtQuick.Window 2.0
 import QmlInterface 1.0
 import FileOperator 1.0
+import CacheText 1.0
 
 Item {
     id: root
     width: parent.width
     height: parent.height
-    signal friendsListDeal(string message) // 通讯录页面管理
+    signal friendsListSetNoteNumber(int val) // 通讯录页面管理
+    signal friendsListDealType(int type, string message)
+    property bool isMailListLoad: false
 
     Rectangle {
         color: "#212126"
@@ -103,26 +106,35 @@ Item {
         style: touchStyle
         tabPosition: Qt.BottomToolBarArea
         Tab {
+            id: tab1
             title: qsTr("消息")
+            /*
             MessageList {
                 id: messageList
                 anchors.fill: parent
             }
+            */
+            source: "MessageList.qml"
         }
         Tab {
+            id: tab2
             title: qsTr("通讯录")
             FriendsList {
                 id: friendsList
                 anchors.fill: parent
-                Connections {
-                    target: root
-                    onFriendsListDeal: {
-                        //addFriends(message);
-                    }
+                onLoaded: {
+                    root.isMailListLoad = true;
+                    root.friendsListSetNoteNumber.connect(friendsList.setNoteNumber);
+                    root.friendsListDealType.connect(friendsList.dealType);
+                    friendsList.setNoteNumber(cacheText.getCount(CacheText.NEW_FRIEND));
+                    //var message = cacheText.pull(CacheText.NEW_FRIEND);
+                    //cacheText.clear(CacheText.NEW_FRIEND);
+                    //friendsList.deal(message);
                 }
             }
         }
         Tab {
+            id: tab3
             title: qsTr("系统")
         }
     }
@@ -197,7 +209,9 @@ Item {
 
     function deal(type, message){
         var top = stackView.depth-1;
-        if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
+        if(type === QmlInterface.ADD_ONE_SUCCESSED){
+            root.friendsListDealType(type, message);
+        }else if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
             if(stackView.get(top).pageName === "searchFriendsPage"){ // 栈顶为查找好友页面
                 stackView.get(top).searchResult(type, message); // 交给查找页面处理
             }
@@ -205,6 +219,8 @@ Item {
             setFriends(message); // 把好友信息写入本地
         }else if(type === QmlInterface.ADD_ONE){ // 是一个好友请求
             console.log("opp: " + message);
+            cacheText.push(CacheText.NEW_FRIEND, message); // 先把消息加入缓存
+            root.friendsListSetNoteNumber(cacheText.getCount(CacheText.NEW_FRIEND));
         }
     }
 

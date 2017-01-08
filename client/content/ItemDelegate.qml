@@ -7,14 +7,16 @@ Item {
     //height: parent.height * 0.125
     height: Screen.height * 0.1
 
+    property string newRequest: "0"
     property alias name: nameitem.text
     property alias language: languageitem.text
-    /*
-    property alias numberText: messageNumber.text
-    property alias talkView: talkPage
-    property alias talkViewFlag: talkPage.flag
-    */
+    property alias dealRequestView: dealRequestPage
     signal clicked
+
+    DealRequestPage {
+        id: dealRequestPage
+        visible: false
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -35,20 +37,41 @@ Item {
 
     Rectangle {
         id: downLine
-        x: parent.width * 0.6
+        x: parent.width * 0.55
         width: 2
         height: parent.height * 0.6
         anchors.verticalCenter: parent.verticalCenter
         color: "#424246"
     }
 
+    Image {
+        id: messageBox
+        width: 50
+        height: 50
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: downLine.right
+        anchors.leftMargin: 50
+        visible: (root.newRequest === "0" // 如果没有新好友请求
+                  ? false : true)
+        source: "../images/messageBox.png"
+        fillMode: Image.PreserveAspectFit
+        Text {
+            id: messageNumber
+            color: "black"
+            text: root.newRequest
+            font.pixelSize: 35
+            anchors.centerIn: parent
+        }
+    }
+
     Text {
         id: languageitem
         color: "white"
         font.pixelSize: 50
+        visible: languageitem.text != ""
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: downLine.right
-        anchors.leftMargin: 20
+        anchors.leftMargin: 50
     }
 
     Rectangle {

@@ -68,18 +68,67 @@ void ManageMsg::splitData(const string &str, int k, string &sub){
 }
 
 void ManageMsg::handle(int fd, const DataStruct &data){
+	switch(static_cast<int>(data.mark)){
+		case REGISTER:
+			tryRegister(fd, data.name, data.message);
+			break;
+		case LOGIN:
+			tryLogin(fd, data.name, data.message);
+			break;
+		case ADD_ONE:
+			tryAddOne(data.name, data.message);
+			break;
+		case ADD_ONE_SUCCESSED:
+		case ADD_ONE_FAILURE:
+			dealAddOneAnswer(data.name, data.message, data.mark);
+			break;
+		case ADD_ALL:
+			tryAddAll(fd, data.name);
+			break;
+		case SEARCH_REQUEST:
+			trySearch(fd, data.name, data.message);
+			break;
+		case TRANSPOND:
+			tryTranspond(data.name, data.message);
+			break;
+	}
+	/*
 	if(data.mark == REGISTER){
 		tryRegister(fd, data.name, data.message);
 	}else if(data.mark == LOGIN){
 		tryLogin(fd, data.name, data.message);
 	}else if(data.mark == ADD_ONE){
 		tryAddOne(data.name, data.message);
+	}else if(data.mark == ADD_ONE_SUCCESSED){
+	}else if(data.mark == ADD_ONE_FAILURE){
 	}else if(data.mark == ADD_ALL){
 		tryAddAll(fd, data.name);
 	}else if(data.mark == SEARCH_REQUEST){
 		trySearch(fd, data.name, data.message);
 	}else if(data.mark == TRANSPOND){
 		tryTranspond(data.name, data.message);
+	}
+	*/
+}
+
+void ManageMsg::dealAddOneAnswer(const string &name, const string &message, MessageType type){
+	string oppName;
+	string str_language;
+	splitData(message, 0, oppName);
+	splitData(message, 1, str_language);
+	DataStruct data;
+	data.name = oppName;
+	data.message = name;
+	data.message.append(1u, seg_char);
+	data.message.append(str_language);
+	auto it = nameMapFd.find(oppName);
+	if(it != nameMapFd.end()){ // 如果对方在线
+		if(type == ADD_ONE_SUCCESSED){
+			data.mark = ADD_ONE_SUCCESSED;
+		}else{
+			data.mark = ADD_ONE_FAILURE;
+		}
+		writeData(it->second, data);
 	}
 }
 

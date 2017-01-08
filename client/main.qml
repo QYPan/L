@@ -6,7 +6,7 @@ import "content"
 ApplicationWindow {
     objectName: "rootObject"
     visible: true
-    width: 500
+    width: 900
     height: 690
     title: qsTr("L")
 
