@@ -11,20 +11,33 @@ CacheText::CacheText(QObject *parent)
 
 }
 
-void CacheText::push(CacheType type, const QString &message){
+void CacheText::push(int type, const QString &message){
     messageList[type] << message;
 }
 
-QString CacheText::pull(CacheType type){
-    return messageList[type].join(seg_char);
+QString CacheText::pop(int type){
+    auto it = messageList.find(type);
+    QString ans;
+    if(it != messageList.end()){
+        ans =  messageList[type].join(seg_char);
+        readed(type);
+    }
+    return ans;
 }
 
-void CacheText::readed(CacheType type){
+void CacheText::readed(int type){
     messageList[type].clear();
+    messageList.erase(messageList.find(type));
 }
 
-int CacheText::addFriend(const QString &name, QmlInterface::Language language){
+int CacheText::getCount(int type){
+    return messageList[type].count();
+}
+
+int CacheText::addFriend(const QString &name, int language){
     friendsList.insert(name, language);
+    qDebug() << "add name: " << name;
+    qDebug() << "add language: " << language;
     auto it = friendsList.begin();
     int index = 0;
     for(; it != friendsList.end(); it++, index++){
@@ -33,6 +46,14 @@ int CacheText::addFriend(const QString &name, QmlInterface::Language language){
         }
     }
     return index;
+}
+
+bool CacheText::isExists(const QString &name){
+    auto it = friendsList.find(name);
+    if(it != friendsList.end()){
+        return true;
+    }
+    return false;
 }
 
 int CacheText::removeFriend(const QString &name){
@@ -52,9 +73,7 @@ void CacheText::initFriendsList(const QString &friends){
     for(auto item : friendslist){
         QString name = item.split(":")[0];
         QString language = item.split(":")[1];
-        qDebug() << "name: " << name;
-        qDebug() << "language: " << language;
-        friendsList.insert(name, static_cast<QmlInterface::Language>(language.toInt()));
+        friendsList.insert(name, language.toInt());
     }
 }
 

@@ -10,6 +10,8 @@ Item {
     id: root
     width: parent.width
     height: parent.height
+    signal setNoteNumber(int val)
+    signal changeOnFriends(int type, string message)
     property bool isMailListLoad: false
 
     Rectangle {
@@ -119,6 +121,11 @@ Item {
                 anchors.fill: parent
                 onLoaded: {
                     friendsList.addFriends(cacheText.pullFriendsList());
+                    isMailListLoad = true;
+                    friendsList.setNoteNumber(cacheText.getCount(QmlInterface.ADD_ONE));
+                    friendsList.pullChangeOnFriends();
+                    root.setNoteNumber.connect(friendsList.setNoteNumber);
+                    root.changeOnFriends.connect(friendsList.dealType);
                 }
             }
         }
@@ -197,6 +204,11 @@ Item {
     function deal(type, message){
         var top = stackView.depth-1;
         if(type === QmlInterface.ADD_ONE_SUCCESSED){
+            if(isMailListLoad == false){ // 通讯录界面还没有加载
+                cacheText.push(type, message); // 缓存消息
+            }else{
+                root.changeOnFriends(type, message);
+            }
         }else if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
             if(stackView.get(top).pageName === "searchFriendsPage"){ // 栈顶为查找好友页面
                 stackView.get(top).searchResult(type, message); // 交给查找页面处理
@@ -204,6 +216,8 @@ Item {
         }else if(type === QmlInterface.ADD_ALL_SUCCESSED){ // 从服务器获取好友列表成功
             cacheText.initFriendsList(message);
         }else if(type === QmlInterface.ADD_ONE){ // 是一个好友请求
+            cacheText.push(type, message);
+            root.setNoteNumber(cacheText.getCount(type));
         }
     }
 

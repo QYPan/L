@@ -38,8 +38,8 @@ Item {
     Rectangle {
         id: downLine
         x: parent.width * 0.55
-        width: 2
-        height: parent.height * 0.6
+        width: 1
+        height: parent.height * 0.2
         anchors.verticalCenter: parent.verticalCenter
         color: "#424246"
     }

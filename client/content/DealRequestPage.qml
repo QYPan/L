@@ -7,8 +7,10 @@ Rectangle {
     id: root
     color: "#212126"
 
+    property string pageName: "dealRequestPage"
     property alias titleName: title.text
-    signal acceptFriend(string name, string language)
+    property bool isLoaded: false
+    signal acceptFriend(string name, int language)
 
     BorderImage {
         id: topView
@@ -153,7 +155,7 @@ Rectangle {
                         judgeButtonRow.visible = false;
                         var clanguage = qmlInterface.clientLanguage;
                         qmlInterface.qmlSendData(QmlInterface.ADD_ONE_SUCCESSED, fname+"#"+clanguage.toString());
-                        root.acceptFriend(fname, flanguage);
+                        root.acceptFriend(fname, ilanguage);
                     }
                 }
                 GrayButton {
@@ -191,22 +193,25 @@ Rectangle {
         var name = friend[0];
         var str_language = friend[1];
         var checkMessage = friend[2];
+        var ilanguage;
         var language;
         console.log("try add new friend");
         console.log("name: " + name);
         console.log("language: " + str_language);
         console.log("checkMessage: " + checkMessage);
-        if(parseInt(str_language) == QmlInterface.CHINESE){
+        ilanguage = parseInt(str_language);
+        if(ilanguage == QmlInterface.CHINESE){
             language = "中文";
-        }else if(parseInt(str_language) == QmlInterface.ENGLISH){
+        }else if(ilanguage == QmlInterface.ENGLISH){
             language = "English";
         }
-        addNoteItem(name, language, checkMessage);
+        addNoteItem(name, language, ilanguage, checkMessage);
     }
 
-    function addNoteItem(name, language, checkMessage){
+    function addNoteItem(name, language, ilanguage, checkMessage){
         newFriendsListView.model.insert(0, {"fname" : name,
                                             "flanguage" : language,
+                                            "ilanguage" : ilanguage,
                                             "fmessage": checkMessage});
     }
 }

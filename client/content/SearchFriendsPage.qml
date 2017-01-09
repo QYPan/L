@@ -147,8 +147,8 @@ Rectangle {
         anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
-            var ok = root.isExistsFriend(inputName.text);
-            if(ok === true){
+            var ok = cacheText.isExists(inputName.text);
+            if(ok === false){
                 stackView.replace(Qt.resolvedUrl("AddFriendPage.qml"));
                 stackView.get(stackView.depth-1).titleName = friendID.text;
                 stackView.get(stackView.depth-1).oppName = inputName.text;
@@ -168,17 +168,6 @@ Rectangle {
         inputName.enabled = flag;
         searchButton.enabled = flag;
         friendID.enabled = flag;
-    }
-
-    function isExistsFriend(name){
-        var fileName = qmlInterface.clientName + "-friends.txt";
-        if(fileOperator.openFile(fileName)){
-            var friends = fileOperator.readFriends();
-            fileOperator.closeFile();
-            console.log("in qml: " + friends);
-            return checkFriends(name, friends);
-            //addFriends(friends);
-        }
     }
 
     function checkFriends(name, friends){
