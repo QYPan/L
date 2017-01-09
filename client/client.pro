@@ -6,7 +6,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    clientmap.cpp \
     clientsocket.cpp \
     datastruct.cpp \
     myeventfilter.cpp \
@@ -24,7 +23,6 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    clientmap.h \
     clientsocket.h \
     datastruct.h \
     myeventfilter.h \

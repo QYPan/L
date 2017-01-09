@@ -10,8 +10,6 @@ Item {
     id: root
     width: parent.width
     height: parent.height
-    signal friendsListSetNoteNumber(int val) // 通讯录页面管理
-    signal friendsListDealType(int type, string message)
     property bool isMailListLoad: false
 
     Rectangle {
@@ -108,13 +106,10 @@ Item {
         Tab {
             id: tab1
             title: qsTr("消息")
-            /*
             MessageList {
                 id: messageList
                 anchors.fill: parent
             }
-            */
-            source: "MessageList.qml"
         }
         Tab {
             id: tab2
@@ -123,13 +118,7 @@ Item {
                 id: friendsList
                 anchors.fill: parent
                 onLoaded: {
-                    root.isMailListLoad = true;
-                    root.friendsListSetNoteNumber.connect(friendsList.setNoteNumber);
-                    root.friendsListDealType.connect(friendsList.dealType);
-                    friendsList.setNoteNumber(cacheText.getCount(CacheText.NEW_FRIEND));
-                    //var message = cacheText.pull(CacheText.NEW_FRIEND);
-                    //cacheText.clear(CacheText.NEW_FRIEND);
-                    //friendsList.deal(message);
+                    friendsList.addFriends(cacheText.pullFriendsList());
                 }
             }
         }
@@ -192,35 +181,29 @@ Item {
         }
     }
 
-    FileOperator {
-        id: fileOperator
-    }
-
-    Component.onCompleted: { // 从本地加载好友列表
+    Component.onCompleted: { // 加载好友列表
+        qmlInterface.qmlSendData(QmlInterface.ADD_ALL, ""); // 发送获取好友列表请求
+        /*
         var fileName = qmlInterface.clientName + "-friends.txt";
         if(fileOperator.openFile(fileName)){
             var friends = fileOperator.readFriends();
             fileOperator.closeFile();
             if(friends === ""){ // 好友列表尚未保存在本地
-                qmlInterface.qmlSendData(QmlInterface.ADD_ALL, ""); // 发送获取好友列表请求
             }
         }
+        */
     }
 
     function deal(type, message){
         var top = stackView.depth-1;
         if(type === QmlInterface.ADD_ONE_SUCCESSED){
-            root.friendsListDealType(type, message);
         }else if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
             if(stackView.get(top).pageName === "searchFriendsPage"){ // 栈顶为查找好友页面
                 stackView.get(top).searchResult(type, message); // 交给查找页面处理
             }
         }else if(type === QmlInterface.ADD_ALL_SUCCESSED){ // 从服务器获取好友列表成功
-            setFriends(message); // 把好友信息写入本地
+            cacheText.initFriendsList(message);
         }else if(type === QmlInterface.ADD_ONE){ // 是一个好友请求
-            console.log("opp: " + message);
-            cacheText.push(CacheText.NEW_FRIEND, message); // 先把消息加入缓存
-            root.friendsListSetNoteNumber(cacheText.getCount(CacheText.NEW_FRIEND));
         }
     }
 

@@ -1,6 +1,5 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
-import ClientMap 1.0
 import FileOperator 1.0
 
 Item {
@@ -30,7 +29,7 @@ Item {
     }
 
     Component.onCompleted: { // 从本地加载消息列表
-        messageListView.model.insert(0, {"title" : "simple1", "numberValue" : "23"})
-        messageListView.model.insert(0, {"title" : "simple2", "numberValue" : "3"})
+        //messageListView.model.insert(0, {"title" : "simple1", "numberValue" : "23"})
+        //messageListView.model.insert(0, {"title" : "simple2", "numberValue" : "3"})
     }
 }

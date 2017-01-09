@@ -15,7 +15,6 @@ ApplicationWindow {
         anchors.fill: parent
         onLoginSuccessed: {
             visible = false;
-            console.log("after login: " + qmlInterface.clientLanguage);
             stackView.push(Qt.resolvedUrl("content/MainTab.qml"));
         }
     }

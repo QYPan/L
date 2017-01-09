@@ -4,7 +4,6 @@
 #include <QQmlContext>
 #include <QDebug>
 #include "qmlinterface.h"
-#include "clientmap.h"
 #include "myeventfilter.h"
 #include "fileoperator.h"
 #include "cachetext.h"
@@ -15,12 +14,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<QmlInterface>("QmlInterface", 1, 0, "QmlInterface"); // 注册 socket 接口类
     qmlRegisterType<FileOperator>("FileOperator", 1, 0, "FileOperator"); // 注册文件操作接口类
     qmlRegisterType<CacheText>("CacheText", 1, 0, "CacheText"); // 注册缓存操作接口类
-    qmlRegisterType<ClientMap>("ClientMap", 1, 0, "ClientMap");
 
     QQmlApplicationEngine engine;
     MyEventFilter *backKeyFilter = new MyEventFilter;
     engine.rootContext()->setContextProperty("qmlInterface", new QmlInterface); // 定义接口实例
-    engine.rootContext()->setContextProperty("cacheText", new CacheText); // 定义实例
+    engine.rootContext()->setContextProperty("fileOperator", new FileOperator); // 定义文件操作实例
+    engine.rootContext()->setContextProperty("cacheText", new CacheText); // 定义缓存实例
     engine.rootContext()->setContextProperty("backKeyFilter", backKeyFilter); // 处理移动设备返回键
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
