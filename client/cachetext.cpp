@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <QDebug>
+#include <QDir>
+#include <QTextStream>
 
 CacheText::CacheText(QObject *parent)
     : QObject(parent)
@@ -61,11 +63,15 @@ int CacheText::removeFriend(const QString &name){
     int index = 0;
     for(; it != friendsList.end(); it++, index++){
         if(it.key() == name){
+            qDebug() << "remove: " << name;
             break;
         }
     }
-    friendsList.erase(friendsList.find(name));
-    return index;
+    if(it != friendsList.end()){
+        friendsList.erase(it);
+        return index;
+    }
+    return -1;
 }
 
 void CacheText::initFriendsList(const QString &friends){
@@ -92,4 +98,101 @@ QString CacheText::pullFriendsList(){
     QString friends = friendslist.join('#');
     qDebug() << "friends: " << friends;
     return friends;
+}
+
+void CacheText::clearAll(){
+    messageList.clear();
+    friendsList.clear();
+}
+
+void CacheText::saveFriends(const QString &name){
+    //QString path = QDir::currentPath()+"/"+name+"-friends.txt";
+    QString path = name+"-friends.txt";
+    QFile file(path);
+    qDebug() << "friends save in: " << path;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    for(auto it = friendsList.begin(); it != friendsList.end(); it++){
+        out << it.key() << ":" << it.value() << '\n';
+    }
+    file.close();
+}
+
+void CacheText::loadToCache(const QString &name){
+    QString path = name+"-cache.txt";
+    QFile file(path);
+    qDebug() << "cache save in: " << path;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QString str_type, message;
+        splitString(line, 0, str_type);
+        splitString(line, 1, message);
+        int type = str_type.toInt();
+        qDebug() << "push: " << type << ":" << message;
+        push(type, message);
+    }
+    file.close();
+    file.remove();
+}
+
+void CacheText::saveCache(const QString &name){
+    QString path = name+"-cache.txt";
+    QFile file(path);
+    qDebug() << "cache save in: " << path;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    QHashIterator<int, QStringList> it(messageList);
+    while (it.hasNext()) {
+        it.next();
+        for(auto item : it.value()){
+            out << it.key() << ":" << item << '\n';
+        }
+    }
+}
+
+void CacheText::setClient(const QString &name, const QString &password){
+    QString path = name+".txt";
+    QFile file(path);
+    qDebug() << "client save in: " << path;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    out << name << '\n' << password << '\n';
+    file.close();
+}
+
+void CacheText::saveAll(const QString &name){
+    saveFriends(name);
+    saveCache(name);
+    clearAll();
+}
+
+void CacheText::splitString(const QString &str, int k, QString &sub){
+    int count = 0;
+    int beg = 0;
+    for(int i= 0; i < str.size(); i++){
+        if(str[i] == ':' || i == str.size()-1){
+            if(count == k){
+                sub = str.mid(beg, i-beg);
+                return;
+            }
+            else{
+                beg = i + 1;
+                count++;
+                if(count == 2)
+                    break;
+            }
+        }
+    }
+    if(beg == str.size()) sub = "";
+    else sub = str.mid(beg);
 }

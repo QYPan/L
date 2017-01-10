@@ -67,6 +67,67 @@ Item {
                 }
             }
 
+            Rectangle {
+                id: confirmDialog
+                height: root.height * 0.2
+                visible: false
+                anchors.centerIn: parent
+                z: 20
+                gradient: Gradient {
+                            GradientStop {position: 0.0; color: "#969696"}
+                            GradientStop {position: 1.0; color: "#242424"}
+                }
+                Item {
+                    id: textBackground
+                    width: parent.width
+                    height: parent.height / 2
+                    Text {
+                        id: dialogMessage
+                        anchors.centerIn: parent
+                    }
+                }
+                Item {
+                    width: parent.width
+                    height: parent.height / 2
+                    anchors.top: textBackground.bottom
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: confirmDialog.width * 0.1
+                        GrayButton {
+                            id: yesButton
+                            text: qsTr("确认");
+                            width: confirmDialog.width * 0.35
+                            height: 90
+                            onClicked: {
+                                inIdPage.setUnLockAll(true);
+                                confirmDialog.visible = false;
+                                stackView.pop();
+                                var index = cacheText.removeFriend(nameitem.text);
+                                if(index !== -1){
+                                    removeFriend(index+1);
+                                    qmlInterface.qmlSendData(QmlInterface.REMOVE_ONE, nameitem.text);
+                                }
+                            }
+                        }
+                        GrayButton {
+                            id: noButton
+                            text: qsTr("取消");
+                            width: confirmDialog.width * 0.35
+                            height: 90
+                            onClicked: {
+                                inIdPage.setUnLockAll(true);
+                                confirmDialog.visible = false;
+                            }
+                        }
+                    }
+                }
+                function setMessageText(message){
+                    dialogMessage.text = message;
+                    var minWidth = dialogMessage.width + 20;
+                    confirmDialog.width = minWidth > root.width / 2 ? minWidth : root.width / 2;
+                }
+            }
+
             Column {
                 id: info
                 //anchors.top: topView.bottom
@@ -119,14 +180,20 @@ Item {
             GrayButton {
                 id: removeButton
                 text: qsTr("删除好友");
-                //visible: nameitem.text != qmlInterface.clientName
                 width: hLine.width
                 height: topView.height
                 anchors.top: sendButton.bottom
                 anchors.topMargin: height
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
+                    confirmDialog.setMessageText("將 "+nameitem.text+"从通讯录中移除？");
+                    confirmDialog.visible = true;
+                    inIdPage.setUnLockAll(false);
                 }
+            }
+            function setUnLockAll(flag){ // 禁止所有组件活动
+                sendButton.enabled = flag;
+                removeButton.enabled = flag;
             }
         }
     }
@@ -180,11 +247,19 @@ Item {
 
     function pullChangeOnFriends(){
         var friends = cacheText.pop(QmlInterface.ADD_ONE_SUCCESSED);
+        var splitFriends;
+        var i;
         if(friends != ""){
-            var splitFriends = friends.split('\n');
-            var i;
+            splitFriends = friends.split('\n');
             for(i = 0; i < splitFriends.length; i++){
                 friendsList.dealType(QmlInterface.ADD_ONE_SUCCESSED, splitFriends[i]);
+            }
+        }
+        friends = cacheText.pop(QmlInterface.REMOVE_ONE);
+        if(friends != ""){
+            splitFriends = friends.split('\n');
+            for(i = 0; i < splitFriends.length; i++){
+                friendsList.dealType(QmlInterface.REMOVE_ONE, splitFriends[i]);
             }
         }
     }
@@ -193,6 +268,11 @@ Item {
         if(type === QmlInterface.ADD_ONE_SUCCESSED){
             var two = message.split("#");
             pushFriend(two[0], parseInt(two[1]));
+        }else if(type === QmlInterface.REMOVE_ONE){
+            var index = cacheText.removeFriend(message);
+            if(index !== -1){
+                removeFriend(index+1);
+            }
         }
     }
 
@@ -227,6 +307,10 @@ Item {
             language = "EN";
         }
         return language;
+    }
+
+    function removeFriend(index){
+        friendsListView.model.remove(index);
     }
 
     function addFriend(index, name, language){

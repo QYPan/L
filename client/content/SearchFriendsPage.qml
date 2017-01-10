@@ -170,20 +170,6 @@ Rectangle {
         friendID.enabled = flag;
     }
 
-    function checkFriends(name, friends){
-        if(friends.length === 0)
-            return false;
-        var splitFriends = friends.split("#");
-        var i;
-        for(i = 0; i < splitFriends.length; i++){
-            var two = splitFriends[i].split(":");
-            if(name === two[0]){
-                return false;
-            }
-        }
-        return true;
-    }
-
     function searchResult(type, message){
         if(type === QmlInterface.SEARCH_SUCCESSED){
             var language;

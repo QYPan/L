@@ -18,7 +18,7 @@ public:
 	friend class Server;
 	enum MessageType {LOGIN, ADD_ONE, ADD_ONE_SUCCESSED, ADD_ONE_FAILURE, ADD_ALL, TRANSPOND,
 	                  ADD_ALL_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED,
-	                  OFFLINE, TRANSPOND_SUCCESSED, REGISTER,
+	                  OFFLINE, TRANSPOND_SUCCESSED, REGISTER, REMOVE_ONE,
 				      REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT, SEARCH_REQUEST, SEARCH_SUCCESSED,
 	                  SEARCH_FAILURE};
 	enum Language {CHINESE, ENGLISH};
@@ -39,6 +39,7 @@ private:
 	void splitData(const string &str, int k, string &sub);
 	void tryRegister(int fd, const string &name, const string &message);
 	void tryAddOne(const string &name, const string &message);
+	void tryRemoveOne(const string &name, const string &oppName);
 	void tryLogin(int fd, const string &name, const string &password);
 	void tryAddAll(int fd, const string &name);
 	void trySearch(int fd, const string &name, const string &oppName);

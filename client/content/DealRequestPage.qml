@@ -153,9 +153,12 @@ Rectangle {
                         answerButton.text = "已接受";
                         answerButton.visible = true;
                         judgeButtonRow.visible = false;
-                        var clanguage = qmlInterface.clientLanguage;
-                        qmlInterface.qmlSendData(QmlInterface.ADD_ONE_SUCCESSED, fname+"#"+clanguage.toString());
-                        root.acceptFriend(fname, ilanguage);
+                        var ok = cacheText.isExists(fname);
+                        if(ok === false){
+                            var clanguage = qmlInterface.clientLanguage;
+                            qmlInterface.qmlSendData(QmlInterface.ADD_ONE_SUCCESSED, fname+"#"+clanguage.toString());
+                            root.acceptFriend(fname, ilanguage);
+                        }
                     }
                 }
                 GrayButton {

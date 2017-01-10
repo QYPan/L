@@ -31,5 +31,6 @@
         <file>content/AddFriendPage.qml</file>
         <file>images/add.png</file>
         <file>content/DealRequestPage.qml</file>
+        <file>content/SystemList.qml</file>
     </qresource>
 </RCC>

@@ -78,8 +78,11 @@ void ManageMsg::handle(int fd, const DataStruct &data){
 		case ADD_ONE:
 			tryAddOne(data.name, data.message);
 			break;
+		case REMOVE_ONE:
+			tryRemoveOne(data.name, data.message);
+			break;
 		case ADD_ONE_SUCCESSED:
-		case ADD_ONE_FAILURE:
+		//case ADD_ONE_FAILURE:
 			dealAddOneAnswer(data.name, data.message, data.mark);
 			break;
 		case ADD_ALL:
@@ -133,6 +136,7 @@ void ManageMsg::dealAddOneAnswer(const string &name, const string &message, Mess
 }
 
 void ManageMsg::trySearch(int fd, const string &name, const string &oppName){
+	cout << "in search" << endl;
 	DataStruct data;
 	char language[5];
 	bool ok = clientdb.checkClient(oppName.data(), NULL, language);
@@ -177,6 +181,18 @@ void ManageMsg::disconnect(int fd){
 		}
 		*/
 	}
+}
+
+void ManageMsg::tryRemoveOne(const string &name, const string &oppName){
+	auto it = nameMapFd.find(oppName);
+	if(it != nameMapFd.end()){ // 如果对方在线
+		DataStruct data;
+		data.name = oppName;
+		data.mark = REMOVE_ONE;
+		data.message = name;
+		writeData(it->second, data);
+	}
+
 }
 
 void ManageMsg::tryAddOne(const string &name, const string &message){

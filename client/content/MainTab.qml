@@ -132,6 +132,9 @@ Item {
         Tab {
             id: tab3
             title: qsTr("系统")
+            SystemList {
+                id: systemPage
+            }
         }
     }
 
@@ -203,7 +206,7 @@ Item {
 
     function deal(type, message){
         var top = stackView.depth-1;
-        if(type === QmlInterface.ADD_ONE_SUCCESSED){
+        if(type === QmlInterface.ADD_ONE_SUCCESSED || type === QmlInterface.REMOVE_ONE){
             if(isMailListLoad == false){ // 通讯录界面还没有加载
                 cacheText.push(type, message); // 缓存消息
             }else{

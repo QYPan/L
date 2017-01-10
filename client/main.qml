@@ -32,4 +32,7 @@ ApplicationWindow {
                          }
                          */
     }
+
+    function tryToLoadClient(){
+    }
 }

@@ -4,7 +4,6 @@ import QtQuick.Window 2.2
 Item {
     id: root
     width: parent.width
-    //height: parent.height * 0.125
     height: Screen.height * 0.1
 
     property string newRequest: "0"

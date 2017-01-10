@@ -16,7 +16,7 @@ class QmlInterface : public QObject
 public:
     enum MessageType {LOGIN, ADD_ONE, ADD_ONE_SUCCESSED, ADD_ONE_FAILURE, ADD_ALL, TRANSPOND
                       , ADD_ALL_SUCCESSED, LOGIN_FAILURE, LOGIN_SUCCESSED
-                      , OFFLINE, TRANSPOND_SUCCESSED, REGISTER
+                      , OFFLINE, TRANSPOND_SUCCESSED, REGISTER, REMOVE_ONE
                       , REGISTER_FAILURE, REGISTER_SUCCESSED, CONNECT, SEARCH_REQUEST, SEARCH_SUCCESSED,
                         SEARCH_FAILURE};
     enum Language {CHINESE, ENGLISH};
