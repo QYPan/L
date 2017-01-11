@@ -14,6 +14,7 @@ SocketThread::SocketThread(QObject *parent)
 bool SocketThread::tryConnect(){
     if(!isRunning()){
         start();
+        qDebug() << "new thread start!";
         return true;
     }
     return false;

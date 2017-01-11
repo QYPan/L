@@ -34,6 +34,7 @@ signals:
     void displayError(int socketError, const QString &message);
     void qmlReadData(int type, const QString &message);
     void sendData(const DataStruct &data);
+    void tryDisconnect();
 public slots:
     void readData(const DataStruct &data);
     void tryLoginOrRegister();

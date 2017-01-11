@@ -12,6 +12,7 @@ Item {
     height: parent.height
     signal setNoteNumber(int val)
     signal changeOnFriends(int type, string message)
+    signal cancellation()
     property bool isMailListLoad: false
 
     Rectangle {
@@ -134,6 +135,9 @@ Item {
             title: qsTr("系统")
             SystemList {
                 id: systemPage
+                onCancellation: {
+                    root.cancellation();
+                }
             }
         }
     }

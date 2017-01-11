@@ -9,13 +9,20 @@ ApplicationWindow {
     width: 900
     height: 690
     title: qsTr("L")
+    id: root
 
-    LoginPage {
-        id: loginpage
+    Loader {
+        id: loadLoginPage
         anchors.fill: parent
+        source: "/content/LoginPage.qml"
+    }
+
+    Connections {
+        target: loadLoginPage.item
         onLoginSuccessed: {
-            visible = false;
-            stackView.push(Qt.resolvedUrl("content/MainTab.qml"));
+            loadLoginPage.source = "";
+            stackView.push(Qt.resolvedUrl("/content/MainTab.qml"));
+            stackView.get(0).cancellation.connect(root.cancellation);
         }
     }
 
@@ -31,6 +38,12 @@ ApplicationWindow {
                                  event.accepted = true;
                          }
                          */
+    }
+
+    function cancellation(){
+        stackView.clear();
+        qmlInterface.tryDisconnect();
+        loadLoginPage.source = "/content/LoginPage.qml";
     }
 
     function tryToLoadClient(){

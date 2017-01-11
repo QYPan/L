@@ -4,8 +4,8 @@ import QmlInterface 1.0
 
 Rectangle {
     id: root
-    width: parent.width
-    height: parent.height
+    //width: parent.width
+    //height: parent.height
     color: "black"
     signal loginSuccessed()
 
@@ -199,6 +199,9 @@ Rectangle {
             if(!isNaN(language)){
                 qmlInterface.clientLanguage = parseInt(message);
             }
+            checkButtonBusy();
+            setUnLockAll(true);
+            inputPassword.text = "";
             loginSuccessed();
         }else{
             showMessage(message);

@@ -32,5 +32,6 @@
         <file>images/add.png</file>
         <file>content/DealRequestPage.qml</file>
         <file>content/SystemList.qml</file>
+        <file>content/TalkPage.qml</file>
     </qresource>
 </RCC>

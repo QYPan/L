@@ -9,6 +9,7 @@ Item {
     id: root
     width: parent.width
     height: parent.height
+    signal cancellation()
 
     ListView {
         id: friendsListView
@@ -65,7 +66,11 @@ Item {
                 id: mouse
                 anchors.fill: parent
                 onClicked: {
-                    if(title == "退出"){
+                    if(title == "注销"){
+                        cacheText.saveAll(qmlInterface.clientName);
+                        cacheText.setClient(qmlInterface.clientName, qmlInterface.clientPassword);
+                        cancellation();
+                    }else if(title == "退出"){
                         cacheText.saveAll(qmlInterface.clientName);
                         cacheText.setClient(qmlInterface.clientName, qmlInterface.clientPassword);
                         Qt.quit();

@@ -19,6 +19,7 @@ void QmlInterface::createSocketThread(){
     //connect(thread, &SocketThread::finished, thread, &SocketThread::deleteLater);
     connect(thread, &SocketThread::error, this, &QmlInterface::displayError);
     connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::tryLoginOrRegister);
+    connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
 }
 
 void QmlInterface::tryConnect(MessageType type){
@@ -82,5 +83,6 @@ void QmlInterface::setClientLanguage(Language language){
 }
 
 void QmlInterface::readData(const DataStruct &data){
+    //qDebug() << "hit: " << data.mark << data.message;
     emit qmlReadData(data.mark, data.message);
 }
