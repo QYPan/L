@@ -7,8 +7,8 @@ Item {
     //height: parent.height * 0.125
     height: Screen.height * 0.1
 
-    property alias text: textitem.text
-    property alias textColor: textitem.color
+    property alias name: nameitem.text
+    property alias message: messageItem.text
     property alias numberText: messageNumber.text
     signal clicked
 
@@ -18,23 +18,38 @@ Item {
         visible: mouse.pressed
     }
 
-    Text {
-        id: textitem
-        width: parent.width - (messageBox.width + 60)
-        color: "white"
-        font.pixelSize: 55
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: 50
-        elide: Text.ElideRight
+    Item {
+        id: personMsg
+        width: parent.width * 0.3
+        height: parent.height
+        Column {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: 50
+            spacing: 5
+            Text {
+                id: nameitem
+                color: "white"
+                width: personMsg.width
+                font.pixelSize: 55
+                elide: Text.ElideRight
+            }
+            Text {
+                id: messageItem
+                width: personMsg.width
+                color: "#c0c0c0"
+                font.pixelSize: 50
+                elide: Text.ElideRight
+            }
+        }
     }
 
     Image {
         id: messageBox
-        width: 50
-        height: 50
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: textitem.right
+        width: nameitem.height
+        height: width
+        anchors.top: parent.top
+        anchors.left: personMsg.right
         anchors.leftMargin: 30
         visible: (messageNumber.text === "0" || // 如果没有缓存消息或者这是一个网络链接出错消息
                   messageNumber.text === "-") ? false : true

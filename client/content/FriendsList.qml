@@ -4,6 +4,7 @@ import QtQuick.Window 2.0
 import FileOperator 1.0
 import QmlInterface 1.0
 import CacheText 1.0
+import "DealRequestLogic.js" as DEAL_REQUEST_LOGIC
 
 Item {
     id: root
@@ -11,6 +12,7 @@ Item {
     height: parent.height
     signal loaded()
     signal setNewFriends(string friends)
+    signal openTalkPage(string name, string language)
 
     Component {
         id: idPage // 个人信息页面
@@ -174,6 +176,7 @@ Item {
                 anchors.topMargin: height
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
+                    root.openTalkPage(cname, clanguage);
                 }
             }
 
@@ -216,13 +219,13 @@ Item {
             newRequest: newRequestText == undefined ? "0" : newRequestText
             onClicked:{
                 if(name == "新的朋友"){
-                    stackView.push(dealRequestView);
+                    stackView.push(DEAL_REQUEST_LOGIC.openDealRequestPage());
                     var newFriends = cacheText.pop(QmlInterface.ADD_ONE);
                     var top = stackView.depth-1;
                     stackView.get(top).dealNewFriends(newFriends);
-                    if(dealRequestView.isLoaded == false){
+                    if(stackView.get(top).isLoaded == false){
                         stackView.get(top).acceptFriend.connect(pushFriend);
-                        dealRequestView.isLoaded = true;
+                        stackView.get(top).isLoaded = true;
                     }
                     newRequestText = "0";
                 }else{

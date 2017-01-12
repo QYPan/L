@@ -5,6 +5,7 @@ import QtQuick.Window 2.0
 import QmlInterface 1.0
 import FileOperator 1.0
 import CacheText 1.0
+import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 
 Item {
     id: root
@@ -12,6 +13,7 @@ Item {
     height: parent.height
     signal setNoteNumber(int val)
     signal changeOnFriends(int type, string message)
+    signal changeMessageList(string name, string language, string message)
     signal cancellation()
     property bool isMailListLoad: false
 
@@ -31,20 +33,12 @@ Item {
         }
     }
 
-    BorderImage {
+    TopBar {
         id: topView
-        border.bottom: 8
-        source: "../images/toolbar.png"
         width: parent.width
         height: Screen.height * 0.07
-
-        Text {
-            font.pixelSize: 100
-            x: 50
-            anchors.verticalCenter: parent.verticalCenter
-            color: "white"
-            text: "L"
-        }
+        title: "L"
+        titleSize: 100
         Rectangle {
             id: addOption
             width: parent.height * 0.6
@@ -112,6 +106,12 @@ Item {
             MessageList {
                 id: messageList
                 anchors.fill: parent
+                onLoaded: {
+                    root.changeMessageList.connect(messageList.changeMessage);
+                }
+                onOpenTalkPage: {
+                    stackView.replace(TALK_PAGE_LOGIC.openTalkPage(name, language));
+                }
             }
         }
         Tab {
@@ -127,6 +127,9 @@ Item {
                     friendsList.pullChangeOnFriends();
                     root.setNoteNumber.connect(friendsList.setNoteNumber);
                     root.changeOnFriends.connect(friendsList.dealType);
+                }
+                onOpenTalkPage: {
+                    stackView.replace(TALK_PAGE_LOGIC.openTalkPage(name, language));
                 }
             }
         }
@@ -222,10 +225,27 @@ Item {
             }
         }else if(type === QmlInterface.ADD_ALL_SUCCESSED){ // 从服务器获取好友列表成功
             cacheText.initFriendsList(message);
+        }else if(type === QmlInterface.TRANSPOND_SUCCESSED){ // 好友信息
+            transpondMessage(message);
         }else if(type === QmlInterface.ADD_ONE){ // 是一个好友请求
-            cacheText.push(type, message);
-            root.setNoteNumber(cacheText.getCount(type));
+        cacheText.push(type, message);
+        root.setNoteNumber(cacheText.getCount(type));
         }
+    }
+
+    function transpondMessage(message){
+        var friend = message.split("#", 2)
+        var toName = friend[0];
+        var toMessage = message.substring(friend[0].length+friend[1].length+2);
+        var ilanguage = parseInt(friend[1]);
+        var language;
+        if(ilanguage == QmlInterface.CHINESE){
+            language = "中文";
+        }else if(ilanguage == QmlInterface.ENGLISH){
+            language = "English";
+        }
+        TALK_PAGE_LOGIC.appendTalkMessage(toName, language, toMessage);
+        root.changeMessageList(toName, language, toMessage);
     }
 
     function setFriends(friends){

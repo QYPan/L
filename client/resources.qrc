@@ -33,5 +33,10 @@
         <file>content/DealRequestPage.qml</file>
         <file>content/SystemList.qml</file>
         <file>content/TalkPage.qml</file>
+        <file>content/TalkPageLogic.js</file>
+        <file>content/TopBar.qml</file>
+        <file>images/headleft.png</file>
+        <file>images/headright.png</file>
+        <file>content/DealRequestLogic.js</file>
     </qresource>
 </RCC>

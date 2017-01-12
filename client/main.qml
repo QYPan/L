@@ -21,6 +21,7 @@ ApplicationWindow {
         target: loadLoginPage.item
         onLoginSuccessed: {
             loadLoginPage.source = "";
+            cacheText.loadToCache(qmlInterface.clientName);
             stackView.push(Qt.resolvedUrl("/content/MainTab.qml"));
             stackView.get(0).cancellation.connect(root.cancellation);
         }

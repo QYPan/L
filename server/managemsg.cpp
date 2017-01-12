@@ -241,9 +241,9 @@ void ManageMsg::tryTranspond(const string &name, const string &message){
 	string oppName; // name 要传消息给 oppName
 	string oppMessage;
 	splitData(message, 0, oppName);
-	splitData(message, 1, oppMessage);
+	oppMessage = message.substr(oppName.length()+1);
 	auto it = nameMapFd.find(oppName);
-	if(it != nameMapFd.end()){
+	if(it != nameMapFd.end()){ // 对方在线
 		DataStruct data;
 		data.name = oppName;
 		data.mark = TRANSPOND_SUCCESSED;

@@ -9,13 +9,7 @@ Item {
     property string newRequest: "0"
     property alias name: nameitem.text
     property alias language: languageitem.text
-    property alias dealRequestView: dealRequestPage
     signal clicked
-
-    DealRequestPage {
-        id: dealRequestPage
-        visible: false
-    }
 
     Rectangle {
         anchors.fill: parent
