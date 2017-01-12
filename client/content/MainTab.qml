@@ -33,12 +33,22 @@ Item {
         }
     }
 
-    TopBar {
+    BorderImage {
         id: topView
+        border.bottom: 8
+        source: "../images/toolbar.png"
         width: parent.width
         height: Screen.height * 0.07
-        title: "L"
-        titleSize: 100
+
+        Text {
+            id: title
+            text: qsTr("L");
+            font.pixelSize: 100
+            x: 50
+            anchors.verticalCenter: parent.verticalCenter
+            color: "white"
+        }
+
         Rectangle {
             id: addOption
             width: parent.height * 0.6
@@ -110,7 +120,7 @@ Item {
                     root.changeMessageList.connect(messageList.changeMessage);
                 }
                 onOpenTalkPage: {
-                    stackView.replace(TALK_PAGE_LOGIC.openTalkPage(name, language));
+                    stackView.push(TALK_PAGE_LOGIC.openTalkPage(name, language));
                 }
             }
         }
@@ -130,6 +140,11 @@ Item {
                 }
                 onOpenTalkPage: {
                     stackView.replace(TALK_PAGE_LOGIC.openTalkPage(name, language));
+                    root.changeMessageList(name, language, "");
+                }
+                onSayHello: {
+                    root.changeMessageList(name, language, "你好！");
+                    TALK_PAGE_LOGIC.appendTalkMessage(name, language, "你好！");
                 }
             }
         }

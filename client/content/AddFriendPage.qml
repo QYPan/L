@@ -5,9 +5,9 @@ import QmlInterface 1.0
 
 Rectangle {
     id: root
+    property string pageName: "addFriendPage"
     property alias titleName: topView.title
     property string oppName: ""
-    property bool isTalkPage: true
     signal sendMessage(string msg)
     color: "#212126"
 

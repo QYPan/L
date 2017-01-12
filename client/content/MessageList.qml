@@ -18,8 +18,10 @@ Item {
             id: client
             name: cname
             message: cmessage
-            numberText: "0"
+            language: clanguage
+            numberText: numberValue
             onClicked:{
+                numberValue = "0";
                 openTalkPage(cname, clanguage);
             }
         }
@@ -61,9 +63,25 @@ Item {
 
     function setMessage(index, message){
         messageListView.model.setProperty(index, "cmessage", message);
+        var item = messageListView.model.get(index);
+        var top = stackView.depth - 1;
+        console.log(stackView.get(top).pageName);
+        console.log(stackView.get(top).clientName);
+        console.log(item.cname);
+        if(stackView.get(top).pageName == "talkPage" && stackView.get(top).clientName == item.cname){
+            return;
+        }
+        var number = parseInt(item.numberValue);
+        number++;
+        messageListView.model.setProperty(index, "numberValue", number.toString());
     }
 
     function appendMessage(index, name, language, message){
-        messageListView.model.insert(index, {"cname" : name, "clanguage" : language, "cmessage" : message})
+        if(language == "中文") language = "CN";
+        else if(language == "English") language = "EN";
+        messageListView.model.insert(index, {"cname" : name,
+                                             "clanguage" : language,
+                                             "cmessage" : message,
+                                             "numberValue" : "1"})
     }
 }

@@ -13,6 +13,7 @@ Item {
     signal loaded()
     signal setNewFriends(string friends)
     signal openTalkPage(string name, string language)
+    signal sayHello(string name, string language);
 
     Component {
         id: idPage // 个人信息页面
@@ -208,7 +209,7 @@ Item {
         model: ListModel {
             ListElement {
                 nameText: qsTr("新的朋友")
-                languageText: ""
+                languageText: "C/E"
                 newRequestText: "0"
             }
         }
@@ -318,5 +319,8 @@ Item {
 
     function addFriend(index, name, language){
         friendsListView.model.insert(index, {"nameText" : name, "languageText" : language});
+        if(name != qmlInterface.clientName){
+            sayHello(name, language);
+        }
     }
 }

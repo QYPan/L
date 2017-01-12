@@ -8,7 +8,7 @@ Item {
 
     property string newRequest: "0"
     property alias name: nameitem.text
-    property alias language: languageitem.text
+    property alias language: languageItem.text
     signal clicked
 
     Rectangle {
@@ -17,24 +17,30 @@ Item {
         visible: mouse.pressed
     }
 
+    Rectangle {
+        id: headImage
+        width: root.height * 0.8
+        height: width
+        color: "#dddddd"
+        anchors.left: parent.left
+        anchors.leftMargin: 40
+        anchors.verticalCenter: parent.verticalCenter
+        Text {
+            id: languageItem
+            color: "black"
+            font.pixelSize: 80
+            anchors.centerIn: parent
+        }
+    }
+
     Text {
         id: nameitem
         color: "white"
-        width: downLine.x - 5
         font.pixelSize: 55
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: 50
-        elide: Text.ElideRight
-    }
-
-    Rectangle {
-        id: downLine
-        x: parent.width * 0.55
-        width: 1
-        height: parent.height * 0.2
-        anchors.verticalCenter: parent.verticalCenter
-        color: "#424246"
+        anchors.left: headImage.right
+        anchors.leftMargin: 40
+        //elide: Text.ElideRight
     }
 
     Image {
@@ -42,7 +48,7 @@ Item {
         width: 50
         height: 50
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: downLine.right
+        anchors.left: nameitem.right
         anchors.leftMargin: 50
         visible: (root.newRequest === "0" // 如果没有新好友请求
                   ? false : true)
@@ -57,16 +63,6 @@ Item {
         }
     }
 
-    Text {
-        id: languageitem
-        color: "white"
-        font.pixelSize: 50
-        visible: languageitem.text != ""
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: downLine.right
-        anchors.leftMargin: 50
-    }
-
     Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
@@ -76,6 +72,7 @@ Item {
     }
 
     Image {
+        id: nextItem
         width: 70
         height: 70
         anchors.right: parent.right

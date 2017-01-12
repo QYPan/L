@@ -9,6 +9,7 @@ Item {
 
     property alias name: nameitem.text
     property alias message: messageItem.text
+    property alias language: languageItem.text
     property alias numberText: messageNumber.text
     signal clicked
 
@@ -18,39 +19,55 @@ Item {
         visible: mouse.pressed
     }
 
+    Rectangle {
+        id: headImage
+        width: root.height * 0.8
+        height: width
+        color: "#dddddd"
+        anchors.left: parent.left
+        anchors.leftMargin: 40
+        anchors.verticalCenter: parent.verticalCenter
+        Text {
+            id: languageItem
+            color: "black"
+            font.pixelSize: 80
+            anchors.centerIn: parent
+        }
+    }
+
     Item {
         id: personMsg
-        width: parent.width * 0.3
-        height: parent.height
-        Column {
-            anchors.verticalCenter: parent.verticalCenter
+        width: parent.width * 0.5
+        height: headImage.height
+        anchors.left: headImage.right
+        anchors.leftMargin: 40
+        Text {
+            id: nameitem
+            anchors.top: parent.top
             anchors.left: parent.left
-            anchors.leftMargin: 50
-            spacing: 5
-            Text {
-                id: nameitem
-                color: "white"
-                width: personMsg.width
-                font.pixelSize: 55
-                elide: Text.ElideRight
-            }
-            Text {
-                id: messageItem
-                width: personMsg.width
-                color: "#c0c0c0"
-                font.pixelSize: 50
-                elide: Text.ElideRight
-            }
+            color: "white"
+            width: personMsg.width
+            font.pixelSize: 55
+            elide: Text.ElideRight
+        }
+        Text {
+            id: messageItem
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            color: "#c0c0c0"
+            font.pixelSize: 50
+            elide: Text.ElideRight
         }
     }
 
     Image {
         id: messageBox
-        width: nameitem.height
+        width: headItem.width
         height: width
         anchors.top: parent.top
-        anchors.left: personMsg.right
-        anchors.leftMargin: 30
+        anchors.topMargin: 10
+        anchors.right: headImage.right
+        anchors.rightMargin: 20
         visible: (messageNumber.text === "0" || // 如果没有缓存消息或者这是一个网络链接出错消息
                   messageNumber.text === "-") ? false : true
         source: "../images/messageBox.png"
