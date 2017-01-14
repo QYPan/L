@@ -133,9 +133,6 @@ Item {
 
             Column {
                 id: info
-                //anchors.top: topView.bottom
-                //anchors.topMargin: topView.height
-                //anchors.horizontalCenter: parent.horizontalCenter
                 anchors.centerIn: parent
                 spacing: 50
                 Item {

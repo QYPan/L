@@ -35,5 +35,9 @@
         <file>content/AddClientPage.qml</file>
         <file>content/DealRequestPage.qml</file>
         <file>content/DealRequestLogic.js</file>
+        <file>content/PersonalDataPage.qml</file>
+        <file>content/GrayCheckDialog.qml</file>
+        <file>content/TalkPage.qml</file>
+        <file>content/TalkPageLogic.js</file>
     </qresource>
 </RCC>

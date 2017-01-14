@@ -7,6 +7,7 @@ import CacheText 1.0
 
 Item {
     id: root
+    signal messageClicked(string name, int language)
 
     Rectangle {
         color: "#212126"
@@ -25,6 +26,27 @@ Item {
             language: languageText
             message: messageText
             newMessage: newMessageNumber
+            onClicked: {
+                newMessageNumber = "0";
+                root.messageClicked(name, modelLanguage(languageText));
+            }
+        }
+    }
+
+    function modelLanguage(la){
+        if(la == "CN"){
+            //return qmlInterface.CHINESE;
+            return 0;
+        }else{
+            //return qmlInterface.ENGLISH;
+            return 1;
+        }
+    }
+
+    function removeItem(name){
+        var index = findItem(name);
+        if(index != -1){
+            messageListView.model.remove(index);
         }
     }
 
@@ -52,14 +74,12 @@ Item {
         messageListView.model.setProperty(index, "messageText", message);
         var item = messageListView.model.get(index);
         var top = stackView.depth - 1;
-        /*
         if(stackView.get(top).pageName == "talkPage" && stackView.get(top).clientName == item.nameText){
             return;
         }
-        var number = parseInt(item.numberValue);
+        var number = parseInt(item.newMessageNumber);
         number++;
-        messageListView.model.setProperty(index, "numberValue", number.toString());
-        */
+        messageListView.model.setProperty(index, "newMessageNumber", number.toString());
     }
 
     function appendMessage(index, name, language, message){
@@ -69,9 +89,15 @@ Item {
         }else if(language === QmlInterface.ENGLISH){
             slanguage = "EN";
         }
+        var value;
+        if(qmlInterface.clientName == name){
+            value = "0";
+        }else{
+            value = "1";
+        }
         messageListView.model.insert(index, {"nameText" : name,
                                              "languageText" : slanguage,
                                              "messageText" : message,
-                                             "newMessageNumber" : "1"})
+                                             "newMessageNumber" : value})
     }
 }

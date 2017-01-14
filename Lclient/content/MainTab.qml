@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
 import QmlInterface 1.0
+import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 
 Item {
     id: root
@@ -82,6 +83,9 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: tabButtons.top
+        onMessageClicked: {
+            root.openTalkPage(name, language, false);
+        }
     }
 
     AddressList {
@@ -91,8 +95,14 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: tabButtons.top
-        Component.onCompleted: {
-            sayHello.connect(messageList.addMessage);
+        onSayHello: {
+            root.sayHello(name, language, message);
+        }
+        onDeleteFriend: {
+            root.removeFriend(name);
+        }
+        onOpenTalkPage: {
+            root.openTalkPage(name, language, true);
         }
     }
 
@@ -219,7 +229,40 @@ Item {
             case QmlInterface.ADD_ONE_SUCCESSED: // 对方同意请求
                 addNewFriend(message);
                 break;
+            case QmlInterface.REMOVE_ONE:
+                removeFriend(message);
+                break;
+            case QmlInterface.TRANSPOND:
+                receiveMessage(message);
+                break;
         }
+    }
+
+    function receiveMessage(message){
+        var friend = message.split("#", 2);
+        var fname = friend[0];
+        var flanguage = friend[1];
+        var fmessage = message.substring(fname.length+flanguage.length+2);
+        messageList.addMessage(fname, parseInt(flanguage), fmessage);
+        TALK_PAGE_LOGIC.appendTalkMessage(fname, parseInt(flanguage), fmessage);
+    }
+
+    function openTalkPage(name, language, flag){
+        if(flag){
+            stackView.replace(TALK_PAGE_LOGIC.openTalkPage(name, language));
+        }else{
+            stackView.push(TALK_PAGE_LOGIC.openTalkPage(name, language));
+        }
+    }
+
+    function removeFriend(name){
+        addressList.tryRemoveFriend(name);
+        messageList.removeItem(name);
+        TALK_PAGE_LOGIC.tryRemovePage(name);
+    }
+
+    function sayHello(name, language, message){
+        messageList.addMessage(name, language, message);
     }
 
     function addNewFriend(message){
@@ -230,6 +273,7 @@ Item {
         messageList.addMessage(name, language, "你好！");
         var index = cacheText.addFriend(name, language);
         addressList.addFriend(index+1, name, addressList.getLanguage(language));
+        TALK_PAGE_LOGIC.appendTalkMessage(name, language, "你好！");
     }
 
     function dealAddOne(type, message){

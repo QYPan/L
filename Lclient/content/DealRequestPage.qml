@@ -30,13 +30,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         clip: true
-        model: ListModel {
-            ListElement {
-                nameText: "fuck"
-                languageText: "EN"
-                messageText: "im your friend juak"
-            }
-        }
+        model: ListModel {}
         delegate: Item {
             width: parent.width
             height: Screen.height * 0.1

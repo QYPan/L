@@ -246,7 +246,7 @@ void ManageMsg::tryTranspond(const string &name, const string &message){
 	if(it != nameMapFd.end()){ // 对方在线
 		DataStruct data;
 		data.name = oppName;
-		data.mark = TRANSPOND_SUCCESSED;
+		data.mark = TRANSPOND;
 		data.message = name;
 		data.message.append(1u, seg_char);
 		data.message.append(oppMessage);

@@ -9,10 +9,19 @@ import "DealRequestLogic.js" as DEAL_REQUEST_LOGIC
 Item {
     id: root
     signal sayHello(string name, int language, string message)
+    signal deleteFriend(string name)
+    signal openTalkPage(string name, int language)
 
     Rectangle {
         color: "#212126"
         anchors.fill: parent
+    }
+
+    onDeleteFriend: {
+        var ok = tryRemoveFriend(name);
+        if(ok){
+            qmlInterface.qmlSendData(QmlInterface.REMOVE_ONE, name);
+        }
     }
 
     ListView {
@@ -35,6 +44,26 @@ Item {
             onClicked: {
                 if(name == "新的朋友"){
                     openRequestPage();
+                }else{
+                    openPersonalDataPage();
+                }
+            }
+
+            function openPersonalDataPage(){
+                stackView.push(Qt.resolvedUrl("PersonalDataPage.qml"));
+                var top = stackView.depth - 1;
+                stackView.get(top).name = name;
+                stackView.get(top).language = modelLanguage(language);
+                stackView.get(top).canDelete = qmlInterface.clientName != name;
+                stackView.get(top).goDeleteFriend.connect(root.deleteFriend);
+                stackView.get(top).openTalkPageRequest.connect(root.openTalkPage);
+            }
+
+            function modelLanguage(la){
+                if(la == "CN"){
+                    return "中文";
+                }else{
+                    return "English";
                 }
             }
 
@@ -50,6 +79,15 @@ Item {
                 newRequestText = "0";
             }
         }
+    }
+
+    function tryRemoveFriend(name){
+        var index = cacheText.removeFriend(name);
+        if(index !== -1){
+            friendsListView.model.remove(index+1);
+            return true;
+        }
+        return false;
     }
 
     function pushFriend(name, language){

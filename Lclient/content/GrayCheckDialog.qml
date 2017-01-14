@@ -4,6 +4,8 @@ Rectangle {
     id: root
     property alias textSize: dialogMessage.font.pointSize
     signal buttonClicked()
+    signal yesClicked()
+    signal noClicked()
     z: 30
     gradient: Gradient {
                 GradientStop {position: 0.0; color: "#969696"}
@@ -22,17 +24,34 @@ Rectangle {
         width: parent.width
         height: parent.height / 2
         anchors.top: textBackground.bottom
-        GrayButton {
-            id: dialogButton
-            text: qsTr("确 定")
-            width: parent.width * 0.7
-            height: parent.height * 0.55
-            anchors.centerIn: parent;
-            onClicked: {
-                buttonClicked();
+        Row {
+            anchors.centerIn: parent
+            spacing: 15
+            GrayButton {
+                id: yesButton
+                text: qsTr("确 定")
+                textSize: 11
+                width: root.width * 0.3
+                height: width * 0.4
+                onClicked: {
+                    buttonClicked();
+                    yesClicked();
+                }
+            }
+            GrayButton {
+                id: noButton
+                text: qsTr("取 消")
+                textSize: 11
+                width: root.width * 0.3
+                height: width * 0.4
+                onClicked: {
+                    buttonClicked();
+                    noClicked();
+                }
             }
         }
     }
+
     function setMessageText(message){
         dialogMessage.text = message;
         var minWidth = dialogMessage.width + 20;

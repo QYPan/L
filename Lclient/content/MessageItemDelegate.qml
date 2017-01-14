@@ -3,12 +3,12 @@ import QtQuick.Window 2.0
 
 Item {
     id: root
-    signal clicked
     property string newMessage: "0"
     property real margins: Screen.height * 0.07
     property alias name: nameItem.text
     property alias language: languageItem.text
     property alias message: messageItem.text
+    signal clicked
 
     Rectangle {
         anchors.fill: parent
@@ -54,11 +54,13 @@ Item {
     Text {
         id: messageItem
         text: messageText
+        width: parent.width * 0.5
         color: "#c0c0c0"
         font.pointSize: 13
         anchors.bottom: headImage.bottom
         anchors.left: headImage.right
         anchors.leftMargin: margins * 0.3
+        elide: Text.ElideRight
     }
 
     Image {
@@ -96,7 +98,7 @@ Item {
         id: mouse
         anchors.fill: parent
         onClicked: {
-            root.clicked;
+            root.clicked();
         }
     }
 
