@@ -1,4 +1,5 @@
 import QtQuick 2.5
+import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
 import QmlInterface 1.0
 
@@ -8,18 +9,11 @@ Window {
     height: 480
     title: qsTr("Hello World")
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            qmlInterface.qmlSendData(textEdit.text);
-        }
-    }
-
     Text {
         id: socketState
         anchors.top: parent.top
         font.pointSize: 25
-        text: "state: disconnect"
+        text: "state: init"
     }
 
     Text {
@@ -60,6 +54,19 @@ Window {
             anchors.margins: -10
             color: "transparent"
             border.width: 1
+        }
+    }
+
+    Button {
+        id: pushButton
+        anchors.top: textEdit.bottom
+        anchors.topMargin: 20
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width * 0.5
+        height: textEdit.height
+        text: "发送"
+        onClicked: {
+            qmlInterface.qmlSendData(textEdit.text);
         }
     }
 }

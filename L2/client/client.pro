@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += core qml quick network
+QT += core qml quick network testlib
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11

@@ -4,38 +4,85 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <errno.h>
 #include <stdio.h>
 #include <netinet/in.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <string.h>
+
+fd_set readfds;
+
+int heartCount[1200];
+int max_fd;
+int min_client_fd = 1200;
+
+int server_sockfd, client_sockfd;
+
+void initHeartCount(){
+	for(int i = 0; i < 1200; i++){
+		heartCount[i] = 1;
+	}
+}
+
+void *checkHeart(void *arg){
+	while(1){
+		sleep(5);
+		for(int fd = min_client_fd; fd <= max_fd; fd++){
+			if(fd != server_sockfd){
+				if(heartCount[fd]){
+					heartCount[fd] = 0;
+				}else{
+					close(fd);
+					FD_CLR(fd, &readfds);
+					printf("client on fd %d timeout\n", fd);
+				}
+			}
+		}
+	}
+	return ((void *)0);
+}
 
 int main()
 {
-    int server_sockfd, client_sockfd;
     int server_len, client_len;
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
     int result;
-	int max_fd;
-    fd_set readfds, testfds;
+
+	pthread_t tid;
+    fd_set testfds;
 
 /*  Create and name a socket for the server.  */
 
     server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(server_sockfd == -1){
+		perror("socket");
+		exit(1);
+	}
+
+	int on = 1;
+	setsockopt(server_sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(9734);
     server_len = sizeof(server_address);
 
-    bind(server_sockfd, (struct sockaddr *)&server_address, server_len);
+    if(bind(server_sockfd, (struct sockaddr *)&server_address, server_len) == -1){
+		perror("bind");
+		exit(1);
+	}
 
 /*  Create a connection queue and initialize readfds to handle input from server_sockfd.  */
 
-    listen(server_sockfd, 5);
+    if(listen(server_sockfd, 5) == -1){
+		perror("listen");
+		exit(1);
+	}
 
     FD_ZERO(&readfds);
     FD_SET(server_sockfd, &readfds);
@@ -44,6 +91,14 @@ int main()
 /*  Now wait for clients and requests.
     Since we have passed a null pointer as the timeout parameter, no timeout will occur.
     The program will exit and report an error if select returns a value of less than 1.  */
+
+	initHeartCount();
+
+	int err = pthread_create(&tid, NULL, checkHeart, NULL);
+	if(err != 0){
+		perror("thread");
+		exit(1);
+	}
 
     while(1) {
         int fd;
@@ -75,6 +130,7 @@ int main()
                         (struct sockaddr *)&client_address, (socklen_t *)&client_len);
                     FD_SET(client_sockfd, &readfds);
 					if(client_sockfd > max_fd) max_fd = client_sockfd;
+					if(client_sockfd < min_client_fd) min_client_fd = client_sockfd;
                     printf("adding client on fd %d\n", client_sockfd);
                 }
 
@@ -94,6 +150,7 @@ int main()
                     else {
 						char str[1000] = {0};
                         int count = read(fd, str, sizeof(str));
+						heartCount[fd]++;
 						printf("count: %d\n", count);
 						printf("get data from client %d: %s\n", fd, str);
                         write(fd, str, strlen(str));

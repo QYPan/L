@@ -18,8 +18,12 @@ ClientSocket::ClientSocket(QObject *parent)
 }
 
 void ClientSocket::sendData(const QString &data){
-    qDebug() << "send data: " << data;
-    write(data.toUtf8().data(), data.length());
+    if(state() == QAbstractSocket::ConnectedState){
+        qDebug() << "send data: " << data;
+        write(data.toUtf8().data(), data.length());
+    }else{
+        qDebug() << "socket is disconnected";
+    }
 }
 
 void ClientSocket::onError(){

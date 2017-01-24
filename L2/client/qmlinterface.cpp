@@ -1,4 +1,5 @@
 #include "qmlinterface.h"
+#include <QTest>
 
 QmlInterface::QmlInterface(QObject *parent)
     : QObject(parent)
@@ -10,15 +11,26 @@ QmlInterface::QmlInterface(QObject *parent)
 
 void QmlInterface::createSocketThread(){
     thread = new SocketThread(this);
-    //connect(thread, &SocketThread::finished, thread, &SocketThread::deleteLater);
+    connect(thread, &SocketThread::finished, this, &QmlInterface::reconnect);
     connect(thread, &SocketThread::error, this, &QmlInterface::displayError);
     //connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::tryLoginOrRegister);
     connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
 }
 
+void QmlInterface::reconnect(){
+    qDebug() << "thread death!";
+    QTest::qWait(3000);
+    tryConnect();
+}
+
 void QmlInterface::tryConnect(){
     if(!thread->tryConnect()){ // 已经连接了
     }
+}
+
+void QmlInterface::socketDisconnected(){
+    emit displayError(-1, "socket disconnected!");
+    emit tryDisconnect(); // 结束 socket 线程
 }
 
 void QmlInterface::getSocketState(QAbstractSocket::SocketState socketState){

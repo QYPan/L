@@ -12,8 +12,9 @@ public:
 signals:
     void readData(const QString &data);
     void getError(int socketError, const QString &message);
-private slots:
+public slots:
     void sendData(const QString &data);
+private slots:
     void onReadyRead();
     void onError();
 private:
