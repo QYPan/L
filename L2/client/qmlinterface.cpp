@@ -13,7 +13,7 @@ void QmlInterface::createSocketThread(){
     thread = new SocketThread(this);
     connect(thread, &SocketThread::finished, this, &QmlInterface::reconnect);
     connect(thread, &SocketThread::error, this, &QmlInterface::displayError);
-    //connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::tryLoginOrRegister);
+    connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::connectSuccessed);
     connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
 }
 
@@ -23,13 +23,18 @@ void QmlInterface::reconnect(){
     tryConnect();
 }
 
+void QmlInterface::connectSuccessed(){
+    getSocketState(QAbstractSocket::ConnectedState);
+    displayError(-2, "no error");
+}
+
 void QmlInterface::tryConnect(){
     if(!thread->tryConnect()){ // 已经连接了
     }
 }
 
 void QmlInterface::socketDisconnected(){
-    emit displayError(-1, "socket disconnected!");
+    emit displayError(-2, "socket disconnected!");
     emit tryDisconnect(); // 结束 socket 线程
 }
 

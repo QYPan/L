@@ -17,15 +17,22 @@ Window {
     }
 
     Text {
-        id: message
+        id: messageSend
         anchors.top: socketState.bottom
         font.pointSize: 25
-        text: "message:"
+        text: "send:"
+    }
+
+    Text {
+        id: messageRecive
+        anchors.top: messageSend.bottom
+        font.pointSize: 25
+        text: "recive:"
     }
 
     Text {
         id: error
-        anchors.top: message.bottom
+        anchors.top: messageRecive.bottom
         font.pointSize: 25
         text: "error: no error"
     }
@@ -33,7 +40,9 @@ Window {
     Connections {
         target: qmlInterface
         onQmlReadData: {
-            message.text = "message: " + data;
+            if(data !== "heart"){
+                messageRecive.text = "recive: " + data;
+            }
         }
         onDisplayError: {
             error.text = "error: " + message;
@@ -67,6 +76,7 @@ Window {
         text: "发送"
         onClicked: {
             qmlInterface.qmlSendData(textEdit.text);
+            messageSend.text = "send: " + textEdit.text;
         }
     }
 }

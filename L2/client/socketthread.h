@@ -14,7 +14,7 @@ public:
     void setClientName(const QString &name);
 signals:
     void error(int socketError, const QString &message);
-    //void connectSuccessed();
+    void connectSuccessed();
 protected:
     void run();
 private:

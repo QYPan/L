@@ -41,13 +41,23 @@ void SocketThread::run(){
     connect(&socket, SIGNAL(disconnected()), m_receiver.data(), SLOT(socketDisconnected()));
     connect(m_receiver.data(), SIGNAL(qmlSendData(QString)), &socket, SLOT(sendData(QString)));
 
-    connect(&timer, &QTimer::timeout, [&](){
-        socket.sendData("heart");
+    int heartCount = 0;
+
+    connect(&socket, &ClientSocket::readData, [&](){
+        heartCount = 0;
     });
 
-    timer.start(2000);
+    connect(&timer, &QTimer::timeout, [&](){
+        socket.sendData("heart");
+        heartCount++;
+        if(heartCount > 1){
+            this->quit();
+        }
+    });
 
-    //emit connectSuccessed();
+    timer.start(3000);
+
+    emit connectSuccessed();
     /*
     connect(&socket, &ClientSocket::getError, m_receiver.data(), &QmlInterface::error);
     connect(&socket, &ClientSocket::readData, m_receiver.data(), &QmlInterface::readData);

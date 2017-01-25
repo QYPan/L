@@ -21,6 +21,7 @@ public slots:
     void getSocketState(QAbstractSocket::SocketState socketState);
     void socketDisconnected(); // socket 断开
     void reconnect(); // 断线重连
+    void connectSuccessed();
 private:
     void tryConnect();
     void createSocketThread();

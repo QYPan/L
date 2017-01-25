@@ -15,6 +15,8 @@
 #include <string.h>
 
 fd_set readfds;
+pthread_mutex_t heart_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t readfds_lock = PTHREAD_MUTEX_INITIALIZER;
 
 int heartCount[1200];
 int max_fd;
@@ -24,21 +26,32 @@ int server_sockfd, client_sockfd;
 
 void initHeartCount(){
 	for(int i = 0; i < 1200; i++){
-		heartCount[i] = 1;
+		heartCount[i] = 0;
 	}
+}
+
+void close_fd(int fd){
+	close(fd);
+	pthread_mutex_lock(&readfds_lock);
+	FD_CLR(fd, &readfds);
+	pthread_mutex_unlock(&readfds_lock);
 }
 
 void *checkHeart(void *arg){
 	while(1){
-		sleep(5);
+		sleep(2);
 		for(int fd = min_client_fd; fd <= max_fd; fd++){
-			if(fd != server_sockfd){
-				if(heartCount[fd]){
-					heartCount[fd] = 0;
+			if(fd != server_sockfd && FD_ISSET(fd,&readfds)){
+				if(heartCount[fd] < 2){
+
+					pthread_mutex_lock(&heart_lock);
+					heartCount[fd]++;
+					pthread_mutex_unlock(&heart_lock);
+
 				}else{
-					close(fd);
-					FD_CLR(fd, &readfds);
-					printf("client on fd %d timeout\n", fd);
+					heartCount[fd] = 0;
+					close_fd(fd);
+					printf("client on fd %d timeout, remove it\n", fd);
 				}
 			}
 		}
@@ -142,15 +155,18 @@ int main()
                     ioctl(fd, FIONREAD, &nread);
 
                     if(nread == 0) {
-                        close(fd);
-                        FD_CLR(fd, &readfds);
+						close_fd(fd);
                         printf("removing client on fd %d\n", fd);
                     }
 
                     else {
 						char str[1000] = {0};
                         int count = read(fd, str, sizeof(str));
-						heartCount[fd]++;
+
+						pthread_mutex_lock(&heart_lock);
+						heartCount[fd] = 0;
+						pthread_mutex_unlock(&heart_lock);
+
 						printf("count: %d\n", count);
 						printf("get data from client %d: %s\n", fd, str);
                         write(fd, str, strlen(str));
