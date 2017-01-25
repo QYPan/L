@@ -32,8 +32,8 @@ void ClientSocket::onError(){
 
 void ClientSocket::onReadyRead(){
     char buffer[1000] = {0};
-    //read(buffer, bytesAvailable());
-    read(buffer, 1000);
+    read(buffer, bytesAvailable());
+    //read(buffer, 1000);
     QString data(buffer);
     emit readData(data);
 }
