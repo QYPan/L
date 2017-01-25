@@ -39,10 +39,10 @@ void close_fd(int fd){
 
 void *checkHeart(void *arg){
 	while(1){
-		sleep(2);
+		sleep(8);
 		for(int fd = min_client_fd; fd <= max_fd; fd++){
 			if(fd != server_sockfd && FD_ISSET(fd,&readfds)){
-				if(heartCount[fd] < 2){
+				if(heartCount[fd] < 1){
 
 					pthread_mutex_lock(&heart_lock);
 					heartCount[fd]++;
@@ -141,10 +141,15 @@ int main()
                     client_len = sizeof(client_address);
                     client_sockfd = accept(server_sockfd, 
                         (struct sockaddr *)&client_address, (socklen_t *)&client_len);
+					pthread_mutex_lock(&readfds_lock);
                     FD_SET(client_sockfd, &readfds);
+					pthread_mutex_unlock(&readfds_lock);
 					if(client_sockfd > max_fd) max_fd = client_sockfd;
 					if(client_sockfd < min_client_fd) min_client_fd = client_sockfd;
                     printf("adding client on fd %d\n", client_sockfd);
+					pthread_mutex_lock(&heart_lock);
+					heartCount[fd] = 0;
+					pthread_mutex_unlock(&heart_lock);
                 }
 
 /*  If it isn't the server, it must be client activity.
