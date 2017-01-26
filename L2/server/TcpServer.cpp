@@ -1,14 +1,43 @@
 #include "TcpServer.h"
 
-TcpServer::TcpServer(){
+TcpServer::TcpServer()
+	: heart_lock(PTHREAD_MUTEX_INITIALIZER)
+	, readfds_lock(PTHREAD_MUTEX_INITIALIZER)
+	, max_fd(-1)
+{
+	FD_ZERO(&readfds);
 }
 
 bool TcpServer::init(){
 	init_address();
+	init_heart_count();
 	if(!init_socket()){
 		return false;
 	}
 	return true;
+}
+
+bool TcpServer::is_client(int fd){
+	if(fd != server_sockfd && FD_ISSET(fd, &readfds)){
+		return true;
+	}
+	return false;
+}
+
+void TcpServer::init_heart_time(int fd){
+	pthread_mutex_lock(&heart_lock);
+	heartCount[fd] = false;
+	pthread_mutex_unlock(&heart_lock);
+}
+
+void TcpServer::set_outtime(int fd){
+	pthread_mutex_lock(&heart_lock);
+	heartCount[fd] = true;
+	pthread_mutex_unlock(&heart_lock);
+}
+
+bool TcpServer::is_outtime(int fd){
+	return heartCount[fd];
 }
 
 bool TcpServer::begin_listen(){
@@ -46,6 +75,30 @@ void TcpServer::init_address(){
 	server_address.sin_port = htons(9658);
 	server_len = sizeof(server_address);
 }
+
+void TcpServer::init_heart_count(){
+	for(int i = 0; i < 1200; i++){
+		heartCount[i] = false;
+	}
+}
+
+void TcpServer::set_fd(int fd){
+	FD_SET(fd, &readfds);
+	if(fd > max_fd)
+		max_fd = fd;
+}
+
+void TcpServer::close_fd(int fd){
+	close(fd);
+	FD_CLR(fd, &readfds);
+}
+
+int TcpServer::try_select(fd_set *testfds){
+	int activity = select(max_fd+1, testfds, (fd_set *)0,
+			              (fd_set *)0, (struct timeval *)0);
+	return activity;
+}
+
 
 TcpServer::~TcpServer(){
 }

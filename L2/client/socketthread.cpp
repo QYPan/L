@@ -2,6 +2,9 @@
 #include "clientsocket.h"
 #include "qmlinterface.h"
 #include <QTcpSocket>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QByteArray>
 #include <QMetaType>
 #include <QTimer>
 #include <QAbstractSocket>
@@ -27,8 +30,8 @@ void SocketThread::run(){
     ClientSocket socket;
     QTimer send_timer, count_timer;
     //socket.connectToHost("118.89.35.51", 60000);
-    //socket.connectToHost("127.0.0.1", 9734);
-    socket.connectToHost("118.89.35.51", 9734);
+    //socket.connectToHost("118.89.35.51", 9734);
+    socket.connectToHost("127.0.0.1", 9658);
     if (!socket.waitForConnected(timeOut)) {
         emit error(socket.error(), socket.errorString());
         return;
@@ -56,7 +59,14 @@ void SocketThread::run(){
     });
 
     connect(&send_timer, &QTimer::timeout, [&](){
-        socket.sendData("heart");
+        QJsonObject heart_json;
+        heart_json.insert("mtype", "SYN");
+        heart_json.insert("dtype", "HEART");
+        QJsonDocument heart_document;
+        heart_document.setObject(heart_json);
+        QByteArray byteArray = heart_document.toJson(QJsonDocument::Compact);
+        QString heart_data(byteArray);
+        socket.sendData(heart_data);
     });
 
     //socket.sendData("heart"); // 连接建立后立即发送第一个心跳
