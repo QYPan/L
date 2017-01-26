@@ -47,13 +47,13 @@ void SocketThread::run(){
     int heartCount = 0;
 
     connect(&socket, &ClientSocket::readData, [&](){
-        heartCount = 0;
+        heartCount = 0; // 接收到数据，心跳置为初始值
     });
 
     connect(&count_timer, &QTimer::timeout, [&](){
         if(!heartCount){
             heartCount = 1;
-        }else{
+        }else{ // 心跳超时
             this->quit();
         }
     });

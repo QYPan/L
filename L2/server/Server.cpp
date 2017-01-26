@@ -83,10 +83,18 @@ void Server::handle_client(int fd){
 				IOManager::ack_heart(fd);
 			}else if(dtype == "REGISTER"){
 				Clientdb::UserInfo userInfo;
-				userInfo.name = value["name"].asString();
-				userInfo.password = value["password"].asString();
-				userInfo.language = value["language"].asString();
-				userInfo.sex = value["sex"].asInt();
+				Json::Value userInfoObj;
+				userInfoObj = value["userInfo"];
+				userInfo.name = userInfoObj["name"].asString();
+				userInfo.password = userInfoObj["password"].asString();
+				userInfo.language = userInfoObj["language"].asString();
+				userInfo.sex = userInfoObj["sex"].asInt();
+				/*
+				cout << "name: " << userInfo.name << endl;
+				cout << "password: " << userInfo.password << endl;
+				cout << "language: " << userInfo.language << endl;
+				cout << "sex: " << userInfo.sex << endl;
+				*/
 				bool res = clientdb.tryInsertClient(userInfo);
 				IOManager::ack_register(fd, res);
 			}

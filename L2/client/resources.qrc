@@ -1,5 +1,32 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>images/add.png</file>
+        <file>images/button_default.png</file>
+        <file>images/button_pressed.png</file>
+        <file>images/downline.png</file>
+        <file>images/headleft.png</file>
+        <file>images/headright.png</file>
+        <file>images/LLogo.png</file>
+        <file>images/messageBox.png</file>
+        <file>images/navigation_next_item.png</file>
+        <file>images/navigation_previous_item.png</file>
+        <file>images/password.png</file>
+        <file>images/passwordall.png</file>
+        <file>images/passworddown.png</file>
+        <file>images/quit.png</file>
+        <file>images/slash.png</file>
+        <file>images/tabs_standard.png</file>
+        <file>images/textinput.png</file>
+        <file>images/title.png</file>
+        <file>images/toolbar.png</file>
+        <file>images/user.png</file>
+        <file>images/userall.png</file>
+        <file>images/userdown.png</file>
+        <file>content/GrayButton.qml</file>
+        <file>content/InitPage.qml</file>
+        <file>content/WordButton.qml</file>
+        <file>content/RegisterPage.qml</file>
+        <file>content/ChoseBox.qml</file>
     </qresource>
 </RCC>

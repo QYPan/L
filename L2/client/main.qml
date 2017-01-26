@@ -1,12 +1,22 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
-import QmlInterface 1.0
+import "content"
 
 ApplicationWindow {
     id: root
     visible: true
-    width: 640
-    height: 480
+    width: 406
+    height: 701
     title: qsTr("L")
+
+    StackView {
+        id: stackView // 实现翻页
+        anchors.fill: parent
+        focus: true
+    }
+
+    Component.onCompleted: {
+        stackView.push(Qt.resolvedUrl("/content/InitPage.qml"));
+    }
 }
