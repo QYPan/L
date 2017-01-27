@@ -1,12 +1,23 @@
 #include "qmlinterface.h"
 #include <QTest>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
 
 QmlInterface::QmlInterface(QObject *parent)
     : QObject(parent)
+    , cacheManager(NULL)
     , thread(NULL)
 {
+    initCacheManager();
     createSocketThread();
     tryConnect();
+}
+
+void QmlInterface::initCacheManager(){
+    cacheManager = new CacheManager(this);
+    connect(cacheManager, &CacheManager::sendData, this, &QmlInterface::sendData);
+    connect(this, &QmlInterface::qmlSendData, cacheManager, &CacheManager::addData);
 }
 
 void QmlInterface::createSocketThread(){
@@ -17,6 +28,22 @@ void QmlInterface::createSocketThread(){
     connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
 }
 
+void QmlInterface::readData(const QString &data){
+    emit qmlReadData(data); // 发给 UI 处理
+    QJsonParseError jsonError;
+    QJsonDocument document = QJsonDocument::fromJson(data.toUtf8(), &jsonError);
+    if(!document.isNull() && (jsonError.error == QJsonParseError::NoError)){
+        QJsonObject obj = document.object();
+        QString mtype = obj.value("mtype").toString();
+        QString dtype = obj.value("dtype").toString();
+        if(mtype == "ACK"){
+            if(dtype != "HEART"){
+                cacheManager->hadReceiveACK(true);
+            }
+        }
+    }
+}
+
 void QmlInterface::reconnect(){
     qDebug() << "thread death!";
     QTest::qWait(3000);
@@ -25,6 +52,7 @@ void QmlInterface::reconnect(){
 
 void QmlInterface::connectSuccessed(){
     getSocketState(QAbstractSocket::ConnectedState);
+    cacheManager->hadReceiveACK(false); // 重新分发未发送成功的数据
     displayError(-2, "no error");
 }
 

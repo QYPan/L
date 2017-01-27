@@ -8,7 +8,8 @@ CONFIG += c++11
 SOURCES += main.cpp \
     qmlinterface.cpp \
     socketthread.cpp \
-    clientsocket.cpp
+    clientsocket.cpp \
+    cachemanager.cpp
 
 RESOURCES += resources.qrc \
     resources.qrc
@@ -38,4 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     qmlinterface.h \
     socketthread.h \
-    clientsocket.h
+    clientsocket.h \
+    cachemanager.h
