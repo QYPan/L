@@ -4,6 +4,9 @@ Rectangle {
     id: root
     color: "black"
     property string pageName: "registerPage"
+    property int textSize1: choseTextSize.sizeC
+    property int textSize2: choseTextSize.sizeE
+
     Column {
         id: all
         anchors.centerIn: parent
@@ -16,7 +19,7 @@ Rectangle {
                 id: registerTagText
                 text: qsTr("欢迎使用 L")
                 color: "white"
-                font.pointSize: 20
+                font.pointSize: textSize2
                 anchors.centerIn: parent
             }
         }
@@ -40,7 +43,7 @@ Rectangle {
             }
             TextInput {
                 id: inputName
-                font.pointSize: 20
+                font.pointSize: textSize2
                 color: "white"
                 width: downLine1.width
                 maximumLength: 16
@@ -81,7 +84,7 @@ Rectangle {
             }
             TextInput {
                 id: inputPassword
-                font.pointSize: 20
+                font.pointSize: textSize2
                 color: "white"
                 echoMode: TextInput.Password
                 width: downLine1.width
@@ -160,7 +163,7 @@ Rectangle {
                     id: languageTag
                     text: qsTr("语言:")
                     color: "white"
-                    font.pointSize: 15
+                    font.pointSize: textSize1
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -183,7 +186,7 @@ Rectangle {
                     id: cnText
                     text: qsTr("中文")
                     color: "white"
-                    font.pointSize: 15
+                    font.pointSize: textSize1
                     anchors.left: cnChose.right
                     anchors.leftMargin: cnChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
@@ -209,7 +212,7 @@ Rectangle {
                     id: enText
                     text: qsTr("English")
                     color: "white"
-                    font.pointSize: 15
+                    font.pointSize: textSize1
                     anchors.left: enChose.right
                     anchors.leftMargin: enChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
@@ -229,7 +232,7 @@ Rectangle {
                     id: sexTag
                     text: qsTr("性别:")
                     color: "white"
-                    font.pointSize: 15
+                    font.pointSize: textSize1
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -252,7 +255,7 @@ Rectangle {
                     id: manText
                     text: qsTr("男")
                     color: "white"
-                    font.pointSize: 15
+                    font.pointSize: textSize1
                     anchors.left: manChose.right
                     anchors.leftMargin: manChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
@@ -278,7 +281,7 @@ Rectangle {
                     id: womanText
                     text: qsTr("女")
                     color: "white"
-                    font.pointSize: 15
+                    font.pointSize: textSize1
                     anchors.left: womanChose.right
                     anchors.leftMargin: womanChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter

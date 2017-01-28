@@ -2,10 +2,14 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
+import QmlInterface 1.0
 
 Rectangle {
     id: root
     color: "black"
+    property int textSize1: choseTextSize.sizeB
+    property int textSize2: choseTextSize.sizeC
+    property int textSize3: choseTextSize.sizeE
 
     Image {
         id: logo
@@ -44,7 +48,7 @@ Rectangle {
             }
             TextInput {
                 id: inputName
-                font.pointSize: 20
+                font.pointSize: textSize3
                 color: "white"
                 width: downLine1.width
                 maximumLength: 16
@@ -85,7 +89,7 @@ Rectangle {
             }
             TextInput {
                 id: inputPassword
-                font.pointSize: 20
+                font.pointSize: textSize3
                 color: "white"
                 echoMode: TextInput.Password
                 width: downLine1.width
@@ -112,7 +116,7 @@ Rectangle {
     GrayButton {
         id: loginButton
         text: qsTr("登 录")
-        textSize: 15
+        textSize: textSize2
         width: uandp.width
         height: width * 0.17
         buttonPressed: true
@@ -120,20 +124,35 @@ Rectangle {
         anchors.topMargin: height * 0.7
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
-            console.log("login clicked");
+            //console.log("login clicked");
+            tryLogin();
         }
     }
 
     WordButton {
         id: registerButton
         text: qsTr("新用户注册")
-        textSize: 13
+        textSize: textSize1
         anchors.right: parent.right
         anchors.rightMargin: loginButton.height * 0.3
         anchors.bottom: parent.bottom
         anchors.bottomMargin: loginButton.height * 0.3
         onClicked: {
             stackView.push(Qt.resolvedUrl("RegisterPage.qml"));
+        }
+    }
+
+    GrayDialog {
+        id: noticeDialog
+        width: parent.width * 0.5
+        height: parent.height * 0.2
+        //textSize: textSize2
+        anchors.centerIn: parent
+        visible: false
+        onButtonClicked: {
+            visible = false;
+            lockAll(false);
+            loginButton.text = qsTr("登 录");
         }
     }
 
@@ -147,9 +166,38 @@ Rectangle {
                     if(stackView.get(top).pageName === "registerPage"){
                         stackView.get(top).handleResult(newData.result);
                     }
+                }else if(newData.dtype === "LOGIN"){
+                    if(newData.result === "yes"){
+                        stackView.replace(Qt.resolvedUrl("MainTab.qml"));
+                    }else{
+                        noticeDialog.setMessageText(qsTr("用户名或密码不正确！"));
+                        noticeDialog.visible = true;
+                        lockAll(true);
+                    }
                 }
             }
         }
+    }
+
+    function tryLogin(){
+        var data = {};
+        var userInfo = {};
+        data.mtype = "SYN";
+        data.dtype = "LOGIN";
+        userInfo.name = inputName.text;
+        userInfo.password = inputPassword.text;
+        data.userInfo = userInfo;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
+        lockAll(true);
+        loginButton.text = qsTr("正在登录...");
+    }
+
+    function lockAll(flag){
+        inputName.enabled = !flag;
+        inputPassword.enabled = !flag;
+        registerButton.enabled = !flag;
+        loginButton.buttonPressed = flag;
     }
 
     function checkInput(){

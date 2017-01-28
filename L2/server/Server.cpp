@@ -25,7 +25,7 @@ bool Server::init(){
 	return true;
 }
 
-void Server::check_heart(){
+void Server::check_heart(){ // 这个是子线程函数
 	for(int fd = 0; fd <= tcpServer.get_max_fd(); fd++){
 		if(tcpServer.is_client(fd)){
 			if(!tcpServer.is_outtime(fd)){
@@ -39,6 +39,7 @@ void Server::check_heart(){
 }
 
 void Server::close_connection(int fd){
+	onlineManager.removeFromMap(fd);
 	tcpServer.close_fd(fd);
 	printf("%d disconnected\n", fd);
 }
@@ -89,14 +90,20 @@ void Server::handle_client(int fd){
 				userInfo.password = userInfoObj["password"].asString();
 				userInfo.language = userInfoObj["language"].asString();
 				userInfo.sex = userInfoObj["sex"].asInt();
-				/*
-				cout << "name: " << userInfo.name << endl;
-				cout << "password: " << userInfo.password << endl;
-				cout << "language: " << userInfo.language << endl;
-				cout << "sex: " << userInfo.sex << endl;
-				*/
-				bool res = clientdb.tryInsertClient(userInfo);
+				bool res = clientdb.insertClient(userInfo);
 				IOManager::ack_register(fd, res);
+			}else if(dtype == "LOGIN"){
+				Clientdb::UserInfo userInfo;
+				Json::Value userInfoObj;
+				userInfoObj = value["userInfo"];
+				string login_name = userInfoObj["name"].asString();
+				string login_password = userInfoObj["password"].asString();
+				bool res = clientdb.findClient(login_name, userInfo);
+				bool ok = (res && (login_password == userInfo.password));
+				IOManager::ack_login(fd, ok);
+				if(ok){
+					onlineManager.addToMap(fd, login_name);
+				}
 			}
 		}
 	}

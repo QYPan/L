@@ -9,7 +9,8 @@ SOURCES += main.cpp \
     qmlinterface.cpp \
     socketthread.cpp \
     clientsocket.cpp \
-    cachemanager.cpp
+    cachemanager.cpp \
+    textsize.cpp
 
 RESOURCES += resources.qrc \
     resources.qrc
@@ -40,4 +41,5 @@ HEADERS += \
     qmlinterface.h \
     socketthread.h \
     clientsocket.h \
-    cachemanager.h
+    cachemanager.h \
+    textsize.h

@@ -16,6 +16,23 @@ void IOManager::readData(int fd, string &data){
 	data = string(buffer);
 }
 
+void IOManager::ack_login(int fd, bool result){
+	char buffer[200] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "LOGIN";
+	if(result){
+		root["result"] = "yes";
+	}else{
+		root["result"] = "no";
+	}
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
 void IOManager::ack_register(int fd, bool result){
 	char buffer[200] = {0};
 	Json::Value root;

@@ -19,8 +19,13 @@ public:
 	Clientdb();
 	~Clientdb();
 	bool init();
-	bool tryInsertClient(const UserInfo &userInfo);
+	bool insertClient(const UserInfo &userInfo);
+	bool removeClient(const string &name);
+	bool insertFriend(const string &cname, const string &fname);
+	bool removeFriend(const string &cname, const string &fname);
+	bool findClient(const string &name, UserInfo &userInfo);
 private:
+	void setClient(MYSQL_ROW &sqlrow, UserInfo &userInfo);
 	MYSQL client_conn;
 };
 

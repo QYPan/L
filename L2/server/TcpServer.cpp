@@ -83,14 +83,18 @@ void TcpServer::init_heart_count(){
 }
 
 void TcpServer::set_fd(int fd){
+	pthread_mutex_lock(&readfds_lock);
 	FD_SET(fd, &readfds);
+	pthread_mutex_unlock(&readfds_lock);
 	if(fd > max_fd)
 		max_fd = fd;
 }
 
 void TcpServer::close_fd(int fd){
 	close(fd);
+	pthread_mutex_lock(&readfds_lock);
 	FD_CLR(fd, &readfds);
+	pthread_mutex_unlock(&readfds_lock);
 }
 
 int TcpServer::try_select(fd_set *testfds){

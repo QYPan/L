@@ -10,8 +10,10 @@
 class QmlInterface : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(TextSize)
 public:
     QmlInterface(QObject *parent = 0);
+    enum TextSize {SizeA=13, SizeB=15, SizeC=20, SizeD, SizeE, SizeF, SizeG};
 signals:
     void sendData(const QString &data);
     void qmlSendData(const QString &data);

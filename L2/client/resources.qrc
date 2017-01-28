@@ -28,5 +28,8 @@
         <file>content/WordButton.qml</file>
         <file>content/RegisterPage.qml</file>
         <file>content/ChoseBox.qml</file>
+        <file>content/MainTab.qml</file>
+        <file>content/TopBar.qml</file>
+        <file>content/GrayDialog.qml</file>
     </qresource>
 </RCC>
