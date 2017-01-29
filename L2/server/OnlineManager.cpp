@@ -16,7 +16,7 @@ void OnlineManager::addToMap(int fd, const string &name){
 void OnlineManager::removeFromMap(int fd){
 	auto it = fdMapName.find(fd);
 	if(it != fdMapName.end()){
-		string name = it->scond;
+		string name = it->second;
 		fdMapName.erase(fd);
 		nameMapFd.erase(name);
 	}

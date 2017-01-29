@@ -11,9 +11,21 @@ class QmlInterface : public QObject
 {
     Q_OBJECT
     Q_ENUMS(TextSize)
+    Q_PROPERTY(int sex READ sex WRITE setSex NOTIFY sexChanged)
+    Q_PROPERTY(QString clientName READ clientName WRITE setClientName NOTIFY clientNameChanged)
+    Q_PROPERTY(QString clientPassword READ clientPassword WRITE setClientPassword NOTIFY clientPasswordChanged)
+    Q_PROPERTY(QString clientLanguage READ clientLanguage WRITE setClientLanguage NOTIFY clientLanguageChanged)
 public:
     QmlInterface(QObject *parent = 0);
     enum TextSize {SizeA=13, SizeB=15, SizeC=20, SizeD, SizeE, SizeF, SizeG};
+    QString clientName() const;
+    void setClientName(const QString &name);
+    QString clientLanguage() const;
+    void setClientLanguage(const QString &language);
+    QString clientPassword() const;
+    void setClientPassword(const QString &password);
+    int sex() const;
+    void setSex(int s);
 signals:
     void sendData(const QString &data);
     void qmlSendData(const QString &data);
@@ -21,6 +33,11 @@ signals:
     void qmlGetSocketState(const QString &stateMessage);
     void displayError(int socketError, const QString &message);
     void tryDisconnect();
+
+    void sexChanged(int s);
+    void clientNameChanged(const QString &name);
+    void clientPasswordChanged(const QString &password);
+    void clientLanguageChanged(const QString &language);
 public slots:
     void readData(const QString &data);
     void getSocketState(QAbstractSocket::SocketState socketState);
@@ -33,6 +50,10 @@ private:
     void initCacheManager();
     CacheManager *cacheManager;
     SocketThread *thread;
+    QString m_name;
+    QString m_password;
+    QString m_language;
+    int m_sex;
 };
 
 #endif // QMLINTERFACE_H

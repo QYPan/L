@@ -159,24 +159,42 @@ Rectangle {
     Connections {
         target: qmlInterface
         onQmlReadData: {
-            var newData = JSON.parse(data);
-            if(newData.mtype === "ACK"){
-                if(newData.dtype === "REGISTER"){
-                    var top = stackView.depth - 1;
-                    if(stackView.get(top).pageName === "registerPage"){
-                        stackView.get(top).handleResult(newData.result);
-                    }
-                }else if(newData.dtype === "LOGIN"){
-                    if(newData.result === "yes"){
-                        stackView.replace(Qt.resolvedUrl("MainTab.qml"));
-                    }else{
-                        noticeDialog.setMessageText(qsTr("用户名或密码不正确！"));
-                        noticeDialog.visible = true;
-                        lockAll(true);
-                    }
+            dealResult(data);
+        }
+    }
+
+    function dealResult(data){
+        var newData = JSON.parse(data);
+        if(newData.mtype === "ACK"){
+            if(newData.dtype === "REGISTER"){
+                var top = stackView.depth - 1;
+                if(stackView.get(top).pageName === "registerPage"){
+                    stackView.get(top).handleResult(newData.result);
+                }
+            }else if(newData.dtype === "LOGIN"){
+                if(newData.result === "yes"){
+                    saveUserInfo(newData.userInfo);
+                    stackView.replace(Qt.resolvedUrl("MainTab.qml"));
+                }else{
+                    noticeDialog.setMessageText(qsTr("用户名或密码不正确！"));
+                    noticeDialog.visible = true;
+                    lockAll(true);
                 }
             }
         }
+    }
+
+    function saveUserInfo(userInfo){
+        /*
+        console.log(userInfo.name);
+        console.log(userInfo.password);
+        console.log(userInfo.language);
+        console.log(userInfo.sex);
+        */
+        qmlInterface.clientName = userInfo.name;
+        qmlInterface.clientPassword = userInfo.password;
+        qmlInterface.clientLanguage = userInfo.language;
+        qmlInterface.sex = userInfo.sex;
     }
 
     function tryLogin(){

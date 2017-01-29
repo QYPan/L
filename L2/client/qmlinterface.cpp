@@ -93,3 +93,35 @@ void QmlInterface::getSocketState(QAbstractSocket::SocketState socketState){
     }
     emit qmlGetSocketState(stateString);
 }
+
+QString QmlInterface::clientName() const{
+    return m_name;
+}
+
+void QmlInterface::setClientName(const QString &name){
+    m_name = name;
+}
+
+QString QmlInterface::clientPassword() const{
+    return m_password;
+}
+
+void QmlInterface::setClientPassword(const QString &password){
+    m_password = password;
+}
+
+QString QmlInterface::clientLanguage() const{
+    return m_language;
+}
+
+void QmlInterface::setClientLanguage(const QString &language){
+    m_language = language;
+}
+
+int QmlInterface::sex() const{
+    return m_sex;
+}
+
+void QmlInterface::setSex(int s){
+    m_sex = s;
+}

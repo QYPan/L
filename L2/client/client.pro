@@ -10,7 +10,8 @@ SOURCES += main.cpp \
     socketthread.cpp \
     clientsocket.cpp \
     cachemanager.cpp \
-    textsize.cpp
+    textsize.cpp \
+    signalmanager.cpp
 
 RESOURCES += resources.qrc \
     resources.qrc
@@ -42,4 +43,5 @@ HEADERS += \
     socketthread.h \
     clientsocket.h \
     cachemanager.h \
-    textsize.h
+    textsize.h \
+    signalmanager.h

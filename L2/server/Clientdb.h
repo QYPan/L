@@ -5,12 +5,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <vector>
+#include <json/json.h>
 #include "mysql.h"
 using namespace std;
 
 class Clientdb{
 public:
 	struct UserInfo {
+		UserInfo()
+			: name("")
+			, password("")
+			, language("")
+			, sex(-1)
+		{}
 		string name;
 		string password;
 		string language;
@@ -23,7 +31,9 @@ public:
 	bool removeClient(const string &name);
 	bool insertFriend(const string &cname, const string &fname);
 	bool removeFriend(const string &cname, const string &fname);
+	bool getFriends(const string &name, vector<UserInfo> &linkmans);
 	bool findClient(const string &name, UserInfo &userInfo);
+	void appendFriend(MYSQL_ROW &sqlrow, vector<UserInfo> &linkmans);
 private:
 	void setClient(MYSQL_ROW &sqlrow, UserInfo &userInfo);
 	MYSQL client_conn;

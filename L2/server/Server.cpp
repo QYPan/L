@@ -1,8 +1,9 @@
 #include "Server.h"
 #include "IOManager.h"
 #include <stdio.h>
+#include <vector>
 #include <sys/ioctl.h>
-#include <json/json.h>
+using namespace std;
 
 Server::Server(){
 }
@@ -44,7 +45,7 @@ void Server::close_connection(int fd){
 	printf("%d disconnected\n", fd);
 }
 
-void Server::deal_fd(int fd){
+void Server::handle_fd(int fd){
 
 	if(fd == tcpServer.get_fd()){ // 有新连接
 
@@ -78,37 +79,57 @@ void Server::handle_client(int fd){
 	Json::Value value;
 	if(reader.parse(data, value)){
 		string mtype = value["mtype"].asString(); // 请求 or 应答
-		string dtype = value["dtype"].asString(); // 消息类型
 		if(mtype == "SYN"){
-			if(dtype == "HEART"){
-				IOManager::ack_heart(fd);
-			}else if(dtype == "REGISTER"){
-				Clientdb::UserInfo userInfo;
-				Json::Value userInfoObj;
-				userInfoObj = value["userInfo"];
-				userInfo.name = userInfoObj["name"].asString();
-				userInfo.password = userInfoObj["password"].asString();
-				userInfo.language = userInfoObj["language"].asString();
-				userInfo.sex = userInfoObj["sex"].asInt();
-				bool res = clientdb.insertClient(userInfo);
-				IOManager::ack_register(fd, res);
-			}else if(dtype == "LOGIN"){
-				Clientdb::UserInfo userInfo;
-				Json::Value userInfoObj;
-				userInfoObj = value["userInfo"];
-				string login_name = userInfoObj["name"].asString();
-				string login_password = userInfoObj["password"].asString();
-				bool res = clientdb.findClient(login_name, userInfo);
-				bool ok = (res && (login_password == userInfo.password));
-				IOManager::ack_login(fd, ok);
-				if(ok){
-					onlineManager.addToMap(fd, login_name);
-				}
-			}
+			handle_syn(fd, value);
 		}
 	}
 }
 
+void Server::handle_syn(int fd, const Json::Value &value){
+	string dtype = value["dtype"].asString(); // 消息类型
+	if(dtype == "HEART"){
+		IOManager::ack_heart(fd);
+	}else if(dtype == "REGISTER"){
+		handle_syn_register(fd, value);
+	}else if(dtype == "LOGIN"){
+		handle_syn_login(fd, value);
+	}else if(dtype == "LINKMANS"){ // 获取好友列表
+		handle_syn_linkmans(fd, value);
+	}
+}
+
+void Server::handle_syn_linkmans(int fd, const Json::Value &value){
+	string clientName = value["clientName"].asString();
+	vector<Clientdb::UserInfo> linkmans;
+	bool res = clientdb.getFriends(clientName, linkmans);
+	IOManager::ack_linkmans(fd, res, linkmans);
+}
+
+void Server::handle_syn_register(int fd, const Json::Value &value){
+	Clientdb::UserInfo userInfo;
+	Json::Value userInfoObj;
+	userInfoObj = value["userInfo"];
+	userInfo.name = userInfoObj["name"].asString();
+	userInfo.password = userInfoObj["password"].asString();
+	userInfo.language = userInfoObj["language"].asString();
+	userInfo.sex = userInfoObj["sex"].asInt();
+	bool res = clientdb.insertClient(userInfo);
+	IOManager::ack_register(fd, res);
+}
+
+void Server::handle_syn_login(int fd, const Json::Value &value){
+	Clientdb::UserInfo userInfo;
+	Json::Value userInfoObj;
+	userInfoObj = value["userInfo"];
+	string login_name = userInfoObj["name"].asString();
+	string login_password = userInfoObj["password"].asString();
+	bool res = clientdb.findClient(login_name, userInfo);
+	bool ok = (res && (login_password == userInfo.password));
+	IOManager::ack_login(fd, ok, userInfo);
+	if(ok){
+		onlineManager.addToMap(fd, login_name);
+	}
+}
 
 bool Server::loop(){
 	while(true){
@@ -121,7 +142,7 @@ bool Server::loop(){
 		int max_fd = tcpServer.get_max_fd();
 		for(int fd = 0; fd <= max_fd; fd++){
 			if(FD_ISSET(fd, &testfds)){
-				deal_fd(fd);
+				handle_fd(fd);
 			}
 		}
 	}

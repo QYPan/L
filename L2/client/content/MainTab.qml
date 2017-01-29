@@ -106,6 +106,7 @@ Rectangle {
         Tab {
             id: linkmanTab
             title: qsTr("联系人")
+            source: "LinkmanList.qml"
         }
         Tab {
             id: systemTab
@@ -143,6 +144,30 @@ Rectangle {
                     }
                 }
             }
+        }
+    }
+
+    Connections { // 所有消息入口
+        target: qmlInterface
+        onQmlReadData: {
+            dealResult(data);
+        }
+    }
+
+    function dealResult(data){
+        var newData = JSON.parse(data);
+        if(newData.mtype === "ACK"){
+            if(newData.dtype === "LINKMANS"){
+                handleLinkmans(newData.linkmans);
+            }
+        }
+    }
+
+    function handleLinkmans(linkmans){
+        var i;
+        for(i = 0; i < linkmans.length; i++){
+            signalManager.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            //console.log(linkmans[i].name+" "+linkmans[i].language+" "+linkmans[i].sex);
         }
     }
 }

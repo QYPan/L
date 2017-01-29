@@ -86,6 +86,53 @@ bool Clientdb::removeFriend(const string &name, const string &fname){
 	}
 }
 
+bool Clientdb::getFriends(const string &name, vector<UserInfo> &linkmans){
+	MYSQL_RES *res_ptr;
+	MYSQL_ROW sqlrow;
+	char sql_sentence[200];
+	sprintf(sql_sentence, "SELECT cname, language, sex FROM clients WHERE cname IN \
+			(SELECT fname FROM friends WHERE cname = '%s')", name.c_str());
+	int res = mysql_query(&client_conn, sql_sentence);
+	if(res){
+		printf("SELECT error in frineds table: %s\n", mysql_error(&client_conn));
+		return false;
+	}else{
+		bool ok = false;
+		res_ptr = mysql_use_result(&client_conn);
+		if(res_ptr){
+			while((sqlrow = mysql_fetch_row(res_ptr))){
+				appendFriend(sqlrow, linkmans);
+				ok = true;
+			}
+			if(mysql_errno(&client_conn)){
+				printf("Retrive error in clients table: %s\n", mysql_error(&client_conn));
+			}
+			mysql_free_result(res_ptr);
+		}
+		return ok;
+	}
+}
+
+void Clientdb::appendFriend(MYSQL_ROW &sqlrow, vector<UserInfo> &linkmans){
+	unsigned int field_count = 0;
+	UserInfo userInfo;
+	while(field_count < mysql_field_count(&client_conn)){ // 提取列
+		switch(field_count){
+			case 0: // cname
+				userInfo.name = string(sqlrow[field_count]);
+				break;
+			case 1: // language
+				userInfo.language = string(sqlrow[field_count]);
+				break;
+			case 2: // sex
+				sscanf(sqlrow[field_count], "%d", &userInfo.sex);
+				break;
+		}
+		field_count++;
+	}
+	linkmans.push_back(userInfo);
+}
+
 bool Clientdb::findClient(const string &name, UserInfo &userInfo){
 	MYSQL_RES *res_ptr;
 	MYSQL_ROW sqlrow;

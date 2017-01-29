@@ -31,5 +31,7 @@
         <file>content/MainTab.qml</file>
         <file>content/TopBar.qml</file>
         <file>content/GrayDialog.qml</file>
+        <file>content/LinkmanList.qml</file>
+        <file>content/LinkmanItemDelegate.qml</file>
     </qresource>
 </RCC>

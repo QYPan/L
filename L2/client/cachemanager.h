@@ -15,7 +15,7 @@ public:
 signals:
     void sendData(const QString &data);
 private:
-    QList<QString> dataList;
+    QList<QString> dataList; // 待发送的消息(JSON 字符串)
 };
 
 #endif // CACHEMANAGER_H

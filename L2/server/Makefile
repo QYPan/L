@@ -9,7 +9,7 @@ TcpServer.o : TcpServer.h TcpServer.cpp
 	g++ -c -std=c++11 -Wall TcpServer.cpp $(link)
 Clientdb.o : Clientdb.h Clientdb.cpp
 	g++ -c -std=c++11 -Wall Clientdb.cpp $(link)
-IOManager.o : IOManager.h IOManager.cpp
+IOManager.o : Clientdb.h IOManager.h IOManager.cpp
 	g++ -c -std=c++11 -Wall IOManager.cpp $(link)
 OnlineManager.o : OnlineManager.h OnlineManager.cpp
 	g++ -c -std=c++11 -Wall OnlineManager.cpp $(link)
