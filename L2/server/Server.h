@@ -21,6 +21,10 @@ private:
 	void handle_syn_register(int fd, const Json::Value &value);
 	void handle_syn_login(int fd, const Json::Value &value);
 	void handle_syn_linkmans(int fd, const Json::Value &value);
+	void handle_syn_search_client(int fd, const Json::Value &value);
+	void handle_syn_ready(int fd, const Json::Value &value);
+	void handle_syn_verify(int fd, const Json::Value &value);
+	void handle_ack(int fd, const Json::Value &value);
 	TcpServer tcpServer;
 	OnlineManager onlineManager;
 	Clientdb clientdb;

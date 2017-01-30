@@ -8,7 +8,7 @@ BorderImage {
     source: "../images/toolbar.png"
     property alias title: title.text
     property alias titleSize: title.font.pointSize
-    signal back();
+    signal backed();
 
     Rectangle {
         id: backButton
@@ -30,7 +30,7 @@ BorderImage {
             anchors.fill: parent
             //anchors.margins: -10
             onClicked:{
-                root.back();
+                root.backed();
             }
         }
     }

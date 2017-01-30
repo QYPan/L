@@ -13,8 +13,10 @@ class OnlineManager{
 public:
 	OnlineManager();
 	~OnlineManager();
+	int isOnline(const string &name);
 	void addToMap(int fd, const string &name);
 	void removeFromMap(int fd);
+	void removeFromMap(const string &name);
 private:
 	void init();
 	map<int, string> fdMapName;

@@ -10,7 +10,11 @@ class SignalManager : public QObject
 public:
     SignalManager(QObject *parent = 0);
 signals:
-    void addLinkman(const QString &name, const QString &language, int sex);
+    void addLinkman(int index, const QString &name, const QString &language, int sex);
+    void searchResult(const QString &data);
+    void getLinkmans();
+    void verifyAck();
+    void setLinkmans(const QString &linkmans);
 };
 
 #endif // SIGNALMANAGER_H

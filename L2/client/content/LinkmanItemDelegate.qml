@@ -13,7 +13,7 @@ Item {
     property int textSize3: choseTextSize.sizeC
     property int textSize4: 9
 
-    signal clicked
+    signal clicked()
 
     Rectangle {
         anchors.fill: parent

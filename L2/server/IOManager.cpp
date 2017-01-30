@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+map<string, list<string> > IOManager::syn_caches;
+
 IOManager::IOManager(){
 }
 
@@ -16,13 +18,72 @@ void IOManager::readData(int fd, string &data){
 	data = string(buffer);
 }
 
+int IOManager::count_syn(const string &name){
+	auto &msg_list = syn_caches[name];
+	return msg_list.size();
+}
+
+void IOManager::handle_ack(int fd, const string &name){
+	auto &msg_list = syn_caches[name];
+	if(!msg_list.empty()){
+		msg_list.pop_front(); // 移除前一条消息
+		send_syn(fd, name); // 发送下一条消息
+	}
+}
+
+void IOManager::send_syn(int fd, const string &name){
+	auto &msg_list = syn_caches[name];
+	if(!msg_list.empty()){
+		char buffer[1000] = {0};
+		strcpy(buffer, msg_list.front().c_str());
+		write(fd, buffer, sizeof(buffer));
+	}
+}
+
+void IOManager::cache_syn_verify(const string &name, const Clientdb::UserInfo &userInfo, const string &msg){
+	Json::Value root;
+	root["mtype"] = "SYN";
+	root["dtype"] = "VERIFY";
+	Json::Value juserInfo;
+	juserInfo["name"] = userInfo.name;
+	juserInfo["language"] = userInfo.language;
+	juserInfo["sex"] = userInfo.sex;
+	root["userInfo"] = juserInfo;
+	root["verifyMsg"] = msg;
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+	auto &msg_list = syn_caches[name];
+	msg_list.push_back(strOut);
+}
+
+
+void IOManager::ack_search_client(int fd, bool result, const Clientdb::UserInfo &userInfo){
+	char buffer[200] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "SEARCH_CLIENT";
+	root["result"] = result;
+	if(result){
+		Json::Value juserInfo;
+		juserInfo["name"] = userInfo.name;
+		juserInfo["language"] = userInfo.language;
+		juserInfo["sex"] = userInfo.sex;
+		root["userInfo"] = juserInfo;
+	}
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
 void IOManager::ack_linkmans(int fd, bool result, const vector<Clientdb::UserInfo> &linkmans){
 	char buffer[1000] = {0};
 	Json::Value root;
 	root["mtype"] = "ACK";
 	root["dtype"] = "LINKMANS";
+	root["result"] = result;
 	if(result){
-		root["result"] = "yes";
 		Json::Value arrayObj;
 		for(auto it : linkmans){
 			Json::Value item;
@@ -32,8 +93,6 @@ void IOManager::ack_linkmans(int fd, bool result, const vector<Clientdb::UserInf
 			arrayObj.append(item);
 		}
 		root["linkmans"] = arrayObj;
-	}else{
-		root["result"] = "no";
 	}
 	Json::FastWriter writer;
 	string strOut = writer.write(root);
@@ -42,21 +101,22 @@ void IOManager::ack_linkmans(int fd, bool result, const vector<Clientdb::UserInf
 	write(fd, buffer, sizeof(buffer));
 }
 
-void IOManager::ack_login(int fd, bool result, const Clientdb::UserInfo &userInfo){
+void IOManager::ack_login(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo){
 	char buffer[200] = {0};
 	Json::Value root;
 	root["mtype"] = "ACK";
 	root["dtype"] = "LOGIN";
+	root["result"] = result;
 	if(result){
-		root["result"] = "yes";
-		Json::Value juserInfo;
-		juserInfo["name"] = userInfo.name;
-		juserInfo["password"] = userInfo.password;
-		juserInfo["language"] = userInfo.language;
-		juserInfo["sex"] = userInfo.sex;
-		root["userInfo"] = juserInfo;
-	}else{
-		root["result"] = "no";
+		root["logined"] = logined;
+		if(!logined){
+			Json::Value juserInfo;
+			juserInfo["name"] = userInfo.name;
+			juserInfo["password"] = userInfo.password;
+			juserInfo["language"] = userInfo.language;
+			juserInfo["sex"] = userInfo.sex;
+			root["userInfo"] = juserInfo;
+		}
 	}
 	Json::FastWriter writer;
 	string strOut = writer.write(root);
@@ -70,11 +130,33 @@ void IOManager::ack_register(int fd, bool result){
 	Json::Value root;
 	root["mtype"] = "ACK";
 	root["dtype"] = "REGISTER";
-	if(result){
-		root["result"] = "yes";
-	}else{
-		root["result"] = "no";
-	}
+	root["result"] = result;
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
+void IOManager::ack_ready(int fd){
+	char buffer[100] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "READY";
+
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
+void IOManager::ack_verify(int fd){
+	char buffer[100] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "VERIFY";
+
 	Json::FastWriter writer;
 	string strOut = writer.write(root);
 

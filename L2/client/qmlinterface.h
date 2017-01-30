@@ -10,14 +10,16 @@
 class QmlInterface : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(TextSize)
     Q_PROPERTY(int sex READ sex WRITE setSex NOTIFY sexChanged)
     Q_PROPERTY(QString clientName READ clientName WRITE setClientName NOTIFY clientNameChanged)
     Q_PROPERTY(QString clientPassword READ clientPassword WRITE setClientPassword NOTIFY clientPasswordChanged)
     Q_PROPERTY(QString clientLanguage READ clientLanguage WRITE setClientLanguage NOTIFY clientLanguageChanged)
 public:
     QmlInterface(QObject *parent = 0);
-    enum TextSize {SizeA=13, SizeB=15, SizeC=20, SizeD, SizeE, SizeF, SizeG};
+    Q_INVOKABLE int addLinkman(const QString &name, const QString &language, int sex);
+    Q_INVOKABLE int removeLinkman(const QString &name);
+    Q_INVOKABLE bool isLinkman(const QString &name);
+    Q_INVOKABLE QString getLinkmans();
     QString clientName() const;
     void setClientName(const QString &name);
     QString clientLanguage() const;

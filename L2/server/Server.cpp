@@ -81,8 +81,15 @@ void Server::handle_client(int fd){
 		string mtype = value["mtype"].asString(); // 请求 or 应答
 		if(mtype == "SYN"){
 			handle_syn(fd, value);
+		}else if(mtype == "ACK"){
+			handle_ack(fd, value);
 		}
 	}
+}
+
+void Server::handle_ack(int fd, const Json::Value &value){
+	string clientName = value["clientName"].asString();
+	IOManager::handle_ack(fd, clientName);
 }
 
 void Server::handle_syn(int fd, const Json::Value &value){
@@ -91,11 +98,51 @@ void Server::handle_syn(int fd, const Json::Value &value){
 		IOManager::ack_heart(fd);
 	}else if(dtype == "REGISTER"){
 		handle_syn_register(fd, value);
+	}else if(dtype == "READY"){ // 对端已经初始化完毕
+		handle_syn_ready(fd, value);
 	}else if(dtype == "LOGIN"){
 		handle_syn_login(fd, value);
 	}else if(dtype == "LINKMANS"){ // 获取好友列表
 		handle_syn_linkmans(fd, value);
+	}else if(dtype == "SEARCH_CLIENT"){ // 查询用户
+		handle_syn_search_client(fd, value);
+	}else if(dtype == "VERIFY"){ // 添加好友请求
+		handle_syn_verify(fd, value);
 	}
+}
+
+void Server::handle_syn_ready(int fd, const Json::Value &value){
+	IOManager::ack_ready(fd); // 先回应
+	string clientName = value["clientName"].asString();
+	IOManager::send_syn(fd, clientName);
+}
+
+void Server::handle_syn_verify(int fd, const Json::Value &value){
+	IOManager::ack_verify(fd); // 先回应
+	Clientdb::UserInfo userInfo;
+	Json::Value userInfoObj;
+	string oppClientName = value["oppClientName"].asString();
+	string msg = value["verifyMsg"].asString();
+	userInfoObj = value["userInfo"];
+	userInfo.name = userInfoObj["name"].asString();
+	userInfo.language = userInfoObj["language"].asString();
+	userInfo.sex = userInfoObj["sex"].asInt();
+	IOManager::cache_syn_verify(oppClientName, userInfo, msg);
+
+	int opp_fd = onlineManager.isOnline(oppClientName);
+	if(opp_fd != -1){
+		int counts = IOManager::count_syn(oppClientName);
+		if(counts == 1){
+			IOManager::send_syn(opp_fd, oppClientName);
+		}
+	}
+}
+
+void Server::handle_syn_search_client(int fd, const Json::Value &value){
+	string clientName = value["clientName"].asString();
+	Clientdb::UserInfo userInfo;
+	bool res = clientdb.findClient(clientName, userInfo);
+	IOManager::ack_search_client(fd, res, userInfo);
 }
 
 void Server::handle_syn_linkmans(int fd, const Json::Value &value){
@@ -123,10 +170,13 @@ void Server::handle_syn_login(int fd, const Json::Value &value){
 	userInfoObj = value["userInfo"];
 	string login_name = userInfoObj["name"].asString();
 	string login_password = userInfoObj["password"].asString();
+
+	int login_fd = onlineManager.isOnline(login_name);
 	bool res = clientdb.findClient(login_name, userInfo);
 	bool ok = (res && (login_password == userInfo.password));
-	IOManager::ack_login(fd, ok, userInfo);
-	if(ok){
+
+	IOManager::ack_login(fd, ok, login_fd != -1, userInfo);
+	if(ok && (login_fd == -1)){
 		onlineManager.addToMap(fd, login_name);
 	}
 }

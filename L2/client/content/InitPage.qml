@@ -172,9 +172,13 @@ Rectangle {
                     stackView.get(top).handleResult(newData.result);
                 }
             }else if(newData.dtype === "LOGIN"){
-                if(newData.result === "yes"){
+                if(newData.result === true && newData.logined === false){
                     saveUserInfo(newData.userInfo);
                     stackView.replace(Qt.resolvedUrl("MainTab.qml"));
+                }else if(newData.result === true){
+                    noticeDialog.setMessageText(qsTr("无法重复登录！"));
+                    noticeDialog.visible = true;
+                    lockAll(true);
                 }else{
                     noticeDialog.setMessageText(qsTr("用户名或密码不正确！"));
                     noticeDialog.visible = true;

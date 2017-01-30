@@ -75,7 +75,7 @@ Rectangle {
             onClicked: {
                 addButton.visible = false;
                 fillScreenMouse.enabled = false;
-                //stackView.push(Qt.resolvedUrl("SearchClientPage.qml"));
+                stackView.push(Qt.resolvedUrl("SearchClientPage.qml"));
             }
         }
     }
@@ -105,7 +105,7 @@ Rectangle {
         }
         Tab {
             id: linkmanTab
-            title: qsTr("联系人")
+            title: qsTr("通讯录")
             source: "LinkmanList.qml"
         }
         Tab {
@@ -154,20 +154,75 @@ Rectangle {
         }
     }
 
+    Connections {
+        target: signalManager
+        onGetLinkmans: {
+            signalManager.setLinkmans(qmlInterface.getLinkmans());
+        }
+    }
+
+    Component.onCompleted: {
+        requestLinkmans();
+    }
+
     function dealResult(data){
         var newData = JSON.parse(data);
         if(newData.mtype === "ACK"){
-            if(newData.dtype === "LINKMANS"){
+            if(newData.dtype === "LINKMANS"){ // 获取联系人
                 handleLinkmans(newData.linkmans);
+            }else if(newData.dtype === "SEARCH_CLIENT"){ // 查找结果
+                handleSearchClient(data);
+            }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
+                handleVerifyAck();
+            }
+        }else if(newData.mtype === "SYN"){
+            sendAck(); // 应答服务器
+            if(newData.dtype === "VERIFY"){ // 有人向自己发出好友邀请
             }
         }
+    }
+
+    function sendAck(){
+        var data = {};
+        data.mtype = "ACK";
+        data.clientName = qmlInterface.clientName;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
+    }
+
+    function handleVerifyAck(){
+        signalManager.verifyAck();
+    }
+
+    function handleSearchClient(data){
+        signalManager.searchResult(data);
     }
 
     function handleLinkmans(linkmans){
         var i;
         for(i = 0; i < linkmans.length; i++){
-            signalManager.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            qmlInterface.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            //signalManager.addLinkman(i+1, linkmans[i].name, linkmans[i].language, linkmans[i].sex);
             //console.log(linkmans[i].name+" "+linkmans[i].language+" "+linkmans[i].sex);
         }
+        sendReady();
+    }
+
+    function sendReady(){
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "READY";
+        data.clientName = qmlInterface.clientName;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
+    }
+
+    function requestLinkmans() {
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "LINKMANS";
+        data.clientName = qmlInterface.clientName;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
     }
 }

@@ -33,5 +33,8 @@
         <file>content/GrayDialog.qml</file>
         <file>content/LinkmanList.qml</file>
         <file>content/LinkmanItemDelegate.qml</file>
+        <file>content/SearchClientPage.qml</file>
+        <file>content/PersonalDataPage.qml</file>
+        <file>content/VerifyPage.qml</file>
     </qresource>
 </RCC>

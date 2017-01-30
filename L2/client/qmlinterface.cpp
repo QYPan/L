@@ -44,6 +44,10 @@ void QmlInterface::readData(const QString &data){
     }
 }
 
+QString QmlInterface::getLinkmans(){
+    return cacheManager->getLinkmans();
+}
+
 void QmlInterface::reconnect(){
     qDebug() << "thread death!";
     QTest::qWait(3000);
@@ -92,6 +96,18 @@ void QmlInterface::getSocketState(QAbstractSocket::SocketState socketState){
             break;
     }
     emit qmlGetSocketState(stateString);
+}
+
+int QmlInterface::addLinkman(const QString &name, const QString &language, int sex){
+    return cacheManager->addLinkman(name, language, sex);
+}
+
+int QmlInterface::removeLinkman(const QString &name){
+    return cacheManager->removeLinkman(name);
+}
+
+bool QmlInterface::isLinkman(const QString &name){
+    return cacheManager->isLinkman(name);
 }
 
 QString QmlInterface::clientName() const{

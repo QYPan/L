@@ -29,32 +29,48 @@ Item {
             language: itemLanguage
             sex: itemSex
             newRequest: itemNewRequest
+            onClicked: {
+                if(itemName !== qsTr("新的朋友")){
+                    openPersonalDataPage();
+                }
+            }
+            function openPersonalDataPage(){
+                stackView.push(Qt.resolvedUrl("PersonalDataPage.qml"));
+                var top = stackView.depth - 1;
+                stackView.get(top).name = itemName;
+                stackView.get(top).language = itemLanguage;
+                stackView.get(top).sex = itemSex;
+                stackView.get(top).isFriend = true;
+            }
         }
     }
 
     Connections {
         target: signalManager
         onAddLinkman: {
-            addLinkman(name, language, sex);
+            addLinkman(index, name, language, sex);
+        }
+        onSetLinkmans: {
+            setLinkmans(linkmans);
         }
     }
 
     Component.onCompleted: {
-        requestLinkmans();
+        signalManager.getLinkmans();
     }
 
-    function addLinkman(name, language, sex){
-        linkmanList.model.append({"itemName" : name,
+    function setLinkmans(data){
+        var linkmans = JSON.parse(data);
+        var i;
+        for(i = 0; i < linkmans.length; i++){
+            addLinkman(i+1, linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+        }
+    }
+
+    function addLinkman(index, name, language, sex){
+        linkmanList.model.insert(index, {"itemName" : name,
                                   "itemLanguage" : language,
                                   "itemSex" : sex});
     }
 
-    function requestLinkmans() {
-        var data = {};
-        data.mtype = "SYN";
-        data.dtype = "LINKMANS";
-        data.clientName = qmlInterface.clientName;
-        var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
-    }
 }

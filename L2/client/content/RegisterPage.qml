@@ -362,7 +362,7 @@ Rectangle {
     }
 
     function handleResult(result){
-        if(result === "yes"){
+        if(result === true){
             registerTagText.text = qsTr("注册成功！");
             backButton.buttonPressed = false;
         }else{
