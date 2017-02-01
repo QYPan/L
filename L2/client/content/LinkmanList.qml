@@ -30,10 +30,18 @@ Item {
             sex: itemSex
             newRequest: itemNewRequest
             onClicked: {
-                if(itemName !== qsTr("新的朋友")){
+                if(itemName === qsTr("新的朋友")){
+                    openHandleVerifyPage();
+                }else{
                     openPersonalDataPage();
                 }
             }
+
+            function openHandleVerifyPage(){
+                itemNewRequest = 0;
+                signalManager.openHandleVerifyPage();
+            }
+
             function openPersonalDataPage(){
                 stackView.push(Qt.resolvedUrl("PersonalDataPage.qml"));
                 var top = stackView.depth - 1;
@@ -50,13 +58,14 @@ Item {
         onAddLinkman: {
             addLinkman(index, name, language, sex);
         }
-        onSetLinkmans: {
-            setLinkmans(linkmans);
+        onSetRequestNumber: {
+            setRequestNumber(number);
         }
     }
 
     Component.onCompleted: {
-        signalManager.getLinkmans();
+        setLinkmans(qmlInterface.getLinkmans());
+        signalManager.getRequestNumber();
     }
 
     function setLinkmans(data){
@@ -73,4 +82,10 @@ Item {
                                   "itemSex" : sex});
     }
 
+
+    function setRequestNumber(number){
+        if(number){
+            linkmanList.model.setProperty(0, "itemNewRequest", number);
+        }
+    }
 }

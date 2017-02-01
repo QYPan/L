@@ -15,15 +15,16 @@ Rectangle {
     property alias canDelete: deleteButton.visible
     */
 
-    property int textSize1 : 17
-    property int textSize2 : 20
+    property int textSize1 : 15
+    property int textSize2 : 17
+    property int textSize3 : 20
 
     TopBar {
         id: topView
         width: parent.width
         height: Screen.height * 0.07
         title: qsTr("详细资料");
-        titleSize: textSize2
+        titleSize: textSize3
         onBacked: {
             stackView.pop();
         }
@@ -46,7 +47,7 @@ Rectangle {
                     height: topView.height
                     Text {
                         id: nameTextTag
-                        font.pointSize: textSize1
+                        font.pointSize: textSize2
                         text: qsTr("ID :");
                         color: "#dddddd"
                         anchors.left: parent.left
@@ -54,7 +55,7 @@ Rectangle {
                     }
                     Text {
                         id: nameText
-                        font.pointSize: textSize1
+                        font.pointSize: textSize2
                         color: "#c0c0c0"
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
@@ -73,7 +74,7 @@ Rectangle {
                     height: topView.height
                     Text {
                         id: languageTextTag
-                        font.pointSize: textSize1
+                        font.pointSize: textSize2
                         color: "#dddddd"
                         text: qsTr("语言 :");
                         anchors.left: parent.left
@@ -82,7 +83,7 @@ Rectangle {
                     Text {
                         id: languageText
                         text: root.language == "CN" ? "中文" : "English"
-                        font.pointSize: textSize1
+                        font.pointSize: textSize2
                         color: "#c0c0c0"
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
@@ -101,7 +102,7 @@ Rectangle {
                     height: topView.height
                     Text {
                         id: sexTextTag
-                        font.pointSize: textSize1
+                        font.pointSize: textSize2
                         color: "#dddddd"
                         text: qsTr("性别 :");
                         anchors.left: parent.left
@@ -110,7 +111,7 @@ Rectangle {
                     Text {
                         id: sexText
                         text: sex ? qsTr("女") : qsTr("男")
-                        font.pointSize: textSize1
+                        font.pointSize: textSize2
                         color: "#c0c0c0"
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
@@ -144,7 +145,51 @@ Rectangle {
                 text: qsTr("删除联系人");
                 visible: ((!root.isFriend) || (root.name == qmlInterface.clientName))
                          ? false : true
+                onClicked: {
+                    checkRemoveLinkman(nameText.text);
+                }
             }
         }
+    }
+
+    GrayCheckDialog {
+        id: checkDialog
+        anchors.centerIn: parent
+        textSize: textSize1
+        width: parent.width * 0.5
+        height: parent.height * 0.2
+        visible: false
+        onButtonClicked: {
+        }
+        onYesClicked: {
+            visible = false;
+            sendRemoveRequest(nameText.text);
+        }
+        onNoClicked: {
+            visible = false;
+            lockAll(false);
+        }
+    }
+
+    function sendRemoveRequest(name){
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "REMOVE_LINKMAN";
+        data.clientName = qmlInterface.clientName;
+        data.oppName = name;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
+        removeButton.text = qsTr("正在删除...");
+    }
+
+    function checkRemoveLinkman(name){
+        lockAll(true);
+        checkDialog.setMessageText(qsTr("确认删除 ")+name+" ?");
+        checkDialog.visible = true;
+    }
+
+    function lockAll(flag){
+        sendOrAddButton.buttonPressed = flag;
+        removeButton.buttonPressed = flag;
     }
 }

@@ -62,7 +62,7 @@ Item {
 
     Image {
         id: messageBox
-        width: parent.height * 0.35
+        width: Screen.height * 0.07 * 0.4
         height: width
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: nextItem.left

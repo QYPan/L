@@ -40,6 +40,66 @@ void IOManager::send_syn(int fd, const string &name){
 	}
 }
 
+void IOManager::ack_remove_linkman(int fd, const string &name){
+	char buffer[200] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "REMOVE_LINKMAN";
+	root["name"] = name;
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
+void IOManager::ack_bad_accept_verify(int fd, const string &name){
+	char buffer[200] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "ACCEPT_VERIFY";
+	root["result"] = false;
+	root["name"] = name;
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
+void IOManager::cache_syn_accept_verify(int fd, const Clientdb::UserInfo &userInfo, const Clientdb::UserInfo &oppUserInfo){
+	// 告诉 user 已经把 oppUser 加为好友
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "ACCEPT_VERIFY";
+	root["result"] = true;
+	Json::Value juserInfo;
+	juserInfo["name"] = oppUserInfo.name;
+	juserInfo["language"] = oppUserInfo.language;
+	juserInfo["sex"] = oppUserInfo.sex;
+	root["userInfo"] = juserInfo;
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	char buffer[1000] = {0};
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+
+	// 告诉 oppUser 已经把 user 加为好友
+	Json::Value oppRoot;
+	oppRoot["mtype"] = "SYN";
+	oppRoot["dtype"] = "ACCEPT_VERIFY";
+	Json::Value jOppUserInfo;
+	jOppUserInfo["name"] = userInfo.name;
+	jOppUserInfo["language"] = userInfo.language;
+	jOppUserInfo["sex"] = userInfo.sex;
+	root["userInfo"] = jOppUserInfo;
+	Json::FastWriter oppWriter;
+	string oppStrOut = oppWriter.write(oppRoot);
+	auto &opp_msg_list = syn_caches[oppUserInfo.name];
+	opp_msg_list.push_back(oppStrOut);
+}
+
 void IOManager::cache_syn_verify(const string &name, const Clientdb::UserInfo &userInfo, const string &msg){
 	Json::Value root;
 	root["mtype"] = "SYN";
@@ -138,25 +198,15 @@ void IOManager::ack_register(int fd, bool result){
 	write(fd, buffer, sizeof(buffer));
 }
 
-void IOManager::ack_ready(int fd){
+void IOManager::ack_message(int fd, const string &msg){
 	char buffer[100] = {0};
 	Json::Value root;
 	root["mtype"] = "ACK";
-	root["dtype"] = "READY";
-
-	Json::FastWriter writer;
-	string strOut = writer.write(root);
-
-	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
-}
-
-void IOManager::ack_verify(int fd){
-	char buffer[100] = {0};
-	Json::Value root;
-	root["mtype"] = "ACK";
-	root["dtype"] = "VERIFY";
-
+	root["dtype"] = msg;
+	// JSON 转换为 JSON 字符串(已格式化)
+	//string strOut = root.toStyledString();
+	
+	// JSON 转换为 JSON 字符串(未格式化)
 	Json::FastWriter writer;
 	string strOut = writer.write(root);
 

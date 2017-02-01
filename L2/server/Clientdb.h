@@ -33,8 +33,9 @@ public:
 	bool removeFriend(const string &cname, const string &fname);
 	bool getFriends(const string &name, vector<UserInfo> &linkmans);
 	bool findClient(const string &name, UserInfo &userInfo);
-	void appendFriend(MYSQL_ROW &sqlrow, vector<UserInfo> &linkmans);
+	bool findFriend(const string &name, const string &fname);
 private:
+	void appendFriend(MYSQL_ROW &sqlrow, vector<UserInfo> &linkmans);
 	void setClient(MYSQL_ROW &sqlrow, UserInfo &userInfo);
 	MYSQL client_conn;
 };

@@ -2,7 +2,7 @@ import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import QmlInterface 1.0
+import "HandleVerifyLogic.js" as HANDLE_VERIFY_LOGIC
 
 Rectangle {
     id: root
@@ -156,29 +156,64 @@ Rectangle {
 
     Connections {
         target: signalManager
-        onGetLinkmans: {
-            signalManager.setLinkmans(qmlInterface.getLinkmans());
+        onOpenHandleVerifyPage: {
+            stackView.push(HANDLE_VERIFY_LOGIC.openHandleVerifyPage());
+        }
+        onGetRequestNumber: {
+            signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
+        }
+        onHandleAcceptVerify: {
+            handleAcceptVerifySignal(data);
         }
     }
 
     Component.onCompleted: {
         requestLinkmans();
+        HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
+    }
+
+    function handleAcceptVerifySignal(data){
+        var newData = JSON.parse(data);
+        if(newData.result){
+            var userInfo = newData.userInfo;
+            if(!qmlInterface.isLinkman(userInfo.name)){
+                var index = qmlInterface.addLinkman(userInfo.name, userInfo.language, userInfo.sex);
+                signalManager.addLinkman(index, userInfo.name, userInfo.language, userInfo.sex);
+            }
+        }else{
+        }
     }
 
     function dealResult(data){
         var newData = JSON.parse(data);
         if(newData.mtype === "ACK"){
             if(newData.dtype === "LINKMANS"){ // 获取联系人
-                handleLinkmans(newData.linkmans);
+                handleLinkmansAck(newData.linkmans);
             }else if(newData.dtype === "SEARCH_CLIENT"){ // 查找结果
-                handleSearchClient(data);
+                handleSearchClientAck(data);
             }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
                 handleVerifyAck();
+            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 服务器回应好友同意请求
+                handleAcceptVerifyAck(data);
             }
         }else if(newData.mtype === "SYN"){
             sendAck(); // 应答服务器
             if(newData.dtype === "VERIFY"){ // 有人向自己发出好友邀请
+                handleVerifySyn(newData.userInfo, newData.verifyMsg);
+            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 对方已同意好友请求
             }
+        }
+    }
+
+    function handleAcceptVerifyAck(data){
+        signalManager.handleAcceptVerifyAck(data);
+    }
+
+    function handleVerifySyn(userInfo, msg){
+        HANDLE_VERIFY_LOGIC.addVerifyItem(userInfo, msg);
+        var top = stackView.depth - 1;
+        if(stackView.get(top).pageName !== "handleVerifyPage"){
+            signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
         }
     }
 
@@ -194,11 +229,11 @@ Rectangle {
         signalManager.verifyAck();
     }
 
-    function handleSearchClient(data){
+    function handleSearchClientAck(data){
         signalManager.searchResult(data);
     }
 
-    function handleLinkmans(linkmans){
+    function handleLinkmansAck(linkmans){
         var i;
         for(i = 0; i < linkmans.length; i++){
             qmlInterface.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);

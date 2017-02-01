@@ -36,5 +36,8 @@
         <file>content/SearchClientPage.qml</file>
         <file>content/PersonalDataPage.qml</file>
         <file>content/VerifyPage.qml</file>
+        <file>content/HandleVerifyPage.qml</file>
+        <file>content/HandleVerifyLogic.js</file>
+        <file>content/GrayCheckDialog.qml</file>
     </qresource>
 </RCC>

@@ -88,6 +88,7 @@ void Server::handle_client(int fd){
 }
 
 void Server::handle_ack(int fd, const Json::Value &value){
+	IOManager::ack_message(fd, string("ACK_ACK_SYN"));
 	string clientName = value["clientName"].asString();
 	IOManager::handle_ack(fd, clientName);
 }
@@ -108,17 +109,77 @@ void Server::handle_syn(int fd, const Json::Value &value){
 		handle_syn_search_client(fd, value);
 	}else if(dtype == "VERIFY"){ // 添加好友请求
 		handle_syn_verify(fd, value);
+	}else if(dtype == "ACCEPT_VERIFY"){ // 同意好友请求
+		handle_syn_accept_verify(fd, value);
+	}else if(dtype == "REMOVE_LINKMAN"){ // 删除好友请求
+		handle_syn_remove_linkman(fd, value);
 	}
 }
 
 void Server::handle_syn_ready(int fd, const Json::Value &value){
-	IOManager::ack_ready(fd); // 先回应
+	IOManager::ack_message(fd, string("READY")); // 先回应
 	string clientName = value["clientName"].asString();
 	IOManager::send_syn(fd, clientName);
 }
 
+void Server::handle_syn_remove_linkman(int fd, const Json::Value &value){
+	string clientName = value["clientName"].asString();
+	string oppName = value["oppName"].asString();
+
+	bool isFriend = clientdb.findFriend(clientName, oppName);
+	if(!isFriend){
+		IOManager::ack_message(fd, "HAD_REMOVE_LINKMAN"); // 已经不是好友关系
+	}else{
+		bool ok1 = clientdb.removeFriend(clientName, oppName);
+		if(ok1){
+			bool ok2 = clientdb.removeFriend(oppName, clientName);
+			if(ok2){ // 到这步则表示已经把双方的好友关系都从数据库中删除
+				IOManager::ack_remove_linkman(fd, oppName);
+			}else{
+				clientdb.insertFriend(clientName, oppName);
+			}
+		}
+	}
+}
+
+void Server::handle_syn_accept_verify(int fd, const Json::Value &value){
+	Clientdb::UserInfo userInfo, oppUserInfo;
+	Json::Value userInfoObj;
+	Json::Value oppUserInfoObj;
+	userInfoObj = value["userInfo"];
+	userInfo.name = userInfoObj["name"].asString();
+	userInfo.language = userInfoObj["language"].asString();
+	userInfo.sex = userInfoObj["sex"].asInt();
+	oppUserInfoObj = value["oppUserInfo"];
+	oppUserInfo.name = oppUserInfoObj["name"].asString();
+	oppUserInfo.language = oppUserInfoObj["language"].asString();
+	oppUserInfo.sex = oppUserInfoObj["sex"].asInt();
+
+	bool isFriend = clientdb.findFriend(userInfo.name, oppUserInfo.name);
+	if(isFriend){
+		IOManager::ack_bad_accept_verify(fd, oppUserInfo.name); // 已经是好友关系
+	}else{
+		bool ok1 = clientdb.insertFriend(userInfo.name, oppUserInfo.name);
+		if(ok1){
+			bool ok2 = clientdb.insertFriend(oppUserInfo.name, userInfo.name);
+			if(ok2){ // 到这步则表示已经把双方的好友关系都添加进数据库
+				IOManager::cache_syn_accept_verify(fd, userInfo, oppUserInfo);
+				int opp_fd = onlineManager.isOnline(oppUserInfo.name);
+				if(opp_fd != -1){
+					int counts = IOManager::count_syn(oppUserInfo.name);
+					if(counts == 1){
+						IOManager::send_syn(opp_fd, oppUserInfo.name);
+					}
+				}
+			}else{
+				clientdb.removeFriend(userInfo.name, oppUserInfo.name);
+			}
+		}
+	}
+}
+
 void Server::handle_syn_verify(int fd, const Json::Value &value){
-	IOManager::ack_verify(fd); // 先回应
+	IOManager::ack_message(fd, "VERIFY"); // 先回应
 	Clientdb::UserInfo userInfo;
 	Json::Value userInfoObj;
 	string oppClientName = value["oppClientName"].asString();

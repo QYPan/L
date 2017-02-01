@@ -133,6 +133,39 @@ void Clientdb::appendFriend(MYSQL_ROW &sqlrow, vector<UserInfo> &linkmans){
 	linkmans.push_back(userInfo);
 }
 
+bool Clientdb::findFriend(const string &name, const string &fname){
+	MYSQL_RES *res_ptr;
+	MYSQL_ROW sqlrow;
+	char sql_sentence[200];
+	sprintf(sql_sentence, "SELECT fname FROM friends WHERE cname = '%s' AND fname = '%s'",
+			name.c_str(), fname.c_str());
+	int res = mysql_query(&client_conn, sql_sentence);
+	if(res){
+		printf("SELECT error in friends table: %s\n", mysql_error(&client_conn));
+		return false;
+	}else{
+		res_ptr = mysql_use_result(&client_conn);
+		if(res_ptr){
+			bool ok =false;
+			sqlrow = mysql_fetch_row(res_ptr);
+			if(sqlrow){ // 该朋友存在
+				ok = true;
+			}
+			if(mysql_errno(&client_conn)){
+				printf("Retrive error in friends table: %s\n", mysql_error(&client_conn));
+			}
+			mysql_free_result(res_ptr);
+			if(ok)
+				printf("%s has friend %s\n", name.c_str(), fname.c_str());
+			else
+				printf("%s do not has friend %s\n", name.c_str(), fname.c_str());
+			return ok;
+		}else{
+			return false;
+		}
+	}
+}
+
 bool Clientdb::findClient(const string &name, UserInfo &userInfo){
 	MYSQL_RES *res_ptr;
 	MYSQL_ROW sqlrow;

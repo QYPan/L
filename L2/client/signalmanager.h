@@ -14,7 +14,12 @@ signals:
     void searchResult(const QString &data);
     void getLinkmans();
     void verifyAck();
+    void openHandleVerifyPage();
+    void getRequestNumber();
+    void setRequestNumber(int number);
+    void handleAcceptVerifyAck(const QString &data);
     void setLinkmans(const QString &linkmans);
+    void acceptVerify(const QString &name, const QString &language, int sex);
 };
 
 #endif // SIGNALMANAGER_H
