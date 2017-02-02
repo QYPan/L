@@ -128,7 +128,7 @@ void Server::handle_syn_remove_linkman(int fd, const Json::Value &value){
 
 	bool isFriend = clientdb.findFriend(clientName, oppName);
 	if(!isFriend){
-		IOManager::ack_message(fd, "HAD_REMOVE_LINKMAN"); // 已经不是好友关系
+		IOManager::ack_bad_remove_linkman(fd, oppName); // 已经不是好友关系
 	}else{
 		bool ok1 = clientdb.removeFriend(clientName, oppName);
 		if(ok1){

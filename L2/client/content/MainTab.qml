@@ -162,8 +162,11 @@ Rectangle {
         onGetRequestNumber: {
             signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
         }
-        onHandleAcceptVerify: {
+        onHandleAcceptVerifyAck: {
             handleAcceptVerifySignal(data);
+        }
+        onHandleRemoveLinkmanAck: {
+            handleRemoveLinkmanSignal(data);
         }
     }
 
@@ -172,15 +175,35 @@ Rectangle {
         HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
     }
 
+    function handleRemoveLinkmanSignal(data){
+        var newData = JSON.parse(data);
+        var name = newData.name;
+        var index = qmlInterface.removeLinkman(name);
+        if(index !== -1){
+            signalManager.removeLinkman(index+1);
+            var top = stackView.depth - 1;
+            if(stackView.get(top).pageName === "personalDataPage" &&
+               stackView.get(top).name === name){
+                stackView.pop();
+            }
+        }
+    }
+
     function handleAcceptVerifySignal(data){
         var newData = JSON.parse(data);
-        if(newData.result){
+        if(newData.result){ // 尚未添加进好友列表
             var userInfo = newData.userInfo;
             if(!qmlInterface.isLinkman(userInfo.name)){
                 var index = qmlInterface.addLinkman(userInfo.name, userInfo.language, userInfo.sex);
-                signalManager.addLinkman(index, userInfo.name, userInfo.language, userInfo.sex);
+                signalManager.addLinkman(index+1, userInfo.name, userInfo.language, userInfo.sex);
+            }
+            if(newData.mtype === "ACK"){
+                HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
             }
         }else{
+            if(newData.mtype === "ACK"){
+                HANDLE_VERIFY_LOGIC.setButtonText(newData.name, qsTr("已接受"));
+            }
         }
     }
 
@@ -194,18 +217,25 @@ Rectangle {
             }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
                 handleVerifyAck();
             }else if(newData.dtype === "ACCEPT_VERIFY"){ // 服务器回应好友同意请求
-                handleAcceptVerifyAck(data);
+                handleAcceptVerifySynOrAck(data);
+            }else if(newData.dtype === "REMOVE_LINKMAN"){ // 服务器回应删除好友请求
+                handleRemoveLinkmanAck(data);
             }
         }else if(newData.mtype === "SYN"){
             sendAck(); // 应答服务器
             if(newData.dtype === "VERIFY"){ // 有人向自己发出好友邀请
                 handleVerifySyn(newData.userInfo, newData.verifyMsg);
             }else if(newData.dtype === "ACCEPT_VERIFY"){ // 对方已同意好友请求
+                handleAcceptVerifySynOrAck(data);
             }
         }
     }
 
-    function handleAcceptVerifyAck(data){
+    function handleRemoveLinkmanAck(data){
+        signalManager.handleRemoveLinkmanAck(data);
+    }
+
+    function handleAcceptVerifySynOrAck(data){
         signalManager.handleAcceptVerifyAck(data);
     }
 

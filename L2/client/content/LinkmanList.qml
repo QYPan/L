@@ -61,6 +61,9 @@ Item {
         onSetRequestNumber: {
             setRequestNumber(number);
         }
+        onRemoveLinkman: {
+            removeLinkman(index);
+        }
     }
 
     Component.onCompleted: {
@@ -82,6 +85,9 @@ Item {
                                   "itemSex" : sex});
     }
 
+    function removeLinkman(index){
+        linkmanList.model.remove(index);
+    }
 
     function setRequestNumber(number){
         if(number){

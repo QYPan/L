@@ -93,7 +93,7 @@ Rectangle {
 
             GrayButton {
                 id: acceptButton
-                text: qsTr("接受")
+                text: itemButtonText
                 textSize: 12
                 width: topView.height * 1.4
                 height: parent.height * 0.4
@@ -106,7 +106,8 @@ Rectangle {
             }
 
             function acceptVerify(){
-                acceptButton.text = qsTr("处理中");
+                itemButtonText = qsTr("处理中");
+                //acceptButton.text = qsTr("处理中");
                 acceptButton.buttonPressed = true;
                 //signalManager.acceptVerify(nameItem.text, languageItem.text, itemDelegate.sex);
                 sendAcceptVerify(nameItem.text, languageItem.text, itemDelegate.sex);
@@ -132,7 +133,7 @@ Rectangle {
         }
     }
 
-    function findItemByName(name){
+    function findIndexByName(name){
         var i;
         for(i = 0; i < verifyView.count; i++){
             var currentItem = verifyView.model.get(i);
@@ -143,14 +144,15 @@ Rectangle {
         return -1;
     }
 
-    function changeButtonText(index, text){
-        //verifyView.model.setProperty(index, "itemNewRequest", number);
+    function setButtonText(index, text){
+        verifyView.model.setProperty(index, "itemButtonText", text);
     }
 
     function addVerifyItem(name, language, sex, message){
         verifyView.model.insert(0, {"itemName" : name,
                                             "itemLanguage" : language,
                                             "itemSex" : sex,
+                                            "itemButtonText" : qsTr("接受"),
                                             "itemMessage" : message});
         newRequests += 1;
     }

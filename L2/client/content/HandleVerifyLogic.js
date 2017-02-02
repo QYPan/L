@@ -44,3 +44,10 @@ function addVerifyItem(userInfo, msg){
 function getNewRequestsCount(){
     return verifyPage.newRequests;
 }
+
+function setButtonText(name, text){
+    var index = verifyPage.findIndexByName(name);
+    if(index !== -1){
+        verifyPage.setButtonText(index, text);
+    }
+}

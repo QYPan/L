@@ -45,6 +45,21 @@ void IOManager::ack_remove_linkman(int fd, const string &name){
 	Json::Value root;
 	root["mtype"] = "ACK";
 	root["dtype"] = "REMOVE_LINKMAN";
+	root["result"] = true;
+	root["name"] = name;
+	Json::FastWriter writer;
+	string strOut = writer.write(root);
+
+	strcpy(buffer, strOut.c_str());
+	write(fd, buffer, sizeof(buffer));
+}
+
+void IOManager::ack_bad_remove_linkman(int fd, const string &name){
+	char buffer[200] = {0};
+	Json::Value root;
+	root["mtype"] = "ACK";
+	root["dtype"] = "REMOVE_LINKMAN";
+	root["result"] = false;
 	root["name"] = name;
 	Json::FastWriter writer;
 	string strOut = writer.write(root);
@@ -89,11 +104,12 @@ void IOManager::cache_syn_accept_verify(int fd, const Clientdb::UserInfo &userIn
 	Json::Value oppRoot;
 	oppRoot["mtype"] = "SYN";
 	oppRoot["dtype"] = "ACCEPT_VERIFY";
+	oppRoot["result"] = true;
 	Json::Value jOppUserInfo;
 	jOppUserInfo["name"] = userInfo.name;
 	jOppUserInfo["language"] = userInfo.language;
 	jOppUserInfo["sex"] = userInfo.sex;
-	root["userInfo"] = jOppUserInfo;
+	oppRoot["userInfo"] = jOppUserInfo;
 	Json::FastWriter oppWriter;
 	string oppStrOut = oppWriter.write(oppRoot);
 	auto &opp_msg_list = syn_caches[oppUserInfo.name];
