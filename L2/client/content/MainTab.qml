@@ -3,6 +3,7 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import "HandleVerifyLogic.js" as HANDLE_VERIFY_LOGIC
+import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 
 Rectangle {
     id: root
@@ -102,6 +103,7 @@ Rectangle {
         Tab {
             id: messageTab
             title: qsTr("消息")
+            source: "MessageList.qml"
         }
         Tab {
             id: linkmanTab
@@ -162,17 +164,25 @@ Rectangle {
         onGetRequestNumber: {
             signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
         }
-        onHandleAcceptVerifyAck: {
+        onHandleAcceptVerifySynOrAck: {
             handleAcceptVerifySignal(data);
         }
         onHandleRemoveLinkmanAck: {
             handleRemoveLinkmanSignal(data);
+        }
+        onSendMessage: {
+            handleSendMessageSignal(data);
         }
     }
 
     Component.onCompleted: {
         requestLinkmans();
         HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
+    }
+
+    function handleSendMessageSignal(data){
+        var userInfo = JSON.parse(data);
+        stackView.replace(TALK_PAGE_LOGIC.openTalkPage(userInfo));
     }
 
     function handleRemoveLinkmanSignal(data){
@@ -191,18 +201,20 @@ Rectangle {
 
     function handleAcceptVerifySignal(data){
         var newData = JSON.parse(data);
-        if(newData.result){ // 尚未添加进好友列表
-            var userInfo = newData.userInfo;
+        var userInfo = newData.userInfo;
+        if(!newData.isFriend){ // 尚未添加进好友列表
             if(!qmlInterface.isLinkman(userInfo.name)){
                 var index = qmlInterface.addLinkman(userInfo.name, userInfo.language, userInfo.sex);
                 signalManager.addLinkman(index+1, userInfo.name, userInfo.language, userInfo.sex);
             }
             if(newData.mtype === "ACK"){
                 HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
+                //sayHello(userInfo.name);
             }
+            TALK_PAGE_LOGIC.appendMessage(userInfo, "你好！"); // 打招呼
         }else{
             if(newData.mtype === "ACK"){
-                HANDLE_VERIFY_LOGIC.setButtonText(newData.name, qsTr("已接受"));
+                HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
             }
         }
     }
@@ -236,7 +248,7 @@ Rectangle {
     }
 
     function handleAcceptVerifySynOrAck(data){
-        signalManager.handleAcceptVerifyAck(data);
+        signalManager.handleAcceptVerifySynOrAck(data);
     }
 
     function handleVerifySyn(userInfo, msg){

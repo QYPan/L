@@ -26,7 +26,9 @@ private:
 	void handle_syn_verify(int fd, const Json::Value &value);
 	void handle_syn_accept_verify(int fd, const Json::Value &value);
 	void handle_syn_remove_linkman(int fd, const Json::Value &value);
+	void handle_syn_transpond(int fd, const Json::Value &value);
 	void handle_ack(int fd, const Json::Value &value);
+	void try_send_syn(const string &clientName);
 	TcpServer tcpServer;
 	OnlineManager onlineManager;
 	Clientdb clientdb;

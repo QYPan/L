@@ -38,7 +38,7 @@ function openHandleVerifyPage(){
 }
 
 function addVerifyItem(userInfo, msg){
-    verifyPage.addVerifyItem(userInfo.name, userInfo.language, userInfo.sex, msg);
+    verifyPage.addVerifyItem(userInfo, msg);
 }
 
 function getNewRequestsCount(){

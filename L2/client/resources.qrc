@@ -39,5 +39,8 @@
         <file>content/HandleVerifyPage.qml</file>
         <file>content/HandleVerifyLogic.js</file>
         <file>content/GrayCheckDialog.qml</file>
+        <file>content/TalkPage.qml</file>
+        <file>content/TalkPageLogic.js</file>
+        <file>content/MessageList.qml</file>
     </qresource>
 </RCC>

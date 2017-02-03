@@ -131,11 +131,7 @@ Rectangle {
                 height: nameItem.height
                 text: root.isFriend ? qsTr("发消息") : qsTr("添加到通讯录")
                 onClicked: {
-                    if(!root.isFriend){
-                        stackView.replace(Qt.resolvedUrl("VerifyPage.qml"));
-                        var top = stackView.depth - 1;
-                        stackView.get(top).titleName = root.name;
-                    }
+                    sendOrAddButtonClicked();
                 }
             }
             GrayButton {
@@ -168,6 +164,21 @@ Rectangle {
         onNoClicked: {
             visible = false;
             lockAll(false);
+        }
+    }
+
+    function sendOrAddButtonClicked(){
+        if(!root.isFriend){
+            stackView.replace(Qt.resolvedUrl("VerifyPage.qml"));
+            var top = stackView.depth - 1;
+            stackView.get(top).titleName = root.name;
+        }else{
+            var userInfo = {};
+            userInfo.name = root.name
+            userInfo.language = root.language
+            userInfo.sex = root.sex
+            var strOut = JSON.stringify(userInfo);
+            signalManager.sendMessage(strOut);
         }
     }
 

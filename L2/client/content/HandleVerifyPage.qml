@@ -148,10 +148,10 @@ Rectangle {
         verifyView.model.setProperty(index, "itemButtonText", text);
     }
 
-    function addVerifyItem(name, language, sex, message){
-        verifyView.model.insert(0, {"itemName" : name,
-                                            "itemLanguage" : language,
-                                            "itemSex" : sex,
+    function addVerifyItem(userInfo, message){
+        verifyView.model.insert(0, {"itemName" : userInfo.name,
+                                            "itemLanguage" : userInfo.language,
+                                            "itemSex" : userInfo.sex,
                                             "itemButtonText" : qsTr("接受"),
                                             "itemMessage" : message});
         newRequests += 1;
