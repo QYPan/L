@@ -17,7 +17,7 @@ public:
 	static void readData(int fd, string &data);
 	static void ack_heart(int fd);
 	static void ack_message(int fd, const string &msg);
-	static void ack_transpond(int fd, bool result, const string &oppName);
+	static void ack_transpond(int fd, bool isFriend, const string &oppName);
 	static void ack_accept_verify(int fd, bool isFriend, const Clientdb::UserInfo &userInfo);
 	static void ack_register(int fd, bool result);
 	static void ack_login(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo);

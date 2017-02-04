@@ -5,7 +5,6 @@
 #include <QWidget>
 #include <QAbstractSocket>
 #include "socketthread.h"
-#include "cachemanager.h"
 
 class QmlInterface : public QObject
 {
@@ -16,10 +15,6 @@ class QmlInterface : public QObject
     Q_PROPERTY(QString clientLanguage READ clientLanguage WRITE setClientLanguage NOTIFY clientLanguageChanged)
 public:
     QmlInterface(QObject *parent = 0);
-    Q_INVOKABLE int addLinkman(const QString &name, const QString &language, int sex);
-    Q_INVOKABLE int removeLinkman(const QString &name);
-    Q_INVOKABLE bool isLinkman(const QString &name);
-    Q_INVOKABLE QString getLinkmans();
     QString clientName() const;
     void setClientName(const QString &name);
     QString clientLanguage() const;
@@ -29,9 +24,9 @@ public:
     int sex() const;
     void setSex(int s);
 signals:
-    void sendData(const QString &data);
     void qmlSendData(const QString &data);
     void qmlReadData(const QString &data);
+    void qmlConnectSuccessed(bool flag);
     void qmlGetSocketState(const QString &stateMessage);
     void displayError(int socketError, const QString &message);
     void tryDisconnect();
@@ -47,10 +42,7 @@ public slots:
     void reconnect(); // 断线重连
     void connectSuccessed();
 private:
-    void tryConnect();
     void createSocketThread();
-    void initCacheManager();
-    CacheManager *cacheManager;
     SocketThread *thread;
     QString m_name;
     QString m_password;

@@ -17,12 +17,12 @@ public:
     };
 
     CacheManager(QObject *parent = 0);
-    QString getLinkmans();
-    void hadReceiveACK(bool flag);
-    void addData(const QString &data);
-    int addLinkman(const QString &name, const QString &language, int sex);
-    int removeLinkman(const QString &name);
-    bool isLinkman(const QString &name);
+    Q_INVOKABLE void addData(const QString &data);
+    Q_INVOKABLE void hadReceiveACK(bool flag);
+    Q_INVOKABLE QString getLinkmans();
+    Q_INVOKABLE int addLinkman(const QString &name, const QString &language, int sex);
+    Q_INVOKABLE int removeLinkman(const QString &name);
+    Q_INVOKABLE bool isLinkman(const QString &name);
 signals:
     void sendData(const QString &data);
 private:

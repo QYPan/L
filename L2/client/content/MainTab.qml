@@ -154,6 +154,16 @@ Rectangle {
         onQmlReadData: {
             dealResult(data);
         }
+        onQmlConnectSuccessed: {
+            tryLogin();
+        }
+    }
+
+    Connections {
+        target: cacheManager
+        onSendData: {
+            qmlInterface.qmlSendData(data);
+        }
     }
 
     Connections {
@@ -164,14 +174,8 @@ Rectangle {
         onGetRequestNumber: {
             signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
         }
-        onHandleAcceptVerifySynOrAck: {
-            handleAcceptVerifySignal(data);
-        }
-        onHandleRemoveLinkmanAck: {
-            handleRemoveLinkmanSignal(data);
-        }
-        onSendMessage: {
-            handleSendMessageSignal(data);
+        onOpenTalkPage: {
+            handleOpenTalkPageSignal(userInfoStr, isPush);
         }
     }
 
@@ -180,15 +184,84 @@ Rectangle {
         HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
     }
 
-    function handleSendMessageSignal(data){
-        var userInfo = JSON.parse(data);
-        stackView.replace(TALK_PAGE_LOGIC.openTalkPage(userInfo));
+    function tryLogin(){
+        var data = {};
+        var userInfo = {};
+        data.mtype = "SYN";
+        data.dtype = "LOGIN";
+        userInfo.name = qmlInterface.clientName;
+        userInfo.password = qmlInterface.clientPassword;
+        data.userInfo = userInfo;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
     }
 
-    function handleRemoveLinkmanSignal(data){
+    function handleOpenTalkPageSignal(userInfoStr, isPush){
+        var userInfo = JSON.parse(userInfoStr);
+        if(isPush){
+            stackView.push(TALK_PAGE_LOGIC.openTalkPage(userInfo));
+        }else{
+            stackView.replace(TALK_PAGE_LOGIC.openTalkPage(userInfo));
+        }
+    }
+
+    function dealResult(data){
+        var newData = JSON.parse(data);
+        if(newData.mtype === "ACK"){
+            if(newData.dtype !== "LOGIN" && newData.dtype !== "READY"){
+                cacheManager.hadReceiveACK(true);
+            }
+            if(newData.dtype === "LOGIN"){ // 表示这是个断线重连后登录成功的 ACK
+                sendReady();
+            }else if(newData.dtype === "LINKMANS"){ // 获取联系人
+                handleLinkmansAck(newData.linkmans);
+            }else if(newData.dtype === "READY"){
+                cacheManager.hadReceiveACK(false); // 重新发送消息队列里的消息
+            }else if(newData.dtype === "SEARCH_CLIENT"){ // 查找结果
+                handleSearchClientAck(data);
+            }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
+                handleVerifyAck();
+            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 服务器回应好友同意请求
+                handleAcceptVerifySynOrAck(data);
+            }else if(newData.dtype === "REMOVE_LINKMAN"){ // 服务器回应删除好友请求
+                handleRemoveLinkmanAck(data);
+            }else if(newData.dtype === "TRANSPOND"){ // 服务器回应转发请求
+                handleTranspondAck(data);
+            }
+        }else if(newData.mtype === "SYN"){
+            sendAck(); // 应答服务器
+            if(newData.dtype === "VERIFY"){ // 有人向自己发出好友邀请
+                handleVerifySyn(newData.userInfo, newData.verifyMsg);
+            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 对方已同意好友请求
+                handleAcceptVerifySynOrAck(data);
+            }else if(newData.dtype === "TRANSPOND"){
+                handleTranspondSyn(data);
+            }
+        }
+    }
+
+    function handleTranspondSyn(data){
+        var newData = JSON.parse(data);
+        var userInfo = newData.userInfo;
+        var msg = newData.msg;
+        var userInfoStr = JSON.stringify(userInfo);
+        signalManager.receiveMessage(userInfoStr, msg);
+        TALK_PAGE_LOGIC.appendMessage(userInfo, msg);
+    }
+
+    function handleTranspondAck(data){
+        signalManager.handleTranspondAck(data);
+        var newData = JSON.parse(data);
+        var name = newData.oppName;
+        if(newData.isFriend){
+            TALK_PAGE_LOGIC.killBusy(name);
+        }
+    }
+
+    function handleRemoveLinkmanAck(data){
         var newData = JSON.parse(data);
         var name = newData.name;
-        var index = qmlInterface.removeLinkman(name);
+        var index = cacheManager.removeLinkman(name);
         if(index !== -1){
             signalManager.removeLinkman(index+1);
             var top = stackView.depth - 1;
@@ -199,56 +272,26 @@ Rectangle {
         }
     }
 
-    function handleAcceptVerifySignal(data){
+    function handleAcceptVerifySynOrAck(data){
         var newData = JSON.parse(data);
         var userInfo = newData.userInfo;
         if(!newData.isFriend){ // 尚未添加进好友列表
-            if(!qmlInterface.isLinkman(userInfo.name)){
-                var index = qmlInterface.addLinkman(userInfo.name, userInfo.language, userInfo.sex);
-                signalManager.addLinkman(index+1, userInfo.name, userInfo.language, userInfo.sex);
+            if(!cacheManager.isLinkman(userInfo.name)){
+                var index = cacheManager.addLinkman(userInfo.name, userInfo.language, userInfo.sex);
+                var userInfoStr = JSON.stringify(userInfo);
+                signalManager.addLinkman(index+1, userInfoStr);
             }
             if(newData.mtype === "ACK"){
                 HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
                 //sayHello(userInfo.name);
             }
-            TALK_PAGE_LOGIC.appendMessage(userInfo, "你好！"); // 打招呼
+            userInfoStr = JSON.stringify(userInfo);
+            signalManager.receiveMessage(userInfoStr,  "你好！");
         }else{
             if(newData.mtype === "ACK"){
                 HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
             }
         }
-    }
-
-    function dealResult(data){
-        var newData = JSON.parse(data);
-        if(newData.mtype === "ACK"){
-            if(newData.dtype === "LINKMANS"){ // 获取联系人
-                handleLinkmansAck(newData.linkmans);
-            }else if(newData.dtype === "SEARCH_CLIENT"){ // 查找结果
-                handleSearchClientAck(data);
-            }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
-                handleVerifyAck();
-            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 服务器回应好友同意请求
-                handleAcceptVerifySynOrAck(data);
-            }else if(newData.dtype === "REMOVE_LINKMAN"){ // 服务器回应删除好友请求
-                handleRemoveLinkmanAck(data);
-            }
-        }else if(newData.mtype === "SYN"){
-            sendAck(); // 应答服务器
-            if(newData.dtype === "VERIFY"){ // 有人向自己发出好友邀请
-                handleVerifySyn(newData.userInfo, newData.verifyMsg);
-            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 对方已同意好友请求
-                handleAcceptVerifySynOrAck(data);
-            }
-        }
-    }
-
-    function handleRemoveLinkmanAck(data){
-        signalManager.handleRemoveLinkmanAck(data);
-    }
-
-    function handleAcceptVerifySynOrAck(data){
-        signalManager.handleAcceptVerifySynOrAck(data);
     }
 
     function handleVerifySyn(userInfo, msg){
@@ -264,7 +307,7 @@ Rectangle {
         data.mtype = "ACK";
         data.clientName = qmlInterface.clientName;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
     }
 
     function handleVerifyAck(){
@@ -278,7 +321,7 @@ Rectangle {
     function handleLinkmansAck(linkmans){
         var i;
         for(i = 0; i < linkmans.length; i++){
-            qmlInterface.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            cacheManager.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);
             //signalManager.addLinkman(i+1, linkmans[i].name, linkmans[i].language, linkmans[i].sex);
             //console.log(linkmans[i].name+" "+linkmans[i].language+" "+linkmans[i].sex);
         }
@@ -300,6 +343,6 @@ Rectangle {
         data.dtype = "LINKMANS";
         data.clientName = qmlInterface.clientName;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
     }
 }

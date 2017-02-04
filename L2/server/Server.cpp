@@ -121,6 +121,7 @@ void Server::handle_syn(int fd, const Json::Value &value){
 
 void Server::try_send_syn(const string &clientName){
 	int fd = onlineManager.isOnline(clientName);
+	printf("try_send_syn name: %s fd: %d\n", clientName.c_str(), fd);
 	if(fd != -1){
 		int counts = IOManager::count_syn(clientName);
 		if(counts == 1){

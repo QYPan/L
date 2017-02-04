@@ -119,7 +119,7 @@ Rectangle {
             stackView.get(top).name = name;
             stackView.get(top).language = language;
             stackView.get(top).sex = sex;
-            stackView.get(top).isFriend = qmlInterface.isLinkman(name);
+            stackView.get(top).isFriend = cacheManager.isLinkman(name);
         }
     }
 
@@ -164,7 +164,7 @@ Rectangle {
         data.dtype = "SEARCH_CLIENT";
         data.clientName = name;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
     }
 
     function lockAll(flag){

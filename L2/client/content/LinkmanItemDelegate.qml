@@ -92,7 +92,7 @@ Item {
         width: parent.height * 0.5
         height: width
         anchors.right: parent.right
-        anchors.rightMargin: parent.height * 0.3
+        anchors.rightMargin: Screen.height * 0.07 * 0.3
         anchors.verticalCenter: parent.verticalCenter
         source: "../images/navigation_next_item.png"
         fillMode: Image.PreserveAspectFit

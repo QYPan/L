@@ -56,7 +56,8 @@ Item {
     Connections {
         target: signalManager
         onAddLinkman: {
-            addLinkman(index, name, language, sex);
+            var userInfo = JSON.parse(userInfoStr);
+            addLinkman(index, userInfo);
         }
         onSetRequestNumber: {
             setRequestNumber(number);
@@ -67,7 +68,7 @@ Item {
     }
 
     Component.onCompleted: {
-        setLinkmans(qmlInterface.getLinkmans());
+        setLinkmans(cacheManager.getLinkmans());
         signalManager.getRequestNumber();
     }
 
@@ -75,14 +76,14 @@ Item {
         var linkmans = JSON.parse(data);
         var i;
         for(i = 0; i < linkmans.length; i++){
-            addLinkman(i+1, linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            addLinkman(i+1, linkmans[i]);
         }
     }
 
-    function addLinkman(index, name, language, sex){
-        linkmanList.model.insert(index, {"itemName" : name,
-                                  "itemLanguage" : language,
-                                  "itemSex" : sex});
+    function addLinkman(index, userInfo){
+        linkmanList.model.insert(index, {"itemName" : userInfo.name,
+                                  "itemLanguage" : userInfo.language,
+                                  "itemSex" : userInfo.sex});
     }
 
     function removeLinkman(index){

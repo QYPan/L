@@ -6,18 +6,9 @@
 
 QmlInterface::QmlInterface(QObject *parent)
     : QObject(parent)
-    , cacheManager(NULL)
     , thread(NULL)
 {
-    initCacheManager();
     createSocketThread();
-    tryConnect();
-}
-
-void QmlInterface::initCacheManager(){
-    cacheManager = new CacheManager(this);
-    connect(cacheManager, &CacheManager::sendData, this, &QmlInterface::sendData);
-    connect(this, &QmlInterface::qmlSendData, cacheManager, &CacheManager::addData);
 }
 
 void QmlInterface::createSocketThread(){
@@ -26,43 +17,31 @@ void QmlInterface::createSocketThread(){
     connect(thread, &SocketThread::error, this, &QmlInterface::displayError);
     connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::connectSuccessed);
     connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
+    thread->tryConnect();
 }
 
 void QmlInterface::readData(const QString &data){
-    emit qmlReadData(data); // 发给 UI 处理
     QJsonParseError jsonError;
     QJsonDocument document = QJsonDocument::fromJson(data.toUtf8(), &jsonError);
     if(!document.isNull() && (jsonError.error == QJsonParseError::NoError)){
         QJsonObject obj = document.object();
-        QString mtype = obj.value("mtype").toString();
         QString dtype = obj.value("dtype").toString();
-        if(mtype == "ACK"){
-            if(dtype != "HEART"){
-                cacheManager->hadReceiveACK(true);
-            }
+        if(dtype != "HEART"){
+            emit qmlReadData(data); // 发给 UI 处理
         }
     }
-}
-
-QString QmlInterface::getLinkmans(){
-    return cacheManager->getLinkmans();
 }
 
 void QmlInterface::reconnect(){
     qDebug() << "thread death!";
     QTest::qWait(3000);
-    tryConnect();
+    thread->tryConnect();
 }
 
 void QmlInterface::connectSuccessed(){
     getSocketState(QAbstractSocket::ConnectedState);
-    cacheManager->hadReceiveACK(false); // 重新分发未发送成功的数据
+    emit qmlConnectSuccessed(false);
     displayError(-2, "no error");
-}
-
-void QmlInterface::tryConnect(){
-    if(!thread->tryConnect()){ // 已经连接了
-    }
 }
 
 void QmlInterface::socketDisconnected(){
@@ -96,18 +75,6 @@ void QmlInterface::getSocketState(QAbstractSocket::SocketState socketState){
             break;
     }
     emit qmlGetSocketState(stateString);
-}
-
-int QmlInterface::addLinkman(const QString &name, const QString &language, int sex){
-    return cacheManager->addLinkman(name, language, sex);
-}
-
-int QmlInterface::removeLinkman(const QString &name){
-    return cacheManager->removeLinkman(name);
-}
-
-bool QmlInterface::isLinkman(const QString &name){
-    return cacheManager->isLinkman(name);
 }
 
 QString QmlInterface::clientName() const{

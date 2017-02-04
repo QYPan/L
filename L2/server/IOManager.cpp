@@ -56,12 +56,12 @@ void IOManager::cache_syn_transpond(const Clientdb::UserInfo &userInfo, const st
 	msg_list.push_back(strOut);
 }
 
-void IOManager::ack_transpond(int fd, bool result, const string &oppName){
+void IOManager::ack_transpond(int fd, bool isFriend, const string &oppName){
 	char buffer[1000] = {0};
 	Json::Value root;
 	root["mtype"] = "ACK";
 	root["dtype"] = "TRANSPOND";
-	root["result"] = result;
+	root["isFriend"] = isFriend;
 	root["oppName"] = oppName;
 
 	Json::FastWriter writer;

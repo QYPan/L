@@ -30,6 +30,7 @@ Rectangle {
         anchors.rightMargin: topView.height * 0.2
         anchors.top: topView.bottom
         anchors.bottom: inputBackground.top
+        currentIndex: count - 1
         clip: true
         spacing: topView.height * 0.3
         model: ListModel {}
@@ -195,8 +196,28 @@ Rectangle {
             userInfo.language = qmlInterface.clientLanguage;
             userInfo.sex = qmlInterface.sex;
             appendMsg(userInfo, inputMsg.text, true);
+            sendMessage(userInfo, root.clientName, inputMsg.text);
+
+            var oppUserInfo = {};
+            oppUserInfo.name = root.clientName;
+            oppUserInfo.language = root.language;
+            oppUserInfo.sex = root.sex;
+            var userInfoStr = JSON.stringify(oppUserInfo);
+            signalManager.sendMessage(userInfoStr, inputMsg.text);
+
             inputMsg.text = "";
         }
+    }
+
+    function sendMessage(userInfo, oppName, msg){
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "TRANSPOND";
+        data.oppName = oppName;
+        data.msg = msg;
+        data.userInfo = userInfo;
+        var strOut = JSON.stringify(data);
+        cacheManager.addData(strOut);
     }
 
     function appendMsg(userInfo, msg, isItemBusy){
@@ -210,8 +231,23 @@ Rectangle {
                               "itemSex" : userInfo.sex});
     }
 
-    function getItemIndex(){
-        return (msgList.count - 1);
+    function findFirstBusyIndex(){
+        var i;
+        var currentItem;
+        for(i = msgList.count-1; i >= 0; i--){
+            currentItem = msgList.model.get(i);
+            if(currentItem.itemName === qmlInterface.clientName && (!currentItem.isItemBusy)){
+                break; // 找到第一个己方的非发送状态的消息
+            }
+        }
+        var j;
+        for(j = i+1; j < msgList.count; j++){
+            currentItem = msgList.model.get(j);
+            if(currentItem.itemName === qmlInterface.clientName && currentItem.isItemBusy){
+                break;
+            } // 找到己方的第一个处于正在发送状态的消息
+        }
+        return j;
     }
 
     function killBusy(index){

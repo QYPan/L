@@ -26,6 +26,16 @@ function findTalkPage(name){
     }
 }
 
+function killBusy(name){
+    var page = findTalkPage(name);
+    if(page !== undefined){
+        var index = page.findFirstBusyIndex();
+        if(index !== -1){
+            page.killBusy(index);
+        }
+    }
+}
+
 function createTalkPage(userInfo){
     if(component == null)
         component = Qt.createComponent("TalkPage.qml");

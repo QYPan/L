@@ -128,7 +128,7 @@ Rectangle {
                 data.userInfo = userInfo;
                 data.oppUserInfo = oppUserInfo;
                 var strOut = JSON.stringify(data);
-                qmlInterface.qmlSendData(strOut);
+                cacheManager.addData(strOut);
             }
         }
     }

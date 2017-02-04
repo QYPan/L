@@ -99,7 +99,7 @@ Rectangle {
         userInfo.sex = qmlInterface.sex;
         data.userInfo = userInfo;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
         addButton.text = qsTr("正在发送请求...");
         addButton.buttonPressed = true;
     }

@@ -19,8 +19,13 @@ Item {
             id: itemDelegate
             width: parent.width
             height: Screen.height * 0.1
-            property int sex: itemSex
             property real edge: Screen.height * 0.07 * 0.3
+
+            Rectangle {
+                anchors.fill: parent
+                color: "#11ffffff"
+                visible: mouse.pressed
+            }
 
             Rectangle {
                 id: headImage
@@ -37,7 +42,7 @@ Item {
                     anchors.bottom: parent.bottom
                     Text {
                         id: sexText
-                        text: itemDelegate.sex.toString()
+                        text: itemSex.toString()
                         font.pointSize: 13
                         color: "black"
                         anchors.centerIn: parent
@@ -79,6 +84,48 @@ Item {
                 anchors.left: headImage.right
                 anchors.leftMargin: edge
             }
+
+            MouseArea {
+                id: mouse
+                anchors.fill: parent
+                onClicked: {
+                    var userInfo = {};
+                    userInfo.name = itemName;
+                    userInfo.language = itemLanguage;
+                    userInfo.sex = itemSex;
+                    var userInfoStr = JSON.stringify(userInfo);
+                    signalManager.openTalkPage(userInfoStr, true);
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: signalManager
+        onSendMessage: {
+            handleSendMessageSignal(userInfoStr, msg);
+        }
+        onReceiveMessage: {
+            handleReceiveMessageSignal(userInfoStr, msg);
+        }
+    }
+
+    function handleReceiveMessageSignal(userInfoStr, msg){
+        var userInfo = JSON.parse(userInfoStr);
+        changeMessage(userInfo, msg);
+    }
+
+    function handleSendMessageSignal(userInfoStr, msg){
+        var userInfo = JSON.parse(userInfoStr);
+        changeMessage(userInfo, msg);
+    }
+
+    function changeMessage(userInfo, msg){
+        var index = findIndexByName(userInfo.name);
+        if(index !== -1){
+            setMessage(index, msg);
+        }else{
+            addMessageItem(userInfo, msg);
         }
     }
 
@@ -93,17 +140,17 @@ Item {
         return -1;
     }
 
-    function addMessageItem(userInfo, message){
+    function setMessage(index, msg){
+        messageList.model.setProperty(index, "itemMessage", msg);
+    }
+
+    function addMessageItem(userInfo, msg){
         messageList.model.insert(0, {"itemName" : userInfo.name,
                                             "itemLanguage" : userInfo.language,
                                             "itemSex" : userInfo.sex,
-                                            "itemMessage" : message});
+                                            "itemMessage" : msg});
     }
+
     Component.onCompleted: {
-        var u = {};
-        u.name = "abe";
-        u.language = "CN";
-        u.sex = 1;
-        addMessageItem(u, "jofefjeofj");
     }
 }

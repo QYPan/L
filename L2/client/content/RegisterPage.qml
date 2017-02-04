@@ -333,7 +333,7 @@ Rectangle {
         data.userInfo = userInfo;
         var strOut = JSON.stringify(data);
         //console.log(strOut);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
     }
 
     function setChose(value){

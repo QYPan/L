@@ -156,14 +156,35 @@ Rectangle {
         }
     }
 
+    Component.onCompleted: {
+        cacheManager.sendData.connect(qmlInterface.qmlSendData);
+        qmlInterface.qmlReadData.connect(dealResult);
+        qmlInterface.qmlConnectSuccessed.connect(cacheManager.hadReceiveACK);
+    }
+
+    /*
     Connections {
-        target: qmlInterface
-        onQmlReadData: {
-            dealResult(data);
+        id: connectToCache
+        target: cacheManager
+        onSendData: {
+            qmlInterface.qmlSendData(data);
         }
     }
 
+    Connections {
+        id: connectToInterface
+        target: qmlInterface
+        onQmlReadData: {
+            console.log("before logined !!!!!!!!!!!!!!!!!!!!");
+            dealResult(data);
+        }
+    }
+    */
+
+    //Component.onDestruction: console.log("destruction, current depth - " + stackView.depth);
+
     function dealResult(data){
+        cacheManager.hadReceiveACK(true);
         var newData = JSON.parse(data);
         if(newData.mtype === "ACK"){
             if(newData.dtype === "REGISTER"){
@@ -174,6 +195,9 @@ Rectangle {
             }else if(newData.dtype === "LOGIN"){
                 if(newData.result === true && newData.logined === false){
                     saveUserInfo(newData.userInfo);
+                    cacheManager.sendData.disconnect(qmlInterface.qmlSendData);
+                    qmlInterface.qmlReadData.disconnect(dealResult);
+                    qmlInterface.qmlConnectSuccessed.disconnect(cacheManager.hadReceiveACK);
                     stackView.replace(Qt.resolvedUrl("MainTab.qml"));
                 }else if(newData.result === true){
                     noticeDialog.setMessageText(qsTr("无法重复登录！"));
@@ -210,7 +234,7 @@ Rectangle {
         userInfo.password = inputPassword.text;
         data.userInfo = userInfo;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
         lockAll(true);
         loginButton.text = qsTr("正在登录...");
     }

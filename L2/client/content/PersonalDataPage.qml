@@ -178,7 +178,7 @@ Rectangle {
             userInfo.language = root.language
             userInfo.sex = root.sex
             var strOut = JSON.stringify(userInfo);
-            signalManager.sendMessage(strOut);
+            signalManager.openTalkPage(strOut, false);
         }
     }
 
@@ -189,7 +189,7 @@ Rectangle {
         data.clientName = qmlInterface.clientName;
         data.oppName = name;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
         removeButton.text = qsTr("正在删除...");
     }
 

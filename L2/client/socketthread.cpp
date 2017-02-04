@@ -42,7 +42,7 @@ void SocketThread::run(){
     connect(&socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
             m_receiver.data(), SLOT(getSocketState(QAbstractSocket::SocketState)));
     connect(&socket, SIGNAL(disconnected()), m_receiver.data(), SLOT(socketDisconnected()));
-    connect(m_receiver.data(), SIGNAL(sendData(QString)), &socket, SLOT(sendData(QString)));
+    connect(m_receiver.data(), SIGNAL(qmlSendData(QString)), &socket, SLOT(sendData(QString)));
 
     bool counter = true;
 
