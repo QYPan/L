@@ -11,8 +11,9 @@ public:
     SignalManager(QObject *parent = 0);
 signals:
     void addLinkman(int index, const QString &userInfoStr);
-    void removeLinkman(int index);
+    void removeLinkman(const QString &name, int index);
     void searchResult(const QString &data);
+    void stackPop(const QString &data);
     void openTalkPage(const QString &userInfoStr, bool isPush);
     void sendMessage(const QString &userInfoStr, const QString &msg);
     void receiveMessage(const QString &userInfoStr, const QString &msg);

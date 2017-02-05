@@ -20,7 +20,7 @@ ClientSocket::ClientSocket(QObject *parent)
 void ClientSocket::sendData(const QString &data){
     if(state() == QAbstractSocket::ConnectedState){
         qDebug() << "send data: " << data;
-        write(data.toUtf8().data(), 1000);
+        write(data.toUtf8().data(), 1001);
     }else{
         qDebug() << "socket is disconnected";
     }
@@ -31,9 +31,9 @@ void ClientSocket::onError(){
 }
 
 void ClientSocket::onReadyRead(){
-    char buffer[1000] = {0};
-    read(buffer, bytesAvailable());
-    //read(buffer, 1000);
+    char buffer[1001] = {0};
+    //read(buffer, bytesAvailable());
+    read(buffer, 1001);
     QString data(buffer);
     qDebug() << "read data: " << data;
     emit readData(data);

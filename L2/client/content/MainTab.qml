@@ -155,7 +155,7 @@ Rectangle {
             dealResult(data);
         }
         onQmlConnectSuccessed: {
-            tryLogin();
+            reLogin();
         }
     }
 
@@ -184,11 +184,11 @@ Rectangle {
         HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
     }
 
-    function tryLogin(){
+    function reLogin(){
         var data = {};
         var userInfo = {};
         data.mtype = "SYN";
-        data.dtype = "LOGIN";
+        data.dtype = "RELOGIN";
         userInfo.name = qmlInterface.clientName;
         userInfo.password = qmlInterface.clientPassword;
         data.userInfo = userInfo;
@@ -208,15 +208,13 @@ Rectangle {
     function dealResult(data){
         var newData = JSON.parse(data);
         if(newData.mtype === "ACK"){
-            if(newData.dtype !== "LOGIN" && newData.dtype !== "READY"){
-                cacheManager.hadReceiveACK(true);
+            if(newData.dtype === "RELOGIN"){
+                cacheManager.hadReceiveACK(false); // 重发消息
+            }else{
+                cacheManager.hadReceiveACK(true); // 发下一条消息
             }
-            if(newData.dtype === "LOGIN"){ // 表示这是个断线重连后登录成功的 ACK
-                sendReady();
-            }else if(newData.dtype === "LINKMANS"){ // 获取联系人
+            if(newData.dtype === "LINKMANS"){ // 获取联系人
                 handleLinkmansAck(newData.linkmans);
-            }else if(newData.dtype === "READY"){
-                cacheManager.hadReceiveACK(false); // 重新发送消息队列里的消息
             }else if(newData.dtype === "SEARCH_CLIENT"){ // 查找结果
                 handleSearchClientAck(data);
             }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
@@ -255,6 +253,8 @@ Rectangle {
         var name = newData.oppName;
         if(newData.isFriend){
             TALK_PAGE_LOGIC.killBusy(name);
+        }else{
+            TALK_PAGE_LOGIC.setError(name);
         }
     }
 
@@ -263,7 +263,8 @@ Rectangle {
         var name = newData.name;
         var index = cacheManager.removeLinkman(name);
         if(index !== -1){
-            signalManager.removeLinkman(index+1);
+            signalManager.removeLinkman(name, index+1);
+            TALK_PAGE_LOGIC.removePage(name);
             var top = stackView.depth - 1;
             if(stackView.get(top).pageName === "personalDataPage" &&
                stackView.get(top).name === name){
@@ -287,6 +288,7 @@ Rectangle {
             }
             userInfoStr = JSON.stringify(userInfo);
             signalManager.receiveMessage(userInfoStr,  "你好！");
+            TALK_PAGE_LOGIC.appendMessage(userInfo, "你好！");
         }else{
             if(newData.mtype === "ACK"){
                 HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
@@ -334,7 +336,7 @@ Rectangle {
         data.dtype = "READY";
         data.clientName = qmlInterface.clientName;
         var strOut = JSON.stringify(data);
-        qmlInterface.qmlSendData(strOut);
+        cacheManager.addData(strOut);
     }
 
     function requestLinkmans() {

@@ -20,6 +20,7 @@ private:
 	void handle_syn(int fd, const Json::Value &value);
 	void handle_syn_register(int fd, const Json::Value &value);
 	void handle_syn_login(int fd, const Json::Value &value);
+	void handle_syn_relogin(int fd, const Json::Value &value);
 	void handle_syn_linkmans(int fd, const Json::Value &value);
 	void handle_syn_search_client(int fd, const Json::Value &value);
 	void handle_syn_ready(int fd, const Json::Value &value);

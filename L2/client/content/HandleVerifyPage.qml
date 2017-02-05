@@ -8,12 +8,16 @@ Rectangle {
     property string pageName: "handleVerifyPage"
     property int newRequests: 0
 
+    property int textSize1: 13
+    property int textSize2: 15
+    property int textSize3: 20
+
     TopBar {
         id: topView
         width: parent.width
         height: Screen.height * 0.07
         title: qsTr("新的朋友");
-        titleSize: 20
+        titleSize: textSize3
         onBacked: {
             stackView.pop();
         }
@@ -49,7 +53,7 @@ Rectangle {
                     Text {
                         id: sexText
                         text: itemDelegate.sex.toString()
-                        font.pointSize: 13
+                        font.pointSize: textSize1
                         color: "black"
                         anchors.centerIn: parent
                     }
@@ -66,7 +70,7 @@ Rectangle {
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: 15
+                anchors.margins: textSize2
                 height: 1
                 color: "#424246"
             }
@@ -75,7 +79,7 @@ Rectangle {
                 id: nameItem
                 text: itemName
                 color: "white"
-                font.pointSize: 15
+                font.pointSize: textSize2
                 anchors.top: headImage.top
                 anchors.left: headImage.right
                 anchors.leftMargin: topView.height * 0.3
@@ -85,7 +89,7 @@ Rectangle {
                 id: messageItem
                 text: itemMessage
                 color: "#c0c0c0"
-                font.pointSize: 13
+                font.pointSize: textSize1
                 anchors.bottom: headImage.bottom
                 anchors.left: headImage.right
                 anchors.leftMargin: topView.height * 0.3
@@ -94,7 +98,7 @@ Rectangle {
             GrayButton {
                 id: acceptButton
                 text: itemButtonText
-                textSize: 12
+                textSize: textSize1
                 width: topView.height * 1.4
                 height: parent.height * 0.4
                 anchors.right: parent.right

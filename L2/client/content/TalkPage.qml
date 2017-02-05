@@ -11,14 +11,18 @@ Rectangle {
     property string language
     property int sex
 
+    property int textSize1: 13
+    property int textSize2: 17
+    property int textSize3: 20
+
     TopBar {
         id: topView
         width: parent.width
         height: Screen.height * 0.07
         title: clientName
-        titleSize: 20
+        titleSize: textSize3
         onBacked: {
-            stackView.pop();
+            clickBack();
         }
     }
 
@@ -58,7 +62,7 @@ Rectangle {
                     Text {
                         id: sexText
                         text: itemSex.toString()
-                        font.pointSize: 13
+                        font.pointSize: textSize1
                         color: "black"
                         anchors.centerIn: parent
                     }
@@ -67,7 +71,7 @@ Rectangle {
                     id: languageItem
                     text: itemLanguage
                     color: "black"
-                    font.pointSize: 20
+                    font.pointSize: textSize3
                     anchors.centerIn: parent
                 }
             }
@@ -77,6 +81,17 @@ Rectangle {
                 height: width
                 color: "blue"
                 visible: isItemBusy
+                anchors.verticalCenter: headImage.verticalCenter
+                x: isSelf ? msgBackground.x - width - edge :
+                            msgBackground.x + msgBackground.width + edge
+            }
+
+            Rectangle {
+                id: errorNote
+                width: headImage.width * 0.4
+                height: width
+                color: "red"
+                visible: isItemError
                 anchors.verticalCenter: headImage.verticalCenter
                 x: isSelf ? msgBackground.x - width - edge :
                             msgBackground.x + msgBackground.width + edge
@@ -95,7 +110,7 @@ Rectangle {
                 Text {
                     id: msg
                     text: itemMsg
-                    font.pointSize: 17
+                    font.pointSize: textSize2
                     anchors.centerIn: parent
                     width: msgLength < talkDelegate.msgLimitLength ?
                                msgLength : talkDelegate.msgLimitLength
@@ -143,7 +158,7 @@ Rectangle {
             TextInput {
                 id: inputMsg
                 color: "white"
-                font.pointSize: 17
+                font.pointSize: textSize2
                 maximumLength: 200
                 wrapMode: TextInput.WrapAnywhere
                 anchors.left: parent.left
@@ -166,7 +181,7 @@ Rectangle {
             width: root.width * 0.16
             height: sayOrInput.height
             text: qsTr("发送");
-            textSize: 13
+            textSize: textSize1
             anchors.right: parent.right
             anchors.rightMargin: topView.height * 0.2
             anchors.bottom: parent.bottom
@@ -186,7 +201,7 @@ Rectangle {
     Text { // 用来测量消息长度
         id: msgDont
         visible: false
-        font.pointSize: 17
+        font.pointSize: textSize2
     }
 
     function sendButtonClicked(){
@@ -195,7 +210,7 @@ Rectangle {
             userInfo.name = qmlInterface.clientName;
             userInfo.language = qmlInterface.clientLanguage;
             userInfo.sex = qmlInterface.sex;
-            appendMsg(userInfo, inputMsg.text, true);
+            appendMsg(userInfo, inputMsg.text, true, false);
             sendMessage(userInfo, root.clientName, inputMsg.text);
 
             var oppUserInfo = {};
@@ -220,7 +235,7 @@ Rectangle {
         cacheManager.addData(strOut);
     }
 
-    function appendMsg(userInfo, msg, isItemBusy){
+    function appendMsg(userInfo, msg, isItemBusy, isItemError){
         msgDont.text = msg;
         var len = msgDont.width;
         msgList.model.append({"itemName" : userInfo.name,
@@ -228,6 +243,7 @@ Rectangle {
                               "itemMsg" : msg,
                               "msgLength" : len,
                               "isItemBusy" : isItemBusy,
+                              "isItemError" : isItemError,
                               "itemSex" : userInfo.sex});
     }
 
@@ -252,5 +268,18 @@ Rectangle {
 
     function killBusy(index){
         msgList.model.setProperty(index, "isItemBusy", false);
+    }
+
+    function setError(index){
+        msgList.model.setProperty(index, "isItemError", true);
+    }
+
+    function clickBack(){
+        var data = {};
+        data.pageName = "talkPage";
+        data.clientName = clientName;
+        var dataStr = JSON.stringify(data);
+        stackView.pop();
+        signalManager.stackPop(dataStr);
     }
 }

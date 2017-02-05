@@ -14,8 +14,17 @@ function openTalkPage(userInfo){
 function appendMessage(userInfo, msg){
     var page = openTalkPage(userInfo);
     if(page !== undefined){
-        page.appendMsg(userInfo, msg, false);
+        page.appendMsg(userInfo, msg, false, false);
     }
+}
+
+function removePage(name){
+    var page = findTalkPage(name);
+    if(page !== undefined){
+        page.destroy();
+        page = null;
+    }
+    console.log("pages lenght: " + msgPages.length);
 }
 
 function findTalkPage(name){
@@ -23,6 +32,17 @@ function findTalkPage(name){
     for(i = 0; i < msgPages.length; i++){
         if(msgPages[i].clientName === name)
             return msgPages[i];
+    }
+}
+
+function setError(name){
+    var page = findTalkPage(name);
+    if(page !== undefined){
+        var index = page.findFirstBusyIndex();
+        if(index !== -1){
+            page.killBusy(index);
+            page.setError(index);
+        }
     }
 }
 

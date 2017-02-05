@@ -104,6 +104,8 @@ void Server::handle_syn(int fd, const Json::Value &value){
 		handle_syn_ready(fd, value);
 	}else if(dtype == "LOGIN"){
 		handle_syn_login(fd, value);
+	}else if(dtype == "RELOGIN"){
+		handle_syn_relogin(fd, value);
 	}else if(dtype == "LINKMANS"){ // 获取好友列表
 		handle_syn_linkmans(fd, value);
 	}else if(dtype == "SEARCH_CLIENT"){ // 查询用户
@@ -241,6 +243,24 @@ void Server::handle_syn_register(int fd, const Json::Value &value){
 	userInfo.sex = userInfoObj["sex"].asInt();
 	bool res = clientdb.insertClient(userInfo);
 	IOManager::ack_register(fd, res);
+}
+
+void Server::handle_syn_relogin(int fd, const Json::Value &value){
+	Clientdb::UserInfo userInfo;
+	Json::Value userInfoObj;
+	userInfoObj = value["userInfo"];
+	string login_name = userInfoObj["name"].asString();
+	string login_password = userInfoObj["password"].asString();
+
+	int login_fd = onlineManager.isOnline(login_name);
+	bool res = clientdb.findClient(login_name, userInfo);
+	bool ok = (res && (login_password == userInfo.password));
+
+	IOManager::ack_relogin(fd, ok, login_fd != -1, userInfo);
+	if(ok && (login_fd == -1)){
+		onlineManager.addToMap(fd, login_name);
+		IOManager::send_syn(fd, login_name);
+	}
 }
 
 void Server::handle_syn_login(int fd, const Json::Value &value){

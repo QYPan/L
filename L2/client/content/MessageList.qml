@@ -4,6 +4,10 @@ import QtQuick.Window 2.0
 
 Item {
     id: root
+    property int textSize1: 13
+    property int textSize2: 15
+    property int textSize3: 20
+    property int textSize4: 10
 
     Rectangle {
         color: "#212126"
@@ -43,7 +47,7 @@ Item {
                     Text {
                         id: sexText
                         text: itemSex.toString()
-                        font.pointSize: 13
+                        font.pointSize: textSize1
                         color: "black"
                         anchors.centerIn: parent
                     }
@@ -52,7 +56,7 @@ Item {
                     id: languageItem
                     text: itemLanguage
                     color: "black"
-                    font.pointSize: 20
+                    font.pointSize: textSize3
                     anchors.centerIn: parent
                 }
             }
@@ -60,7 +64,6 @@ Item {
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: 15
                 height: 1
                 color: "#424246"
             }
@@ -69,7 +72,7 @@ Item {
                 id: nameItem
                 text: itemName
                 color: "white"
-                font.pointSize: 15
+                font.pointSize: textSize2
                 anchors.top: headImage.top
                 anchors.left: headImage.right
                 anchors.leftMargin: edge
@@ -78,11 +81,33 @@ Item {
             Text {
                 id: messageItem
                 text: itemMessage
+                width: parent.width * 0.6
                 color: "#c0c0c0"
-                font.pointSize: 13
+                font.pointSize: textSize1
                 anchors.bottom: headImage.bottom
                 anchors.left: headImage.right
                 anchors.leftMargin: edge
+                elide: Text.ElideRight
+            }
+
+            Image {
+                id: messageBox
+                width: Screen.height * 0.07 * 0.4
+                height: width
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: parent.height * 0.3
+                visible: (itemNewMsgCount === 0 // 如果没有新消息
+                          ? false : true)
+                source: "../images/messageBox.png"
+                fillMode: Image.PreserveAspectFit
+                Text {
+                    id: messageNumber
+                    color: "black"
+                    text: itemNewMsgCount.toString()
+                    font.pointSize: textSize4
+                    anchors.centerIn: parent
+                }
             }
 
             MouseArea {
@@ -107,6 +132,29 @@ Item {
         }
         onReceiveMessage: {
             handleReceiveMessageSignal(userInfoStr, msg);
+        }
+        onRemoveLinkman: {
+            handleRemoveLinkmanSignal(name);
+        }
+        onStackPop: {
+            handleStackPopSignal(data);
+        }
+    }
+
+    function handleStackPopSignal(data){
+        var newData = JSON.parse(data);
+        if(newData.pageName === "talkPage"){
+            var index = findIndexByName(newData.clientName);
+            if(index !== -1){
+                messageList.model.setProperty(index, "itemNewMsgCount", 0);
+            }
+        }
+    }
+
+    function handleRemoveLinkmanSignal(name){
+        var index = findIndexByName(name);
+        if(index !== -1){
+            messageList.model.remove(index);
         }
     }
 
@@ -141,13 +189,17 @@ Item {
     }
 
     function setMessage(index, msg){
+        var data = messageList.model.get(index);
+        var newMsgCount = data.itemNewMsgCount + 1;
         messageList.model.setProperty(index, "itemMessage", msg);
+        messageList.model.setProperty(index, "itemNewMsgCount", newMsgCount);
     }
 
     function addMessageItem(userInfo, msg){
         messageList.model.insert(0, {"itemName" : userInfo.name,
                                             "itemLanguage" : userInfo.language,
                                             "itemSex" : userInfo.sex,
+                                            "itemNewMsgCount" : 1,
                                             "itemMessage" : msg});
     }
 

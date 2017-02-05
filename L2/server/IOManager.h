@@ -21,6 +21,7 @@ public:
 	static void ack_accept_verify(int fd, bool isFriend, const Clientdb::UserInfo &userInfo);
 	static void ack_register(int fd, bool result);
 	static void ack_login(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo);
+	static void ack_relogin(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo);
 	static void ack_linkmans(int fd, bool result, const vector<Clientdb::UserInfo> &linkmans);
 	static void ack_remove_linkman(int fd, bool isFriend, const string &name);
 	static void ack_search_client(int fd, bool result, const Clientdb::UserInfo &userInfo);
