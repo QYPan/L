@@ -285,8 +285,8 @@ Rectangle {
                 //sayHello(userInfo.name);
             }
             userInfoStr = JSON.stringify(userInfo);
-            signalManager.receiveMessage(userInfoStr,  "你好！");
-            TALK_PAGE_LOGIC.appendMessage(userInfo, "你好！");
+            TALK_PAGE_LOGIC.appendMessage(userInfo, "你好！(这是打招呼内容)",
+                                          qsTr("你好！(这是打招呼内容)"));
         }else{
             if(newData.mtype === "ACK"){
                 HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));

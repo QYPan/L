@@ -116,6 +116,8 @@ Item {
                 onClicked: {
                     touchMsgItem();
                 }
+                onDoubleClicked: {
+                }
             }
 
             function touchMsgItem(){
