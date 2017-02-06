@@ -14,7 +14,7 @@ IOManager::~IOManager(){
 
 void IOManager::readData(int fd, string &data){
 	char buffer[1001] = {0};
-	read(fd, buffer, sizeof(buffer));
+	read(fd, buffer, sizeof(buffer)-1);
 	data = string(buffer);
 }
 
@@ -36,7 +36,7 @@ void IOManager::send_syn(int fd, const string &name){
 	if(!msg_list.empty()){
 		char buffer[1001] = {0};
 		strcpy(buffer, msg_list.front().c_str());
-		write(fd, buffer, sizeof(buffer));
+		write(fd, buffer, sizeof(buffer)-1);
 	}
 }
 
@@ -68,7 +68,7 @@ void IOManager::ack_transpond(int fd, bool isFriend, const string &oppName){
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_remove_linkman(int fd, bool isFriend, const string &name){
@@ -82,7 +82,7 @@ void IOManager::ack_remove_linkman(int fd, bool isFriend, const string &name){
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_accept_verify(int fd, bool isFriend, const Clientdb::UserInfo &userInfo){
@@ -100,7 +100,7 @@ void IOManager::ack_accept_verify(int fd, bool isFriend, const Clientdb::UserInf
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::cache_syn_accept_verify(const Clientdb::UserInfo &userInfo, const string &name){
@@ -152,7 +152,7 @@ void IOManager::ack_search_client(int fd, bool result, const Clientdb::UserInfo 
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_linkmans(int fd, bool result, const vector<Clientdb::UserInfo> &linkmans){
@@ -176,7 +176,7 @@ void IOManager::ack_linkmans(int fd, bool result, const vector<Clientdb::UserInf
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_relogin(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo){
@@ -200,7 +200,7 @@ void IOManager::ack_relogin(int fd, bool result, bool logined, const Clientdb::U
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_login(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo){
@@ -224,7 +224,7 @@ void IOManager::ack_login(int fd, bool result, bool logined, const Clientdb::Use
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_register(int fd, bool result){
@@ -237,7 +237,7 @@ void IOManager::ack_register(int fd, bool result){
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_message(int fd, const string &msg){
@@ -253,7 +253,7 @@ void IOManager::ack_message(int fd, const string &msg){
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }
 
 void IOManager::ack_heart(int fd){
@@ -269,5 +269,5 @@ void IOManager::ack_heart(int fd){
 	string strOut = writer.write(root);
 
 	strcpy(buffer, strOut.c_str());
-	write(fd, buffer, sizeof(buffer));
+	write(fd, buffer, sizeof(buffer)-1);
 }

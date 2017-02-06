@@ -1,5 +1,7 @@
+var request;
+var guserInfo;
+var gmsg;
 var component = null;
-
 var msgPages = new Array;
 
 function openTalkPage(userInfo){
@@ -11,10 +13,39 @@ function openTalkPage(userInfo){
     }
 }
 
-function appendMessage(userInfo, msg){
+function sendRequest(msg){
+    request = new XMLHttpRequest();
+    var str = "http://fanyi.youdao.com/openapi.do?keyfrom=english-2-chinese&key=1263917877&type=data&doctype=json&version=1.1&q=";
+    request.onreadystatechange = handleStateChanged;
+    request.open("GET", str+msg)
+    request.send();
+}
+
+function handleStateChanged(){
+    if(request.readyState === 4 && request.status === 200){
+        var ans = request.responseText;
+        var tmsg = JSON.parse(ans).translation[0];
+        console.log("translate: " + tmsg);
+        appendMessage(guserInfo, gmsg, tmsg);
+    }
+}
+
+function handleMessage(userInfo, msg){
+    guserInfo = userInfo;
+    gmsg = msg;
+    if(userInfo.language !== qmlInterface.clientLanguage){
+        sendRequest(msg);
+    }else{
+        appendMessage(guserInfo, msg, msg);
+    }
+}
+
+function appendMessage(userInfo, msg, tmsg){
+    var userInfoStr = JSON.stringify(userInfo);
+    signalManager.receiveMessage(userInfoStr, tmsg);
     var page = openTalkPage(userInfo);
     if(page !== undefined){
-        page.appendMsg(userInfo, msg, false, false);
+        page.appendMsg(userInfo, msg, tmsg, false, false);
     }
 }
 

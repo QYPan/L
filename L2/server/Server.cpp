@@ -146,7 +146,7 @@ void Server::handle_syn_transpond(int fd, const Json::Value &value){
 
 	bool isFriend = clientdb.findFriend(userInfo.name, oppName);
 	IOManager::ack_transpond(fd, isFriend, oppName);
-	if(isFriend){
+	if(isFriend && userInfo.name != oppName){
 		IOManager::cache_syn_transpond(userInfo, oppName, msg);
 		try_send_syn(oppName);
 	}

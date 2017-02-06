@@ -114,13 +114,17 @@ Item {
                 id: mouse
                 anchors.fill: parent
                 onClicked: {
-                    var userInfo = {};
-                    userInfo.name = itemName;
-                    userInfo.language = itemLanguage;
-                    userInfo.sex = itemSex;
-                    var userInfoStr = JSON.stringify(userInfo);
-                    signalManager.openTalkPage(userInfoStr, true);
+                    touchMsgItem();
                 }
+            }
+
+            function touchMsgItem(){
+                var userInfo = {};
+                userInfo.name = itemName;
+                userInfo.language = itemLanguage;
+                userInfo.sex = itemSex;
+                var userInfoStr = JSON.stringify(userInfo);
+                signalManager.openTalkPage(userInfoStr, true);
             }
         }
     }
@@ -140,6 +144,7 @@ Item {
             handleStackPopSignal(data);
         }
     }
+
 
     function handleStackPopSignal(data){
         var newData = JSON.parse(data);
@@ -193,6 +198,7 @@ Item {
         var newMsgCount = data.itemNewMsgCount + 1;
         messageList.model.setProperty(index, "itemMessage", msg);
         messageList.model.setProperty(index, "itemNewMsgCount", newMsgCount);
+        messageList.model.move(index, 0, 1);
     }
 
     function addMessageItem(userInfo, msg){

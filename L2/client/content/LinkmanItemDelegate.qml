@@ -102,5 +102,7 @@ Item {
         id: mouse
         anchors.fill: parent
         onClicked: root.clicked()
+        onDoubleClicked: {
+        }
     }
 }

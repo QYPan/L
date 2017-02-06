@@ -46,7 +46,7 @@ Rectangle {
             property real msgLimitLength: width - 2 * headImage.width - 6 * edge
             anchors.left: parent.left
             anchors.right: parent.right
-            height: edge + msgBackground.height
+            height: edge + msgBackground.height + originalItem.height
             Rectangle {
                 id: headImage
                 color: "#dddddd"
@@ -75,6 +75,52 @@ Rectangle {
                     anchors.centerIn: parent
                 }
             }
+            Canvas {
+                id: triangleLeft
+                visible: !isSelf
+                x: headImage.width
+                y: edge
+                width: 2*edge
+                height: headImage.height
+                contextType: "2d"
+                onPaint: {
+                    context.lineWidth = 0;
+                    context.strokeStyle = "#dddddd";
+                    context.fillStyle = "#dddddd";
+                    var startX = width / 2;
+                    var startY = height / 2;
+                    context.beginPath();
+                    context.moveTo(startX, startY);
+                    context.lineTo(width, height/3);
+                    context.lineTo(width, 2*height/3);
+                    context.closePath();
+                    context.fill();
+                    context.stroke();
+                }
+            }
+            Canvas {
+                id: triangleRight
+                visible: isSelf
+                x: parent.width - headImage.width - 2*edge
+                y: edge
+                width: 2*edge
+                height: headImage.height
+                contextType: "2d"
+                onPaint: {
+                    context.lineWidth = 0;
+                    context.strokeStyle = "#969696";
+                    context.fillStyle = "#969696";
+                    var startX = width / 2;
+                    var startY = height / 2;
+                    context.beginPath();
+                    context.moveTo(startX, startY);
+                    context.lineTo(0, height/3);
+                    context.lineTo(0, 2*height/3);
+                    context.closePath();
+                    context.fill();
+                    context.stroke();
+                }
+            }
             Rectangle {
                 id: busyState
                 width: headImage.width * 0.4
@@ -101,15 +147,45 @@ Rectangle {
                 id: msgBackground
                 x: isSelf ? parent.width - headImage.width - 2*edge - width : headImage.width + 2*edge
                 y: edge
-                width: msg.width + 2 * edge
-                height: msg.height + 2 * edge > headImage.height ?
-                            msg.height + 2 * edge : headImage.height
+                width: tmsg.width + 2 * edge
+                height: tmsg.height + 2 * edge > headImage.height ?
+                            tmsg.height + 2 * edge : headImage.height
                 color: isSelf ? (textTouch.pressed ? "#808080" : "#969696")
                            :(textTouch.pressed ? "#c0c0c0" : "#dddddd")
                 radius: 6
                 Text {
+                    id: tmsg
+                    text: itemTMsg
+                    font.pointSize: textSize2
+                    anchors.centerIn: parent
+                    width: tmsgLength < talkDelegate.msgLimitLength ?
+                               tmsgLength : talkDelegate.msgLimitLength
+                    wrapMode: Text.Wrap
+                }
+                MouseArea {
+                    id: textTouch
+                    anchors.fill: parent
+                    onPressAndHold: {
+                        talkDelegate.showOriginalMsg();
+                    }
+                }
+            }
+
+            Rectangle {
+                id: originalItem
+                x: isSelf ? parent.width - headImage.width - 2*edge - width : headImage.width + 2*edge
+                y: edge + msgBackground.height
+                width: msg.width + 2 * edge
+                height: 0
+                /*
+                height: msg.height + 2 * edge > headImage.height ?
+                            msg.height + 2 * edge : headImage.height
+                            */
+                color: isSelf ? (originalTouch.pressed ? "#808080" : "#969696")
+                           :(originalTouch.pressed ? "#c0c0c0" : "#dddddd")
+                radius: 6
+                Text {
                     id: msg
-                    text: itemMsg
                     font.pointSize: textSize2
                     anchors.centerIn: parent
                     width: msgLength < talkDelegate.msgLimitLength ?
@@ -117,9 +193,27 @@ Rectangle {
                     wrapMode: Text.Wrap
                 }
                 MouseArea {
-                    id: textTouch
+                    id: originalTouch
                     anchors.fill: parent
+                    onPressAndHold: {
+                        talkDelegate.hideOriginalMsg();
+                    }
                 }
+            }
+
+            function showOriginalMsg(){
+                if(originalItem.height === 0){
+                    msg.text = itemMsg;
+                    originalItem.height =  msg.height + 2 * edge > headImage.height ?
+                                msg.height + 2 * edge : headImage.height
+                }else{
+                    hideOriginalMsg();
+                }
+            }
+
+            function hideOriginalMsg(){
+                originalItem.height = 0;
+                msg.text = "";
             }
         }
     }
@@ -210,7 +304,7 @@ Rectangle {
             userInfo.name = qmlInterface.clientName;
             userInfo.language = qmlInterface.clientLanguage;
             userInfo.sex = qmlInterface.sex;
-            appendMsg(userInfo, inputMsg.text, true, false);
+            appendMsg(userInfo, inputMsg.text, inputMsg.text, true, false);
             sendMessage(userInfo, root.clientName, inputMsg.text);
 
             var oppUserInfo = {};
@@ -235,13 +329,18 @@ Rectangle {
         cacheManager.addData(strOut);
     }
 
-    function appendMsg(userInfo, msg, isItemBusy, isItemError){
+    function appendMsg(userInfo, msg, tmsg, isItemBusy, isItemError){
+        msg = qsTr("原文: ") + msg;
         msgDont.text = msg;
         var len = msgDont.width;
+        msgDont.text = tmsg;
+        var tlen = msgDont.width;
         msgList.model.append({"itemName" : userInfo.name,
                               "itemLanguage" : userInfo.language,
                               "itemMsg" : msg,
+                              "itemTMsg" : tmsg,
                               "msgLength" : len,
+                              "tmsgLength" : tlen,
                               "isItemBusy" : isItemBusy,
                               "isItemError" : isItemError,
                               "itemSex" : userInfo.sex});

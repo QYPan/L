@@ -242,9 +242,7 @@ Rectangle {
         var newData = JSON.parse(data);
         var userInfo = newData.userInfo;
         var msg = newData.msg;
-        var userInfoStr = JSON.stringify(userInfo);
-        signalManager.receiveMessage(userInfoStr, msg);
-        TALK_PAGE_LOGIC.appendMessage(userInfo, msg);
+        TALK_PAGE_LOGIC.handleMessage(userInfo, msg);
     }
 
     function handleTranspondAck(data){
