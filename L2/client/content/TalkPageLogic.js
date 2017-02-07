@@ -12,6 +12,7 @@ function msgPush(data){
     if(!isMsgListFull()){
         msgQueue[qrear] = data;
         qrear = (qrear + 1) % MSG_QUEUE_SIZE;
+        console.log("push msglist length: " + msgListLength());
     }
 }
 
@@ -19,6 +20,7 @@ function msgPop(){
     if(!isMsgListEmpty()){
         msgQueue[qfront] = null;
         qfront = (qfront + 1) % MSG_QUEUE_SIZE;
+        console.log("pop msglist length: " + msgListLength());
     }
 }
 
@@ -56,8 +58,10 @@ function openTalkPage(userInfo){
 function sendRequest(){
     var data = getMsgFront();
     if(data !== undefined){
+        console.log("send request with msg length: " + msgListLength());
         guserInfo = data.userInfo;
         gmsg = data.msg;
+        console.log("request msg: " + data.msg);
         request = new XMLHttpRequest();
         var str = "http://fanyi.youdao.com/openapi.do?keyfrom=english-2-chinese&key=1263917877&type=data&doctype=json&version=1.1&q=";
         request.onreadystatechange = handleStateChanged;
@@ -74,6 +78,8 @@ function handleStateChanged(){
         appendMessage(guserInfo, gmsg, tmsg);
         msgPop();
         sendRequest();
+    }else{
+        console.log("request readyState: " + request.readyState);
     }
 }
 
@@ -82,7 +88,9 @@ function addMessageToList(userInfo, msg){
     data.userInfo = userInfo;
     data.msg = msg;
     msgPush(data);
+    //console.log("try send request with msg length: " + msgListLength());
     if(msgListLength() === 1){
+        //console.log("send request with msg length: " + msgListLength());
         sendRequest();
     }
 }

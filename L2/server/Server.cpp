@@ -89,7 +89,7 @@ void Server::handle_client(int fd){
 }
 
 void Server::handle_ack(int fd, const Json::Value &value){
-	IOManager::ack_message(fd, string("ACK_ACK_SYN"));
+	//IOManager::ack_message(fd, string("ACK_ACK_SYN"));
 	string clientName = value["clientName"].asString();
 	IOManager::handle_ack(fd, clientName);
 }

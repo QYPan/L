@@ -307,7 +307,8 @@ Rectangle {
         data.mtype = "ACK";
         data.clientName = qmlInterface.clientName;
         var strOut = JSON.stringify(data);
-        cacheManager.addData(strOut);
+        //cacheManager.addData(strOut);
+        qmlInterface.qmlSendData(strOut);
     }
 
     function handleVerifyAck(){
