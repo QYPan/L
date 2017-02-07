@@ -179,22 +179,19 @@ void IOManager::ack_linkmans(int fd, bool result, const vector<Clientdb::UserInf
 	write(fd, buffer, sizeof(buffer)-1);
 }
 
-void IOManager::ack_relogin(int fd, bool result, bool logined, const Clientdb::UserInfo &userInfo){
+void IOManager::ack_relogin(int fd, bool result, const Clientdb::UserInfo &userInfo){
 	char buffer[1001] = {0};
 	Json::Value root;
 	root["mtype"] = "ACK";
 	root["dtype"] = "RELOGIN";
 	root["result"] = result;
 	if(result){
-		root["logined"] = logined;
-		if(!logined){
-			Json::Value juserInfo;
-			juserInfo["name"] = userInfo.name;
-			juserInfo["password"] = userInfo.password;
-			juserInfo["language"] = userInfo.language;
-			juserInfo["sex"] = userInfo.sex;
-			root["userInfo"] = juserInfo;
-		}
+		Json::Value juserInfo;
+		juserInfo["name"] = userInfo.name;
+		juserInfo["password"] = userInfo.password;
+		juserInfo["language"] = userInfo.language;
+		juserInfo["sex"] = userInfo.sex;
+		root["userInfo"] = juserInfo;
 	}
 	Json::FastWriter writer;
 	string strOut = writer.write(root);

@@ -252,12 +252,12 @@ void Server::handle_syn_relogin(int fd, const Json::Value &value){
 	string login_name = userInfoObj["name"].asString();
 	string login_password = userInfoObj["password"].asString();
 
-	int login_fd = onlineManager.isOnline(login_name);
+	//int login_fd = onlineManager.isOnline(login_name);
 	bool res = clientdb.findClient(login_name, userInfo);
 	bool ok = (res && (login_password == userInfo.password));
 
-	IOManager::ack_relogin(fd, ok, login_fd != -1, userInfo);
-	if(ok && (login_fd == -1)){
+	IOManager::ack_relogin(fd, ok, userInfo);
+	if(ok){
 		onlineManager.addToMap(fd, login_name);
 		IOManager::send_syn(fd, login_name);
 	}
