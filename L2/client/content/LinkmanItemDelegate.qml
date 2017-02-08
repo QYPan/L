@@ -30,23 +30,32 @@ Item {
         anchors.leftMargin: parent.height * 0.3
         anchors.verticalCenter: parent.verticalCenter
         Item {
-            width: parent.width * 0.2
-            height: parent.height * 0.2
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            width: parent.width * 0.6
+            height: parent.height * 0.6
+            anchors.left: parent.left
+            anchors.top: parent.top
             Text {
-                id: sexText
-                text: root.sex.toString()
-                font.pointSize: textSize4
+                id: languageItem
                 color: "black"
+                font.pointSize: textSize3
                 anchors.centerIn: parent
             }
         }
-        Text {
-            id: languageItem
-            color: "black"
-            font.pointSize: textSize3
-            anchors.centerIn: parent
+        Image {
+            width: parent.width * 0.4
+            height: parent.height * 0.4
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            source: {
+                if(root.sex === -1){
+                     return "../images/man_or_woman_image.png"
+                }else if(root.sex === 0){
+                     return "../images/man_image.png"
+                }else{
+                     return "../images/woman_image.png"
+                }
+            }
+            fillMode: Image.PreserveAspectFit
         }
     }
 

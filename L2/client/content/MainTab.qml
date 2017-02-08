@@ -8,9 +8,13 @@ import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 Rectangle {
     id: root
     color: "#212126"
-    property int textSize1: 15
+    property int textSize1: 13
     property int textSize2: choseTextSize.sizeD
     property int textSize3: choseTextSize.sizeG
+    property int textSize4: 9
+
+    property int newMessageCount: 0
+    property int newLinkmanCount: 0
 
     BorderImage {
         id: topView
@@ -116,6 +120,13 @@ Rectangle {
         }
     }
 
+    property var tabImageDefault: ["../images/message_tab_item_default.png",
+                            "../images/linkman_tab_item_default.png",
+                            "../images/system_tab_item_default.png",]
+    property var tabImage: ["../images/message_tab_item.png",
+                            "../images/linkman_tab_item.png",
+                            "../images/system_tab_item.png",]
+
     Component {
         id: touchStyle
         TabViewStyle {
@@ -130,11 +141,61 @@ Rectangle {
                     border.bottom: 8
                     border.top: 8
                     source: "../images/tabs_standard.png"
-                    Text {
-                        anchors.centerIn: parent
-                        color: styleData.selected ? "#3399ff" : "white"
-                        text: styleData.title
-                        font.pointSize: textSize1
+                    Image {
+                        id: messageTabImage
+                        width: height
+                        height: parent.height * 0.7
+                        anchors.top: parent.top
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        fillMode: Image.PreserveAspectFit
+                        source: styleData.selected ? tabImage[styleData.index]
+                                                   : tabImageDefault[styleData.index]
+                        Image {
+                            id: newMsgImage
+                            width: Screen.height * 0.07 * 0.4
+                            height: width
+                            anchors.right: parent.right
+                            anchors.rightMargin: - Screen.height * 0.07 * 0.2
+                            anchors.top: parent.top
+                            anchors.topMargin: Screen.height * 0.07 * 0.2
+                            visible: {
+                                if(styleData.index === 0){
+                                    return root.newMessageCount === 0 ? false : true;
+                                }else if(styleData.index === 1){
+                                    return root.newLinkmanCount === 0 ? false : true;
+                                }else{
+                                    return false;
+                                }
+                            }
+                            source: "../images/messageBox.png"
+                            fillMode: Image.PreserveAspectFit
+                            Text {
+                                id: messageNumber
+                                color: "black"
+                                text: {
+                                    if(styleData.index === 0){
+                                        return root.newMessageCount.toString();
+                                    }else if(styleData.index === 1){
+                                        return root.newLinkmanCount.toString();
+                                    }else{
+                                        return false;
+                                    }
+                                }
+                                font.pointSize: textSize4
+                                anchors.centerIn: parent
+                            }
+                        }
+                    }
+                    Item {
+                        width: parent.width
+                        height: parent.height * 0.3
+                        anchors.top: messageTabImage.bottom
+                        Text {
+                            anchors.centerIn: parent
+                            color: styleData.selected ? "#3399ff" : "#c0c0c0"
+                            text: styleData.title
+                            font.pointSize: textSize1
+                        }
                     }
                     Rectangle {
                         visible: index > 0
@@ -174,12 +235,16 @@ Rectangle {
         target: signalManager
         onOpenHandleVerifyPage: {
             stackView.push(HANDLE_VERIFY_LOGIC.openHandleVerifyPage());
+            root.newLinkmanCount = 0;
         }
         onGetRequestNumber: {
             signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
         }
         onOpenTalkPage: {
             handleOpenTalkPageSignal(userInfoStr, isPush);
+        }
+        onUpdateNewMessageCount: {
+            root.newMessageCount = count;
         }
     }
 
@@ -247,9 +312,12 @@ Rectangle {
         var newData = JSON.parse(data);
         udata.userInfo = newData.userInfo;
         udata.msg = newData.msg;
-        var udataStr = JSON.stringify(udata);
-        cacheManager.addTranslateData(udataStr);
-        //TALK_PAGE_LOGIC.handleMessage(userInfo, msg);
+        if(udata.userInfo.language === qmlInterface.clientLanguage){
+            TALK_PAGE_LOGIC.appendMessage(udata.userInfo, udata.msg, udata.msg);
+        }else{
+            var udataStr = JSON.stringify(udata);
+            cacheManager.addTranslateData(udataStr);
+        }
     }
 
     function handleTranspondAck(data){
@@ -306,6 +374,7 @@ Rectangle {
         var top = stackView.depth - 1;
         if(stackView.get(top).pageName !== "handleVerifyPage"){
             signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
+            root.newLinkmanCount = HANDLE_VERIFY_LOGIC.getNewRequestsCount();
         }
     }
 

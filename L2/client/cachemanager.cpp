@@ -4,7 +4,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
@@ -13,6 +12,7 @@
 HttpRequest::HttpRequest(QObject *parent)
     : QObject(parent)
 {
+    manager = new QNetworkAccessManager();
 }
 
 void HttpRequest::getRequest(const QString &msg, QString &tmsg){
@@ -24,7 +24,7 @@ void HttpRequest::getRequest(const QString &msg, QString &tmsg){
     QNetworkRequest request;
     request.setUrl(QUrl(baseUrl));
 
-    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    //QNetworkAccessManager *manager = new QNetworkAccessManager();
     // 发送请求
     QNetworkReply *pReplay = manager->get(request);
 
@@ -47,11 +47,11 @@ void HttpRequest::getRequest(const QString &msg, QString &tmsg){
         if(!errorCode){
             QJsonArray tarray = obj.value("translation").toArray();
             tmsg = tarray.at(0).toString();
-        }else{
-            tmsg = msg;
+            qDebug() << "translation: " << tmsg;
+            return;
         }
-        qDebug() << "translation: " << tmsg;
     }
+    tmsg = msg;
 }
 
 void HttpRequest::sendRequest(const QString &udata){

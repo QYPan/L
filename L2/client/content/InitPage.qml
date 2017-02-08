@@ -35,6 +35,7 @@ Rectangle {
             Image {
                 id: userImage
                 source: "../images/userall.png"
+                fillMode: Image.PreserveAspectFit
                 width: parent.height
                 height: width
                 anchors.left: parent.left
@@ -42,6 +43,7 @@ Rectangle {
             Image {
                 id: slashImage1
                 source: "../images/slash.png"
+                fillMode: Image.PreserveAspectFit
                 width: userImage.width * 0.33
                 height: userImage.height
                 anchors.left: userImage.right
@@ -76,6 +78,7 @@ Rectangle {
             Image {
                 id: passwordImage
                 source: "../images/passwordall.png"
+                fillMode: Image.PreserveAspectFit
                 width: userImage.width
                 height: width
                 anchors.left: parent.left
@@ -83,6 +86,7 @@ Rectangle {
             Image {
                 id: slashImage2
                 source: "../images/slash.png"
+                fillMode: Image.PreserveAspectFit
                 width: slashImage1.width
                 height: passwordImage.height
                 anchors.left: passwordImage.right

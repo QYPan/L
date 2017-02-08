@@ -6,8 +6,8 @@ import "content"
 ApplicationWindow {
     id: root
     visible: true
-    width: 406
-    height: 701
+    width: 360
+    height: 670
     title: qsTr("L")
 
     StackView {

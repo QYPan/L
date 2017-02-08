@@ -9,6 +9,8 @@ Item {
     property int textSize3: 20
     property int textSize4: 10
 
+    property int totalNewMsgCount: 0
+
     Rectangle {
         color: "#212126"
         anchors.fill: parent
@@ -40,24 +42,26 @@ Item {
                 anchors.leftMargin: edge
                 anchors.verticalCenter: parent.verticalCenter
                 Item {
-                    width: parent.width * 0.2
-                    height: parent.height * 0.2
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
+                    width: parent.width * 0.6
+                    height: parent.height * 0.6
+                    anchors.left: parent.left
+                    anchors.top: parent.top
                     Text {
-                        id: sexText
-                        text: itemSex.toString()
-                        font.pointSize: textSize1
+                        id: languageItem
+                        text: itemLanguage
                         color: "black"
+                        font.pointSize: textSize3
                         anchors.centerIn: parent
                     }
                 }
-                Text {
-                    id: languageItem
-                    text: itemLanguage
-                    color: "black"
-                    font.pointSize: textSize3
-                    anchors.centerIn: parent
+                Image {
+                    width: parent.width * 0.4
+                    height: parent.height * 0.4
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    source: itemSex ? "../images/woman_image.png"
+                                     : "../images/man_image.png"
+                    fillMode: Image.PreserveAspectFit
                 }
             }
 
@@ -143,24 +147,32 @@ Item {
             handleRemoveLinkmanSignal(name);
         }
         onStackPop: {
-            handleStackPopSignal(data);
+            handleStackPopSignal();
         }
     }
 
 
-    function handleStackPopSignal(data){
-        var newData = JSON.parse(data);
-        if(newData.pageName === "talkPage"){
-            var index = findIndexByName(newData.clientName);
+    function handleStackPopSignal(){
+        var top = stackView.depth - 1;
+        var topItem = stackView.get(top);
+        if(topItem.pageName === "talkPage"){
+            var index = findIndexByName(topItem.clientName);
             if(index !== -1){
+                var curItem = messageList.model.get(index);
+                root.totalNewMsgCount -= curItem.itemNewMsgCount;
+                signalManager.updateNewMessageCount(root.totalNewMsgCount);
                 messageList.model.setProperty(index, "itemNewMsgCount", 0);
             }
         }
+        stackView.pop();
     }
 
     function handleRemoveLinkmanSignal(name){
         var index = findIndexByName(name);
         if(index !== -1){
+            var curItem = messageList.model.get(index);
+            root.totalNewMsgCount -= curItem.itemNewMsgCount;
+            signalManager.updateNewMessageCount(root.totalNewMsgCount);
             messageList.model.remove(index);
         }
     }
@@ -177,6 +189,8 @@ Item {
 
     function changeMessage(userInfo, msg){
         var index = findIndexByName(userInfo.name);
+        root.totalNewMsgCount += 1;
+        signalManager.updateNewMessageCount(root.totalNewMsgCount);
         if(index !== -1){
             setMessage(index, msg);
         }else{

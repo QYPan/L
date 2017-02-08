@@ -22,7 +22,7 @@ Rectangle {
         title: clientName
         titleSize: textSize3
         onBacked: {
-            clickBack();
+            signalManager.stackPop();
         }
     }
 
@@ -55,24 +55,26 @@ Rectangle {
                 x: xCoor
                 y: edge
                 Item {
-                    width: parent.width * 0.2
-                    height: parent.height * 0.2
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
+                    width: parent.width * 0.6
+                    height: parent.height * 0.6
+                    anchors.left: parent.left
+                    anchors.top: parent.top
                     Text {
-                        id: sexText
-                        text: itemSex.toString()
-                        font.pointSize: textSize1
+                        id: languageItem
+                        text: itemLanguage
                         color: "black"
+                        font.pointSize: textSize3
                         anchors.centerIn: parent
                     }
                 }
-                Text {
-                    id: languageItem
-                    text: itemLanguage
-                    color: "black"
-                    font.pointSize: textSize3
-                    anchors.centerIn: parent
+                Image {
+                    width: parent.width * 0.4
+                    height: parent.height * 0.4
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    source: itemSex ? "../images/woman_image.png"
+                                     : "../images/man_image.png"
+                    fillMode: Image.PreserveAspectFit
                 }
             }
             Canvas {
@@ -121,11 +123,12 @@ Rectangle {
                     context.stroke();
                 }
             }
-            Rectangle {
+            Image {
                 id: busyState
                 width: headImage.width * 0.4
                 height: width
-                color: "blue"
+                source: "../images/busy.png"
+                fillMode: Image.PreserveAspectFit
                 visible: isItemBusy
                 anchors.verticalCenter: headImage.verticalCenter
                 x: isSelf ? msgBackground.x - width - edge :
@@ -141,11 +144,12 @@ Rectangle {
                 }
             }
 
-            Rectangle {
+            Image {
                 id: errorNote
-                width: headImage.width * 0.4
+                width: headImage.width * 0.5
                 height: width
-                color: "red"
+                source: "../images/error.png"
+                fillMode: Image.PreserveAspectFit
                 visible: isItemError
                 anchors.verticalCenter: headImage.verticalCenter
                 x: isSelf ? msgBackground.x - width - edge :
@@ -382,12 +386,4 @@ Rectangle {
         msgList.model.setProperty(index, "isItemError", true);
     }
 
-    function clickBack(){
-        var data = {};
-        data.pageName = "talkPage";
-        data.clientName = clientName;
-        var dataStr = JSON.stringify(data);
-        stackView.pop();
-        signalManager.stackPop(dataStr);
-    }
 }

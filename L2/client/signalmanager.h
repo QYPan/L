@@ -13,7 +13,8 @@ signals:
     void addLinkman(int index, const QString &userInfoStr);
     void removeLinkman(const QString &name, int index);
     void searchResult(const QString &data);
-    void stackPop(const QString &data);
+    void stackPop();
+    void updateNewMessageCount(int count);
     void openTalkPage(const QString &userInfoStr, bool isPush);
     void sendMessage(const QString &userInfoStr, const QString &msg);
     void receiveMessage(const QString &userInfoStr, const QString &msg);
