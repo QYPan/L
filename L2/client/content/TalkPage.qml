@@ -130,6 +130,15 @@ Rectangle {
                 anchors.verticalCenter: headImage.verticalCenter
                 x: isSelf ? msgBackground.x - width - edge :
                             msgBackground.x + msgBackground.width + edge
+                RotationAnimation {
+                    id: anim
+                    target: busyState
+                    from: 0
+                    to: 360
+                    duration: 1000
+                    loops: Animation.Infinite // 无限循环
+                    running: true
+                }
             }
 
             Rectangle {

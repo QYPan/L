@@ -8,7 +8,7 @@ import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 Rectangle {
     id: root
     color: "#212126"
-    property int textSize1: choseTextSize.sizeC
+    property int textSize1: 15
     property int textSize2: choseTextSize.sizeD
     property int textSize3: choseTextSize.sizeG
 
@@ -123,13 +123,13 @@ Rectangle {
             tabOverlap: 0
             frame: Item {}
             tab: Item {
-                implicitWidth: control.width/control.count
-                implicitHeight: Screen.height * 0.07
+                implicitWidth: control.width / control.count
+                implicitHeight: Screen.height * 0.075
                 BorderImage {
                     anchors.fill: parent
                     border.bottom: 8
                     border.top: 8
-                    source: styleData.selected ? "../images/tabs_standard.png":"../images/tabs_standard.png"
+                    source: "../images/tabs_standard.png"
                     Text {
                         anchors.centerIn: parent
                         color: styleData.selected ? "#3399ff" : "white"
@@ -163,6 +163,10 @@ Rectangle {
         target: cacheManager
         onSendData: {
             qmlInterface.qmlSendData(data);
+        }
+        onFinishTranslate: {
+            var tudata = JSON.parse(udata);
+            TALK_PAGE_LOGIC.appendMessage(tudata.userInfo, tudata.msg, tudata.tmsg);
         }
     }
 
@@ -239,10 +243,13 @@ Rectangle {
     }
 
     function handleTranspondSyn(data){
+        var udata = {};
         var newData = JSON.parse(data);
-        var userInfo = newData.userInfo;
-        var msg = newData.msg;
-        TALK_PAGE_LOGIC.handleMessage(userInfo, msg);
+        udata.userInfo = newData.userInfo;
+        udata.msg = newData.msg;
+        var udataStr = JSON.stringify(udata);
+        cacheManager.addTranslateData(udataStr);
+        //TALK_PAGE_LOGIC.handleMessage(userInfo, msg);
     }
 
     function handleTranspondAck(data){

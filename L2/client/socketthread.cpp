@@ -30,6 +30,7 @@ void SocketThread::run(){
     ClientSocket socket;
     QTimer sendTimer, countTimer;
     //socket.connectToHost("118.89.35.51", 60000);
+    //socket.connectToHost("118.89.35.51", 9658);
     //socket.connectToHost("127.0.0.1", 9658);
     socket.connectToHost("118.89.35.51", 9658);
     if (!socket.waitForConnected(timeOut)) {
