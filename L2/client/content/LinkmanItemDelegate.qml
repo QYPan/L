@@ -8,10 +8,10 @@ Item {
     property alias language: languageItem.text
     property int sex
 
-    property int textSize1: choseTextSize.sizeA
+    property int textSize1: 12
     property int textSize2: choseTextSize.sizeB
-    property int textSize3: choseTextSize.sizeC
-    property int textSize4: 9
+    property int textSize3: 17
+    property int textSize4: 11
 
     signal clicked()
 
@@ -37,7 +37,7 @@ Item {
             Text {
                 id: languageItem
                 color: "black"
-                font.pointSize: textSize3
+                font.pointSize: textSize1
                 anchors.centerIn: parent
             }
         }
@@ -62,7 +62,7 @@ Item {
     Text {
         id: nameItem
         color: "white"
-        font.pointSize: textSize2
+        font.pointSize: textSize3
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: headImage.right
         anchors.leftMargin: parent.height * 0.3
@@ -84,7 +84,7 @@ Item {
             id: messageNumber
             color: "black"
             text: root.newRequest.toString()
-            font.pointSize: textSize1
+            font.pointSize: textSize4
             anchors.centerIn: parent
         }
     }

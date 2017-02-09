@@ -21,7 +21,6 @@ public slots:
     void sendRequest(const QString &udata);
 private:
     void getRequest(const QString &msg, QString &tmsg);
-    QNetworkAccessManager *manager;
 };
 
 class TranslateThread : public QThread

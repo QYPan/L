@@ -7,7 +7,7 @@ import QmlInterface 1.0
 Rectangle {
     id: root
     color: "black"
-    property int textSize1: choseTextSize.sizeB
+    //property int textSize1: choseTextSize.sizeB
     property int textSize2: choseTextSize.sizeC
     property int textSize3: choseTextSize.sizeE
 
@@ -43,7 +43,6 @@ Rectangle {
             Image {
                 id: slashImage1
                 source: "../images/slash.png"
-                fillMode: Image.PreserveAspectFit
                 width: userImage.width * 0.33
                 height: userImage.height
                 anchors.left: userImage.right
@@ -86,7 +85,6 @@ Rectangle {
             Image {
                 id: slashImage2
                 source: "../images/slash.png"
-                fillMode: Image.PreserveAspectFit
                 width: slashImage1.width
                 height: passwordImage.height
                 anchors.left: passwordImage.right
@@ -120,7 +118,6 @@ Rectangle {
     GrayButton {
         id: loginButton
         text: qsTr("登 录")
-        textSize: textSize2
         width: uandp.width
         height: width * 0.17
         buttonPressed: true
@@ -136,7 +133,7 @@ Rectangle {
     WordButton {
         id: registerButton
         text: qsTr("新用户注册")
-        textSize: textSize1
+        textSize: textSize2
         anchors.right: parent.right
         anchors.rightMargin: loginButton.height * 0.3
         anchors.bottom: parent.bottom

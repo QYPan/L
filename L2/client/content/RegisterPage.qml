@@ -292,7 +292,6 @@ Rectangle {
         GrayButton {
             id: registerButton
             text: qsTr("确认注册")
-            textSize: 15
             width: user.width
             height: width * 0.17
             buttonPressed: true
@@ -306,7 +305,6 @@ Rectangle {
         GrayButton {
             id: backButton
             text: qsTr("返 回")
-            textSize: 15
             width: user.width
             height: width * 0.17
             onClicked: {

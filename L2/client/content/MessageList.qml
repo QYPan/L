@@ -4,10 +4,10 @@ import QtQuick.Window 2.0
 
 Item {
     id: root
-    property int textSize1: 13
+    //property int textSize1: 13
     property int textSize2: 15
-    property int textSize3: 20
-    property int textSize4: 10
+    property int textSize3: 17
+    property int textSize4: 11
 
     property int totalNewMsgCount: 0
 
@@ -76,7 +76,7 @@ Item {
                 id: nameItem
                 text: itemName
                 color: "white"
-                font.pointSize: textSize2
+                font.pointSize: textSize3
                 anchors.top: headImage.top
                 anchors.left: headImage.right
                 anchors.leftMargin: edge
@@ -87,7 +87,7 @@ Item {
                 text: itemMessage
                 width: parent.width * 0.6
                 color: "#c0c0c0"
-                font.pointSize: textSize1
+                font.pointSize: textSize2
                 anchors.bottom: headImage.bottom
                 anchors.left: headImage.right
                 anchors.leftMargin: edge

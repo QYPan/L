@@ -151,9 +151,9 @@ Rectangle {
     GrayCheckDialog {
         id: checkDialog
         anchors.centerIn: parent
-        textSize: textSize1
+        textSize: textSize2
         width: parent.width * 0.5
-        height: parent.height * 0.2
+        height: textHeight + Screen.height * 0.07 * 1.4
         visible: false
         onButtonClicked: {
         }
@@ -195,7 +195,7 @@ Rectangle {
 
     function checkRemoveLinkman(name){
         lockAll(true);
-        checkDialog.setMessageText(qsTr("确认删除 ")+name+" ?");
+        checkDialog.setMessageText(qsTr("删除 ")+name+" 将同时把与该用户的聊天记录删除");
         checkDialog.visible = true;
     }
 

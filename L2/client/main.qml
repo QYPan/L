@@ -14,6 +14,20 @@ ApplicationWindow {
         id: stackView // 实现翻页
         anchors.fill: parent
         focus: true
+        Keys.onReleased: {
+            if (event.key === Qt.Key_Back) {
+                if(stackView.depth > 1){
+                    var top = stackView.depth - 1;
+                    var topPage = stackView.get(top);
+                    if(topPage.pageName === "talkPage"){
+                        signalManager.stackPop();
+                    }else{
+                        stackView.pop();
+                    }
+                    event.accepted = true;
+                }
+            }
+        }
     }
 
     Component.onCompleted: {

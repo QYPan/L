@@ -4,7 +4,7 @@ import QtQuick.Controls.Styles 1.1
 
 Button {
     text: "Press me"
-    property int textSize: choseTextSize.sizeC
+    property int textSize: 17
     property bool buttonPressed: false
     enabled: !buttonPressed
     style: ButtonStyle {

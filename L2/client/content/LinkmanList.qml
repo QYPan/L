@@ -17,14 +17,14 @@ Item {
         model: ListModel {
             ListElement {
                 itemName: qsTr("新的朋友")
-                itemLanguage: "C/E"
+                itemLanguage: "C|E"
                 itemSex: -1
                 itemNewRequest: 0
             }
         }
         delegate: LinkmanItemDelegate {
             width: parent.width
-            height: Screen.height * 0.07
+            height: Screen.height * 0.08
             name: itemName
             language: itemLanguage
             sex: itemSex

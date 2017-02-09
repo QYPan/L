@@ -11,6 +11,7 @@ Rectangle {
     property int textSize1: 13
     property int textSize2: 15
     property int textSize3: 20
+    property int textSize4: 17
 
     TopBar {
         id: topView
@@ -46,24 +47,26 @@ Rectangle {
                 anchors.leftMargin: topView.height * 0.3
                 anchors.verticalCenter: parent.verticalCenter
                 Item {
-                    width: parent.width * 0.2
-                    height: parent.height * 0.2
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
+                    width: parent.width * 0.6
+                    height: parent.height * 0.6
+                    anchors.left: parent.left
+                    anchors.top: parent.top
                     Text {
-                        id: sexText
-                        text: itemDelegate.sex.toString()
-                        font.pointSize: textSize1
+                        id: languageItem
+                        text: itemLanguage
                         color: "black"
+                        font.pointSize: textSize4
                         anchors.centerIn: parent
                     }
                 }
-                Text {
-                    id: languageItem
-                    text: itemLanguage
-                    color: "black"
-                    font.pointSize: 20
-                    anchors.centerIn: parent
+                Image {
+                    width: parent.width * 0.4
+                    height: parent.height * 0.4
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    source: itemDelegate.sex ? "../images/woman_image.png"
+                                     : "../images/man_image.png"
+                    fillMode: Image.PreserveAspectFit
                 }
             }
 
@@ -79,7 +82,7 @@ Rectangle {
                 id: nameItem
                 text: itemName
                 color: "white"
-                font.pointSize: textSize2
+                font.pointSize: textSize4
                 anchors.top: headImage.top
                 anchors.left: headImage.right
                 anchors.leftMargin: topView.height * 0.3
@@ -89,7 +92,7 @@ Rectangle {
                 id: messageItem
                 text: itemMessage
                 color: "#c0c0c0"
-                font.pointSize: textSize1
+                font.pointSize: textSize2
                 anchors.bottom: headImage.bottom
                 anchors.left: headImage.right
                 anchors.leftMargin: topView.height * 0.3

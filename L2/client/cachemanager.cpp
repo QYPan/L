@@ -12,7 +12,6 @@
 HttpRequest::HttpRequest(QObject *parent)
     : QObject(parent)
 {
-    manager = new QNetworkAccessManager();
 }
 
 void HttpRequest::getRequest(const QString &msg, QString &tmsg){
@@ -25,12 +24,13 @@ void HttpRequest::getRequest(const QString &msg, QString &tmsg){
     request.setUrl(QUrl(baseUrl));
 
     //QNetworkAccessManager *manager = new QNetworkAccessManager();
+    QNetworkAccessManager manager;
     // 发送请求
-    QNetworkReply *pReplay = manager->get(request);
+    QNetworkReply *pReplay = manager.get(request);
 
     // 开启一个局部的事件循环，等待响应结束，退出
     QEventLoop eventLoop;
-    QObject::connect(manager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
+    QObject::connect(&manager, &QNetworkAccessManager::finished, &eventLoop, &QEventLoop::quit);
     eventLoop.exec();
 
     // 获取响应信息

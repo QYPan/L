@@ -1,9 +1,11 @@
 import QtQuick 2.0
+import QtQuick.Window 2.0
 
 Rectangle {
     id: root
-    property alias textSize: dialogMessage.font.pointSize
-    property int textSize1: 13
+    property alias textHeight: dialogMessage.height
+    property int textSize: 17
+    property int textSize1: 15
     signal buttonClicked()
     signal yesClicked()
     signal noClicked()
@@ -14,17 +16,23 @@ Rectangle {
     }
     Item {
         id: textBackground
-        width: parent.width
-        height: parent.height / 2
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: buttonRows.top
         Text {
             id: dialogMessage
+            font.pointSize: textSize
+            width: root.width - Screen.height * 0.07 * 0.4
             anchors.centerIn: parent
+            wrapMode: Text.Wrap
         }
     }
     Item {
+        id: buttonRows
         width: parent.width
-        height: parent.height / 2
-        anchors.top: textBackground.bottom
+        height: Screen.height * 0.07
+        anchors.bottom: parent.bottom
         Row {
             anchors.centerIn: parent
             spacing: root.width * 0.2
@@ -32,8 +40,8 @@ Rectangle {
                 id: yesButton
                 text: qsTr("确 定")
                 textSize: textSize1
-                width: root.width * 0.3
-                height: width * 0.4
+                width: buttonRows.width * 0.3
+                height: width * 0.45
                 onClicked: {
                     buttonClicked();
                     yesClicked();
@@ -43,8 +51,8 @@ Rectangle {
                 id: noButton
                 text: qsTr("取 消")
                 textSize: textSize1
-                width: root.width * 0.3
-                height: width * 0.4
+                width: buttonRows.width * 0.3
+                height: width * 0.45
                 onClicked: {
                     buttonClicked();
                     noClicked();

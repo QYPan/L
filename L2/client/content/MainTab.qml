@@ -11,7 +11,7 @@ Rectangle {
     property int textSize1: 13
     property int textSize2: choseTextSize.sizeD
     property int textSize3: choseTextSize.sizeG
-    property int textSize4: 9
+    property int textSize4: 11
 
     property int newMessageCount: 0
     property int newLinkmanCount: 0
@@ -117,6 +117,7 @@ Rectangle {
         Tab {
             id: systemTab
             title: qsTr("系统")
+            source: "SystemList.qml"
         }
     }
 
@@ -135,7 +136,7 @@ Rectangle {
             frame: Item {}
             tab: Item {
                 implicitWidth: control.width / control.count
-                implicitHeight: Screen.height * 0.075
+                implicitHeight: Screen.height * 0.085
                 BorderImage {
                     anchors.fill: parent
                     border.bottom: 8
@@ -144,8 +145,9 @@ Rectangle {
                     Image {
                         id: messageTabImage
                         width: height
-                        height: parent.height * 0.7
+                        height: parent.height * 0.5
                         anchors.top: parent.top
+                        anchors.topMargin: parent.height * 0.1
                         anchors.horizontalCenter: parent.horizontalCenter
                         fillMode: Image.PreserveAspectFit
                         source: styleData.selected ? tabImage[styleData.index]
@@ -157,7 +159,7 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.rightMargin: - Screen.height * 0.07 * 0.2
                             anchors.top: parent.top
-                            anchors.topMargin: Screen.height * 0.07 * 0.2
+                            //anchors.topMargin: Screen.height * 0.07 * 0.2
                             visible: {
                                 if(styleData.index === 0){
                                     return root.newMessageCount === 0 ? false : true;
@@ -188,7 +190,7 @@ Rectangle {
                     }
                     Item {
                         width: parent.width
-                        height: parent.height * 0.3
+                        height: parent.height * 0.4
                         anchors.top: messageTabImage.bottom
                         Text {
                             anchors.centerIn: parent

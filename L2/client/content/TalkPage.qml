@@ -11,7 +11,7 @@ Rectangle {
     property string language
     property int sex
 
-    property int textSize1: 13
+    property int textSize1: 15
     property int textSize2: 17
     property int textSize3: 20
 
@@ -49,8 +49,8 @@ Rectangle {
             height: edge + msgBackground.height + originalItem.height
             Rectangle {
                 id: headImage
-                color: "#dddddd"
-                width: topView.height
+                color: isSelf ? "#808080" : "#c0c0c0"
+                width: topView.height * 0.85
                 height: width
                 x: xCoor
                 y: edge
@@ -63,7 +63,7 @@ Rectangle {
                         id: languageItem
                         text: itemLanguage
                         color: "black"
-                        font.pointSize: textSize3
+                        font.pointSize: textSize2
                         anchors.centerIn: parent
                     }
                 }
@@ -273,6 +273,9 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.rightMargin: topView.height * 0.15
                 anchors.bottom: downLine.top
+                onAccepted: {
+                    sendButtonClicked();
+                }
             }
             Rectangle {
                 id: downLine
