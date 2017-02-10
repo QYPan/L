@@ -1,36 +1,71 @@
+var request;
+var guserInfo;
+var gmsg;
 var component = null;
+var msgPages = new Array;
 
-var pages = new Array;
-
-
-function appendTalkMessage(name, language, message){
-    console.log("in appendTalkMessage");
-    var page = openTalkPage(name, language);
-    page.addMessageFromFriend(message);
-}
-
-function openTalkPage(name, language) {
-    var page = findTalkPage(name);
+function openTalkPage(userInfo){
+    var page = findTalkPage(userInfo.name);
     if(page === undefined){
-        console.log(name + " not exists");
-        return createTalkPage(name, language);
+        return createTalkPage(userInfo);
     }else{
-        console.log(name + " has exists");
         return page;
     }
 }
 
-function findTalkPage(name){
-    var i;
-    console.log("pages count: " + pages.length);
-    for(i = 0; i < pages.length; i++){
-        console.log("cout: " + pages[i].clientName);
-        if(pages[i].clientName === name)
-            return pages[i];
+function appendMessage(userInfo, msg, tmsg){
+    var userInfoStr = JSON.stringify(userInfo);
+    signalManager.receiveMessage(userInfoStr, tmsg);
+    var page = openTalkPage(userInfo);
+    if(page !== undefined){
+        page.appendMsg(userInfo, msg, tmsg, false, false);
     }
 }
 
-function createTalkPage(name, language){
+function removePage(name){
+    var i;
+    for(i = 0; i < msgPages.length; i++){
+        if(msgPages[i].clientName === name){
+            break;
+        }
+    }
+    if(i < msgPages.length && msgPages[i] !== undefined){
+        msgPages[i].destroy();
+        msgPages.splice(i, 1);
+    }
+    //console.log("pages lenght: " + msgPages.length);
+}
+
+function findTalkPage(name){
+    var i;
+    for(i = 0; i < msgPages.length; i++){
+        if(msgPages[i].clientName === name)
+            return msgPages[i];
+    }
+}
+
+function setError(name){
+    var page = findTalkPage(name);
+    if(page !== undefined){
+        var index = page.findFirstBusyIndex();
+        if(index !== -1){
+            page.killBusy(index);
+            page.setError(index);
+        }
+    }
+}
+
+function killBusy(name){
+    var page = findTalkPage(name);
+    if(page !== undefined){
+        var index = page.findFirstBusyIndex();
+        if(index !== -1){
+            page.killBusy(index);
+        }
+    }
+}
+
+function createTalkPage(userInfo){
     if(component == null)
         component = Qt.createComponent("TalkPage.qml");
     if(component.status === Component.Ready){
@@ -40,9 +75,14 @@ function createTalkPage(name, language){
             console.log(component.errorString());
             return false;
         }
-        dynamicObject.clientName = name;
-        dynamicObject.titleName = name + " | " + language;
-        pages.push(dynamicObject);
-        return pages[pages.length-1];
+        dynamicObject.clientName = userInfo.name;
+        dynamicObject.language = userInfo.language;
+        dynamicObject.sex = userInfo.sex;
+        msgPages.push(dynamicObject);
+        return msgPages[msgPages.length-1];
+    }else{
+        console.log("error ready talkPage");
+        console.log(component.errorString());
+        return false;
     }
 }

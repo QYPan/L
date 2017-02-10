@@ -1,37 +1,22 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.3
 import QtQuick.Window 2.0
-import QmlInterface 1.0
-import FileOperator 1.0
-import CacheText 1.0
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
+import "HandleVerifyLogic.js" as HANDLE_VERIFY_LOGIC
 import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 
-Item {
+Rectangle {
     id: root
-    width: parent.width
-    height: parent.height
-    signal setNoteNumber(int val)
-    signal changeOnFriends(int type, string message)
-    signal changeMessageList(string name, string language, string message)
-    signal cancellation()
-    property bool isMailListLoad: false
+    color: "#212126"
+    property string pageName: "mainTabPage"
 
-    Rectangle {
-        color: "#212126"
-        anchors.fill: parent
-    }
+    property int textSize1: 13
+    property int textSize2: choseTextSize.sizeD
+    property int textSize3: choseTextSize.sizeG
+    property int textSize4: 11
 
-    GrayDialog {
-        id: messageDialog
-        visible: false
-        height: parent.height / 5
-        anchors.centerIn: parent
-        textSize: 50
-        onButtonClicked: {
-            visible = false;
-        }
-    }
+    property int newMessageCount: 0
+    property int newLinkmanCount: 0
 
     BorderImage {
         id: topView
@@ -43,8 +28,8 @@ Item {
         Text {
             id: title
             text: qsTr("L");
-            font.pixelSize: 100
-            x: 50
+            font.pointSize: textSize3
+            x: topView.height * 0.3
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
         }
@@ -54,11 +39,11 @@ Item {
             width: parent.height * 0.6
             height: width
             anchors.right: parent.right
-            anchors.rightMargin: 50
+            anchors.rightMargin: topView.height * 0.3
             anchors.verticalCenter: parent.verticalCenter
             color: addMouse.pressed ? "#222" : "transparent"
             Image {
-                id: add
+                id: addImage
                 width: parent.width
                 height: parent.height
                 source: "../images/add.png"
@@ -72,7 +57,7 @@ Item {
                         addButton.visible = false;
                     }else{
                         addButton.visible = true;
-                        fillScreenMouse.enabled = true;
+                        lockAll(true);
                     }
                 }
             }
@@ -84,21 +69,37 @@ Item {
         width: parent.width * 0.5;
         height: topView.height
         anchors.top: topView.bottom
-        anchors.topMargin: 10
+        anchors.topMargin: topView.height * 0.15
         anchors.right: parent.right
-        anchors.rightMargin: 20
+        anchors.rightMargin: topView.height * 0.15
         visible: false;
         color: "#212126"
-        z: 20
+        z: 30
         GrayButton {
             anchors.fill: parent
             text: qsTr("添加朋友")
-            textSize: 50
+            textSize: textSize2
             onClicked: {
                 addButton.visible = false;
-                fillScreenMouse.enabled = false;
-                stackView.push(Qt.resolvedUrl("SearchFriendsPage.qml"));
+                lockAll(false);
+                stackView.push(Qt.resolvedUrl("SearchClientPage.qml"));
             }
+        }
+    }
+
+    MouseArea {
+        id: fillScreenMouse
+        anchors.fill: parent
+        enabled: false
+        z: 25
+        onClicked: {
+            if(addButton.visible){
+                addButton.visible = false;
+            }
+            if(checkDialog.visible){
+                checkDialog.visible = false;
+            }
+            enabled = false;
         }
     }
 
@@ -111,74 +112,99 @@ Item {
         style: touchStyle
         tabPosition: Qt.BottomToolBarArea
         Tab {
-            id: tab1
+            id: messageTab
             title: qsTr("消息")
-            MessageList {
-                id: messageList
-                anchors.fill: parent
-                onLoaded: {
-                    root.changeMessageList.connect(messageList.changeMessage);
-                }
-                onOpenTalkPage: {
-                    stackView.push(TALK_PAGE_LOGIC.openTalkPage(name, language));
-                }
-            }
+            source: "MessageList.qml"
         }
         Tab {
-            id: tab2
+            id: linkmanTab
             title: qsTr("通讯录")
-            FriendsList {
-                id: friendsList
-                anchors.fill: parent
-                onLoaded: {
-                    friendsList.addFriends(cacheText.pullFriendsList());
-                    isMailListLoad = true;
-                    friendsList.setNoteNumber(cacheText.getCount(QmlInterface.ADD_ONE));
-                    friendsList.pullChangeOnFriends();
-                    root.setNoteNumber.connect(friendsList.setNoteNumber);
-                    root.changeOnFriends.connect(friendsList.dealType);
-                }
-                onOpenTalkPage: {
-                    stackView.replace(TALK_PAGE_LOGIC.openTalkPage(name, language));
-                    root.changeMessageList(name, language, "");
-                }
-                onSayHello: {
-                    root.changeMessageList(name, language, "你好！");
-                    TALK_PAGE_LOGIC.appendTalkMessage(name, language, "你好！");
-                }
-            }
+            source: "LinkmanList.qml"
         }
         Tab {
-            id: tab3
+            id: systemTab
             title: qsTr("系统")
-            SystemList {
-                id: systemPage
-                onCancellation: {
-                    root.cancellation();
-                }
-            }
+            source: "SystemList.qml"
         }
     }
+
+    property var tabImageDefault: ["../images/message_tab_item_default.png",
+                            "../images/linkman_tab_item_default.png",
+                            "../images/system_tab_item_default.png",]
+    property var tabImage: ["../images/message_tab_item.png",
+                            "../images/linkman_tab_item.png",
+                            "../images/system_tab_item.png",]
 
     Component {
         id: touchStyle
         TabViewStyle {
             tabsAlignment: Qt.AlignVCenter
             tabOverlap: 0
-            frame: Item { }
+            frame: Item {}
             tab: Item {
-                implicitWidth: control.width/control.count
-                implicitHeight: Screen.height * 0.07
+                implicitWidth: control.width / control.count
+                implicitHeight: Screen.height * 0.085
                 BorderImage {
                     anchors.fill: parent
                     border.bottom: 8
                     border.top: 8
-                    source: styleData.selected ? "../images/tabs_standard.png":"../images/tabs_standard.png"
-                    Text {
-                        anchors.centerIn: parent
-                        color: styleData.selected ? "#3399ff" : "white"
-                        text: styleData.title
-                        font.pixelSize: 45
+                    source: "../images/tabs_standard.png"
+                    Image {
+                        id: messageTabImage
+                        width: height
+                        height: parent.height * 0.5
+                        anchors.top: parent.top
+                        anchors.topMargin: parent.height * 0.1
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        fillMode: Image.PreserveAspectFit
+                        source: styleData.selected ? tabImage[styleData.index]
+                                                   : tabImageDefault[styleData.index]
+                        Image {
+                            id: newMsgImage
+                            width: Screen.height * 0.07 * 0.4
+                            height: width
+                            anchors.right: parent.right
+                            anchors.rightMargin: - Screen.height * 0.07 * 0.2
+                            anchors.top: parent.top
+                            //anchors.topMargin: Screen.height * 0.07 * 0.2
+                            visible: {
+                                if(styleData.index === 0){
+                                    return root.newMessageCount === 0 ? false : true;
+                                }else if(styleData.index === 1){
+                                    return root.newLinkmanCount === 0 ? false : true;
+                                }else{
+                                    return false;
+                                }
+                            }
+                            source: "../images/messageBox.png"
+                            fillMode: Image.PreserveAspectFit
+                            Text {
+                                id: messageNumber
+                                color: "black"
+                                text: {
+                                    if(styleData.index === 0){
+                                        return root.newMessageCount.toString();
+                                    }else if(styleData.index === 1){
+                                        return root.newLinkmanCount.toString();
+                                    }else{
+                                        return false;
+                                    }
+                                }
+                                font.pointSize: textSize4
+                                anchors.centerIn: parent
+                            }
+                        }
+                    }
+                    Item {
+                        width: parent.width
+                        height: parent.height * 0.4
+                        anchors.top: messageTabImage.bottom
+                        Text {
+                            anchors.centerIn: parent
+                            color: styleData.selected ? "#3399ff" : "#c0c0c0"
+                            text: styleData.title
+                            font.pointSize: textSize1
+                        }
                     }
                     Rectangle {
                         visible: index > 0
@@ -193,90 +219,249 @@ Item {
         }
     }
 
-    MouseArea {
-        id: fillScreenMouse
-        anchors.fill: parent
-        enabled: false;
-        z: 10
-        onClicked: {
-            addButton.visible = false;
-            enabled = false;
+    Connections { // 所有消息入口
+        target: qmlInterface
+        onQmlReadData: {
+            dealResult(data);
+        }
+        onQmlConnectSuccessed: {
+            reLogin();
         }
     }
 
     Connections {
-        target: qmlInterface
-        onQmlReadData: {
-            console.log(type);
-            console.log("maintab: " + message);
-            deal(type, message);
+        target: cacheManager
+        onSendData: {
+            qmlInterface.qmlSendData(data);
+        }
+        onFinishTranslate: {
+            var tudata = JSON.parse(udata);
+            TALK_PAGE_LOGIC.appendMessage(tudata.userInfo, tudata.msg, tudata.tmsg);
         }
     }
 
-    Component.onCompleted: { // 加载好友列表
-        qmlInterface.qmlSendData(QmlInterface.ADD_ALL, ""); // 发送获取好友列表请求
-        /*
-        var fileName = qmlInterface.clientName + "-friends.txt";
-        if(fileOperator.openFile(fileName)){
-            var friends = fileOperator.readFriends();
-            fileOperator.closeFile();
-            if(friends === ""){ // 好友列表尚未保存在本地
-            }
+    Connections {
+        target: signalManager
+        onOpenHandleVerifyPage: {
+            stackView.push(HANDLE_VERIFY_LOGIC.openHandleVerifyPage());
+            root.newLinkmanCount = 0;
         }
-        */
-    }
-
-    function deal(type, message){
-        var top = stackView.depth-1;
-        if(type === QmlInterface.ADD_ONE_SUCCESSED || type === QmlInterface.REMOVE_ONE){
-            if(isMailListLoad == false){ // 通讯录界面还没有加载
-                cacheText.push(type, message); // 缓存消息
-            }else{
-                root.changeOnFriends(type, message);
-            }
-        }else if(type === QmlInterface.SEARCH_SUCCESSED || type === QmlInterface.SEARCH_FAILURE){
-            if(stackView.get(top).pageName === "searchFriendsPage"){ // 栈顶为查找好友页面
-                stackView.get(top).searchResult(type, message); // 交给查找页面处理
-            }
-        }else if(type === QmlInterface.ADD_ALL_SUCCESSED){ // 从服务器获取好友列表成功
-            cacheText.initFriendsList(message);
-        }else if(type === QmlInterface.TRANSPOND_SUCCESSED){ // 好友信息
-            transpondMessage(message);
-        }else if(type === QmlInterface.ADD_ONE){ // 是一个好友请求
-        cacheText.push(type, message);
-        root.setNoteNumber(cacheText.getCount(type));
+        onGetRequestNumber: {
+            signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
+        }
+        onOpenTalkPage: {
+            handleOpenTalkPageSignal(userInfoStr, isPush);
+        }
+        onUpdateNewMessageCount: {
+            root.newMessageCount = count;
         }
     }
 
-    function transpondMessage(message){
-        var friend = message.split("#", 2)
-        var toName = friend[0];
-        var toMessage = message.substring(friend[0].length+friend[1].length+2);
-        var ilanguage = parseInt(friend[1]);
-        var language;
-        if(ilanguage == QmlInterface.CHINESE){
-            language = "中文";
-        }else if(ilanguage == QmlInterface.ENGLISH){
-            language = "English";
+    GrayCheckDialog {
+        id: checkDialog
+        anchors.centerIn: parent
+        width: parent.width * 0.5
+        height: textHeight + Screen.height * 0.07 * 1.4
+        visible: false
+        z: 30
+        onButtonClicked: {
+            lockAll(false);
+            visible = false;
         }
-        TALK_PAGE_LOGIC.appendTalkMessage(toName, language, toMessage);
-        root.changeMessageList(toName, language, toMessage);
+        onYesClicked: {
+            Qt.quit();
+        }
+        onNoClicked: {
+        }
     }
 
-    function setFriends(friends){
-        var fileName = qmlInterface.clientName + "-friends.txt";
-        if(fileOperator.openFile(fileName)){
-            var splitFriends = friends.split("#");
-            var i;
-            for(i = 0; i < splitFriends.length; i++){
-                var two = splitFriends[i].split(":");
-                var name = two[0];
-                var language = parseInt(two[1]);
-                fileOperator.addFriend(name, language); // 把服务器发送来的好友名单保存在本地
-            }
+    Component.onCompleted: {
+        requestLinkmans();
+        HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
+    }
+
+    function reLogin(){
+        var data = {};
+        var userInfo = {};
+        data.mtype = "SYN";
+        data.dtype = "RELOGIN";
+        userInfo.name = qmlInterface.clientName;
+        userInfo.password = qmlInterface.clientPassword;
+        data.userInfo = userInfo;
+        var strOut = JSON.stringify(data);
+        qmlInterface.qmlSendData(strOut);
+    }
+
+    function handleOpenTalkPageSignal(userInfoStr, isPush){
+        var userInfo = JSON.parse(userInfoStr);
+        if(isPush){
+            stackView.push(TALK_PAGE_LOGIC.openTalkPage(userInfo));
         }else{
-            console.log("打开好友列表文件失败");
+            stackView.replace(TALK_PAGE_LOGIC.openTalkPage(userInfo));
         }
     }
 
+    function dealResult(data){
+        var newData = JSON.parse(data);
+        if(newData.mtype === "ACK"){
+            if(newData.dtype === "RELOGIN"){
+                cacheManager.hadReceiveACK(false); // 重发消息
+            }else{
+                cacheManager.hadReceiveACK(true); // 发下一条消息
+            }
+            if(newData.dtype === "LINKMANS"){ // 获取联系人
+                handleLinkmansAck(newData.linkmans);
+            }else if(newData.dtype === "SEARCH_CLIENT"){ // 查找结果
+                handleSearchClientAck(data);
+            }else if(newData.dtype === "VERIFY"){ // 服务器回应好友请求发送成功
+                handleVerifyAck();
+            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 服务器回应好友同意请求
+                handleAcceptVerifySynOrAck(data);
+            }else if(newData.dtype === "REMOVE_LINKMAN"){ // 服务器回应删除好友请求
+                handleRemoveLinkmanAck(data);
+            }else if(newData.dtype === "TRANSPOND"){ // 服务器回应转发请求
+                handleTranspondAck(data);
+            }
+        }else if(newData.mtype === "SYN"){
+            sendAck(); // 应答服务器
+            if(newData.dtype === "VERIFY"){ // 有人向自己发出好友邀请
+                handleVerifySyn(newData.userInfo, newData.verifyMsg);
+            }else if(newData.dtype === "ACCEPT_VERIFY"){ // 对方已同意好友请求
+                handleAcceptVerifySynOrAck(data);
+            }else if(newData.dtype === "TRANSPOND"){
+                handleTranspondSyn(data);
+            }
+        }
+    }
+
+    function handleTranspondSyn(data){
+        var udata = {};
+        var newData = JSON.parse(data);
+        udata.userInfo = newData.userInfo;
+        udata.msg = newData.msg;
+        if(udata.userInfo.language === qmlInterface.clientLanguage){
+            TALK_PAGE_LOGIC.appendMessage(udata.userInfo, udata.msg, udata.msg);
+        }else{
+            var udataStr = JSON.stringify(udata);
+            cacheManager.addTranslateData(udataStr);
+        }
+    }
+
+    function handleTranspondAck(data){
+        signalManager.handleTranspondAck(data);
+        var newData = JSON.parse(data);
+        var name = newData.oppName;
+        if(newData.isFriend){
+            TALK_PAGE_LOGIC.killBusy(name);
+        }else{
+            TALK_PAGE_LOGIC.setError(name);
+        }
+    }
+
+    function handleRemoveLinkmanAck(data){
+        var newData = JSON.parse(data);
+        var name = newData.name;
+        var index = cacheManager.removeLinkman(name);
+        if(index !== -1){
+            signalManager.removeLinkman(name, index+1);
+            TALK_PAGE_LOGIC.removePage(name);
+            var top = stackView.depth - 1;
+            if(stackView.get(top).pageName === "personalDataPage" &&
+               stackView.get(top).name === name){
+                stackView.pop();
+            }
+        }
+    }
+
+    function handleAcceptVerifySynOrAck(data){
+        var newData = JSON.parse(data);
+        var userInfo = newData.userInfo;
+        if(!newData.isFriend){ // 尚未添加进好友列表
+            if(!cacheManager.isLinkman(userInfo.name)){
+                var index = cacheManager.addLinkman(userInfo.name, userInfo.language, userInfo.sex);
+                var userInfoStr = JSON.stringify(userInfo);
+                signalManager.addLinkman(index+1, userInfoStr);
+            }
+            if(newData.mtype === "ACK"){
+                HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
+                //sayHello(userInfo.name);
+            }
+            userInfoStr = JSON.stringify(userInfo);
+            TALK_PAGE_LOGIC.appendMessage(userInfo, "你好！(这是打招呼内容)",
+                                          qsTr("你好！(这是打招呼内容)"));
+        }else{
+            if(newData.mtype === "ACK"){
+                HANDLE_VERIFY_LOGIC.setButtonText(userInfo.name, qsTr("已接受"));
+            }
+        }
+    }
+
+    function handleVerifySyn(userInfo, msg){
+        HANDLE_VERIFY_LOGIC.addVerifyItem(userInfo, msg);
+        var top = stackView.depth - 1;
+        if(stackView.get(top).pageName !== "handleVerifyPage"){
+            signalManager.setRequestNumber(HANDLE_VERIFY_LOGIC.getNewRequestsCount());
+            root.newLinkmanCount = HANDLE_VERIFY_LOGIC.getNewRequestsCount();
+        }
+    }
+
+    function sendAck(){
+        var data = {};
+        data.mtype = "ACK";
+        data.clientName = qmlInterface.clientName;
+        var strOut = JSON.stringify(data);
+        //cacheManager.addData(strOut);
+        qmlInterface.qmlSendData(strOut);
+    }
+
+    function handleVerifyAck(){
+        signalManager.verifyAck();
+    }
+
+    function handleSearchClientAck(data){
+        signalManager.searchResult(data);
+    }
+
+    function handleLinkmansAck(linkmans){
+        var i;
+        for(i = 0; i < linkmans.length; i++){
+            cacheManager.addLinkman(linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            //signalManager.addLinkman(i+1, linkmans[i].name, linkmans[i].language, linkmans[i].sex);
+            //console.log(linkmans[i].name+" "+linkmans[i].language+" "+linkmans[i].sex);
+        }
+        sendReady();
+    }
+
+    function sendReady(){
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "READY";
+        data.clientName = qmlInterface.clientName;
+        var strOut = JSON.stringify(data);
+        cacheManager.addData(strOut);
+    }
+
+    function requestLinkmans() {
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "LINKMANS";
+        data.clientName = qmlInterface.clientName;
+        var strOut = JSON.stringify(data);
+        cacheManager.addData(strOut);
+    }
+
+    function lockAll(flag){
+        fillScreenMouse.enabled = flag;
+    }
+
+    function quit(){
+        if(checkDialog.visible){
+            checkDialog.visible = false;
+            lockAll(false);
+        }else{
+            checkDialog.setMessageText(qsTr("退出系统后将不保存任何聊天记录"));
+            checkDialog.visible = true;
+            lockAll(true);
+        }
+    }
 }

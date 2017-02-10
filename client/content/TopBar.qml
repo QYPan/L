@@ -7,13 +7,13 @@ BorderImage {
     border.bottom: 8
     source: "../images/toolbar.png"
     property alias title: title.text
-    property alias titleSize: title.font.pixelSize
-    signal back();
+    property alias titleSize: title.font.pointSize
+    signal backed();
 
     Rectangle {
         id: backButton
         anchors.left: parent.left
-        anchors.leftMargin: 20
+        anchors.leftMargin: parent.height * 0.1
         anchors.verticalCenter: parent.verticalCenter
         antialiasing: true
         width: parent.height * 0.7
@@ -30,7 +30,7 @@ BorderImage {
             anchors.fill: parent
             //anchors.margins: -10
             onClicked:{
-                root.back();
+                root.backed();
             }
         }
     }
@@ -38,7 +38,7 @@ BorderImage {
     Text {
         id: title
         //font.pixelSize: 60
-        x: backButton.x + backButton.width + 30
+        x: backButton.x + backButton.width + parent.height * 0.1
         anchors.verticalCenter: parent.verticalCenter
         color: "white"
     }

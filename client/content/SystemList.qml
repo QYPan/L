@@ -1,35 +1,34 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Window 2.0
-import FileOperator 1.0
-import QmlInterface 1.0
-import CacheText 1.0
 
 Item {
     id: root
-    width: parent.width
-    height: parent.height
-    signal cancellation()
+
+    property int textSize1: 17
+
+    Rectangle {
+        color: "#212126"
+        anchors.fill: parent
+    }
 
     ListView {
-        id: friendsListView
+        id: systemList
         clip: true
         anchors.fill: parent
         model: ListModel {
             ListElement {
-                title: qsTr("关于")
+                systemTitle: qsTr("关于")
             }
             ListElement {
-                title: qsTr("注销")
-            }
-            ListElement {
-                title: qsTr("退出")
+                systemTitle: qsTr("设置")
             }
         }
         delegate: Item {
-            id: subItem
+            id: itemDelegate
             width: parent.width
             height: Screen.height * 0.08
+            property real edge: Screen.height * 0.07 * 0.3
 
             Rectangle {
                 anchors.fill: parent
@@ -37,46 +36,54 @@ Item {
                 visible: mouse.pressed
             }
             Text {
-                id: titleItem
+                id: nameItem
                 color: "white"
-                font.pixelSize: 55
-                text: title
+                text: systemTitle
+                font.pointSize: textSize1
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                anchors.leftMargin: 50
-                elide: Text.ElideRight
+                anchors.leftMargin: edge
+                //elide: Text.ElideRight
+            }
+            Image {
+                id: nextItem
+                width: parent.height * 0.5
+                height: width
+                anchors.right: parent.right
+                anchors.rightMargin: Screen.height * 0.07 * 0.3
+                anchors.verticalCenter: parent.verticalCenter
+                source: "../images/navigation_next_item.png"
+                fillMode: Image.PreserveAspectFit
             }
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: 15
+                anchors.bottom: parent.bottom
                 height: 1
                 color: "#424246"
-            }
-            Image {
-                width: 70
-                height: 70
-                anchors.right: parent.right
-                anchors.rightMargin: 20
-                anchors.verticalCenter: parent.verticalCenter
-                source: title == "退出" ? "../images/quit.png" : "../images/navigation_next_item.png"
-                fillMode: Image.PreserveAspectFit
             }
             MouseArea {
                 id: mouse
                 anchors.fill: parent
                 onClicked: {
-                    if(title == "注销"){
-                        cacheText.saveAll(qmlInterface.clientName);
-                        cacheText.setClient(qmlInterface.clientName, qmlInterface.clientPassword);
-                        cancellation();
-                    }else if(title == "退出"){
-                        cacheText.saveAll(qmlInterface.clientName);
-                        cacheText.setClient(qmlInterface.clientName, qmlInterface.clientPassword);
-                        Qt.quit();
-                    }
+                    root.touchSystemItem(nameItem.text, index);
+                }
+                onDoubleClicked: {
                 }
             }
         }
     }
+
+    function touchSystemItem(name, index){
+        if(index === 0){
+            stackView.push(Qt.resolvedUrl("AboutPage.qml"));
+            var top = stackView.depth - 1;
+            stackView.get(top).itemName = name;
+        }else if(index === 1){
+            stackView.push(Qt.resolvedUrl("SettingPage.qml"));
+            top = stackView.depth - 1;
+            stackView.get(top).itemName = name;
+        }
+    }
+
 }

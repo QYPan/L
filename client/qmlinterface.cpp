@@ -1,67 +1,86 @@
 #include "qmlinterface.h"
-#include <QDebug>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <QTest>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
 
 QmlInterface::QmlInterface(QObject *parent)
     : QObject(parent)
     , thread(NULL)
-    , m_language(CHINESE)
-    , seg_char('#')
 {
-    qRegisterMetaType<DataStruct>("DataStruct");
     createSocketThread();
 }
 
 void QmlInterface::createSocketThread(){
     thread = new SocketThread(this);
-    //connect(thread, &SocketThread::finished, thread, &SocketThread::deleteLater);
+    connect(thread, &SocketThread::finished, this, &QmlInterface::reconnect);
     connect(thread, &SocketThread::error, this, &QmlInterface::displayError);
-    connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::tryLoginOrRegister);
+    connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::connectSuccessed);
     connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
+    thread->tryConnect();
 }
 
-void QmlInterface::tryConnect(MessageType type){
-    connectType = type;
-    if(!thread->tryConnect()){ // 已经连接了
-        tryLoginOrRegister();
+void QmlInterface::readData(const QString &data){
+    QJsonParseError jsonError;
+    QJsonDocument document = QJsonDocument::fromJson(data.toUtf8(), &jsonError);
+    if(!document.isNull() && (jsonError.error == QJsonParseError::NoError)){
+        QJsonObject obj = document.object();
+        QString dtype = obj.value("dtype").toString();
+        if(dtype != "HEART"){
+            emit qmlReadData(data); // 发给 UI 处理
+        }
     }
 }
 
-void QmlInterface::tryLoginOrRegister(){
-    if(connectType == LOGIN){
-        tryLogin(); // 尝试登陆
-    }else if(connectType == REGISTER){
-        tryRegister(); // 尝试注册
+void QmlInterface::reconnect(){
+    //qDebug() << "thread death!";
+    QTest::qWait(3000);
+    thread->tryConnect();
+}
+
+void QmlInterface::connectSuccessed(){
+    getSocketState(QAbstractSocket::ConnectedState);
+    emit qmlConnectSuccessed(false);
+    displayError(-2, "no error");
+}
+
+void QmlInterface::socketDisconnected(){
+    emit displayError(-2, "socket disconnected!");
+    emit tryDisconnect(); // 结束 socket 线程
+}
+
+void QmlInterface::getSocketState(QAbstractSocket::SocketState socketState){
+    QString stateString;
+    switch(socketState){
+        case QAbstractSocket::UnconnectedState:
+            stateString = "The socket is not connected";
+            break;
+        case QAbstractSocket::HostLookupState:
+            stateString = "The socket is performing a host name lookup";
+            break;
+        case QAbstractSocket::ConnectingState:
+            stateString = "The socket has started establishing a connection";
+            break;
+        case QAbstractSocket::ConnectedState:
+            stateString = "A connection is established";
+            break;
+        case QAbstractSocket::BoundState:
+            stateString = "The socket is bound to an address and port";
+            break;
+        case QAbstractSocket::ClosingState:
+            stateString = "The socket is about to close (data may still be waiting to be written)";
+            break;
+        case QAbstractSocket::ListeningState:
+            stateString = "For internal use only";
+            break;
     }
-}
-
-void QmlInterface::tryLogin(){
-    qmlSendData(LOGIN, m_password);
-}
-
-void QmlInterface::tryRegister(){
-    QString message = m_password;
-    message.append(seg_char);
-    char language[5];
-    sprintf(language, "%d", static_cast<int>(m_language));
-    message.append(QString(language));
-    qmlSendData(REGISTER, message);
-}
-
-void QmlInterface::qmlSendData(int type, const QString &message){
-    DataStruct data;
-    data.name = m_name;
-    data.mark = type;
-    data.message = message;
-    qDebug() << m_name << " try to send data :" << type << message;
-    emit sendData(data);
+    emit qmlGetSocketState(stateString);
 }
 
 QString QmlInterface::clientName() const{
     return m_name;
 }
+
 void QmlInterface::setClientName(const QString &name){
     m_name = name;
 }
@@ -74,15 +93,18 @@ void QmlInterface::setClientPassword(const QString &password){
     m_password = password;
 }
 
-QmlInterface::Language QmlInterface::clientLanguage() const{
+QString QmlInterface::clientLanguage() const{
     return m_language;
 }
 
-void QmlInterface::setClientLanguage(Language language){
+void QmlInterface::setClientLanguage(const QString &language){
     m_language = language;
 }
 
-void QmlInterface::readData(const DataStruct &data){
-    //qDebug() << "hit: " << data.mark << data.message;
-    emit qmlReadData(data.mark, data.message);
+int QmlInterface::sex() const{
+    return m_sex;
+}
+
+void QmlInterface::setSex(int s){
+    m_sex = s;
 }

@@ -2,7 +2,7 @@
 #define CLIENTSOCKET_H
 
 #include <QTcpSocket>
-#include "datastruct.h"
+#include <QString>
 
 class ClientSocket : public QTcpSocket
 {
@@ -10,15 +10,14 @@ class ClientSocket : public QTcpSocket
 public:
     ClientSocket(QObject *parent = 0);
 signals:
-    void readData(const DataStruct &data);
+    void readData(const QString &data);
     void getError(int socketError, const QString &message);
+public slots:
+    void sendData(const QString &data);
 private slots:
-    void sendData(const DataStruct &data);
     void onReadyRead();
     void onError();
 private:
-    void resolve(const QString &buffer);
-    void merge(const DataStruct &data);
 };
 
 #endif // CLIENTSOCKET_H

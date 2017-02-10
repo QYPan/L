@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.0
-import QmlInterface 1.0
 
 Rectangle {
     id: root
@@ -9,61 +8,87 @@ Rectangle {
 
     property string pageName: "talkPage"
     property string clientName
-    property alias titleName: topView.title
-    property bool isLoaded: false
+    property string language
+    property int sex
+
+    property int textSize1: 15
+    property int textSize2: 17
+    property int textSize3: 20
 
     TopBar {
         id: topView
         width: parent.width
         height: Screen.height * 0.07
-        titleSize: 60
-        onBack: {
-            stackView.pop();
+        title: clientName
+        titleSize: textSize3
+        onBacked: {
+            signalManager.stackPop();
         }
     }
 
     ListView {
-        id: words
+        id: msgList
         anchors.left: parent.left
+        anchors.leftMargin: topView.height * 0.2
         anchors.right: parent.right
+        anchors.rightMargin: topView.height * 0.2
         anchors.top: topView.bottom
-        anchors.bottom: separationLine.top
-        anchors.margins: topView.height / 5
+        anchors.bottom: inputBackground.top
+        currentIndex: count - 1
         clip: true
         spacing: topView.height * 0.3
         model: ListModel {}
-        delegate: Item{
-            id: perDelegate
-            property int edge: 2 * topView.height / 5
-            width: parent.width
-            //height: 200
-            height: msg.height+edge > manIcon.height ? msg.height+edge : manIcon.height
-            property int limitLength: width - 2 * manIcon.width - 3 * edge
+        delegate: Item {
+            id: talkDelegate
+            property bool isSelf: itemName == qmlInterface.clientName
+            property real xCoor: isSelf ? width - headImage.width : 0.0
+            property real edge: topView.height * 0.2
+            property real msgLimitLength: width - 2 * headImage.width - 6 * edge
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: edge + msgBackground.height + originalItem.height
             Rectangle {
-                id: manIcon
-                x: who ? 0 : parent.width - manIcon.width
-                width: topView.height * 0.8
-                visible: !isBox
+                id: headImage
+                color: isSelf ? "#808080" : "#c0c0c0"
+                width: topView.height * 0.85
                 height: width
-                color: "#212126"
+                x: xCoor
+                y: edge
+                Item {
+                    width: parent.width * 0.6
+                    height: parent.height * 0.6
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    Text {
+                        id: languageItem
+                        text: itemLanguage
+                        color: "black"
+                        font.pointSize: textSize1
+                        anchors.centerIn: parent
+                    }
+                }
                 Image {
-                    id: head
-                    anchors.fill: parent
-                    source: who ? "../images/headleft.png" : "../images/headright.png"
+                    width: parent.width * 0.4
+                    height: parent.height * 0.4
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    source: itemSex ? "../images/woman_image.png"
+                                     : "../images/man_image.png"
                     fillMode: Image.PreserveAspectFit
                 }
             }
             Canvas {
                 id: triangleLeft
-                visible: who
-                x: manIcon.width
-                width: edge
-                height: manIcon.height
+                visible: !isSelf
+                x: headImage.width
+                y: edge
+                width: 2*edge
+                height: headImage.height
                 contextType: "2d"
                 onPaint: {
                     context.lineWidth = 0;
-                    context.strokeStyle = "#c0c0c0";
-                    context.fillStyle = "#c0c0c0";
+                    context.strokeStyle = "#dddddd";
+                    context.fillStyle = "#dddddd";
                     var startX = width / 2;
                     var startY = height / 2;
                     context.beginPath();
@@ -77,15 +102,16 @@ Rectangle {
             }
             Canvas {
                 id: triangleRight
-                visible: who ? false : true
-                x: parent.width - manIcon.width - edge
-                width: edge
-                height: manIcon.height
+                visible: isSelf
+                x: parent.width - headImage.width - 2*edge
+                y: edge
+                width: 2*edge
+                height: headImage.height
                 contextType: "2d"
                 onPaint: {
                     context.lineWidth = 0;
-                    context.strokeStyle = "#686868";
-                    context.fillStyle = "#686868";
+                    context.strokeStyle = "#969696";
+                    context.fillStyle = "#969696";
                     var startX = width / 2;
                     var startY = height / 2;
                     context.beginPath();
@@ -97,126 +123,270 @@ Rectangle {
                     context.stroke();
                 }
             }
+            Image {
+                id: busyState
+                width: headImage.width * 0.4
+                height: width
+                source: "../images/busy.png"
+                fillMode: Image.PreserveAspectFit
+                visible: isItemBusy
+                anchors.verticalCenter: headImage.verticalCenter
+                x: isSelf ? msgBackground.x - width - edge :
+                            msgBackground.x + msgBackground.width + edge
+                RotationAnimation {
+                    id: anim
+                    target: busyState
+                    from: 0
+                    to: 360
+                    duration: 1000
+                    loops: Animation.Infinite // 无限循环
+                    running: true
+                }
+            }
+
+            Image {
+                id: errorNote
+                width: headImage.width * 0.5
+                height: width
+                source: "../images/error.png"
+                fillMode: Image.PreserveAspectFit
+                visible: isItemError
+                anchors.verticalCenter: headImage.verticalCenter
+                x: isSelf ? msgBackground.x - width - edge :
+                            msgBackground.x + msgBackground.width + edge
+            }
+
             Rectangle {
                 id: msgBackground
-                x: who ? manIcon.width+edge : parent.width-manIcon.width-edge-width
-                y: 0
-                width: msg.width + edge
-                height: msg.height+edge > manIcon.height ? msg.height+edge : manIcon.height
+                x: isSelf ? parent.width - headImage.width - 2*edge - width : headImage.width + 2*edge
+                y: edge
+                width: tmsg.width + 2 * edge
+                height: tmsg.height + 2 * edge > headImage.height ?
+                            tmsg.height + 2 * edge : headImage.height
+                color: isSelf ? (textTouch.pressed ? "#808080" : "#969696")
+                           :(textTouch.pressed ? "#c0c0c0" : "#dddddd")
                 radius: 6
-                color: who ? (textTouch.pressed ? "#969696" : "#c0c0c0")
-                           :(textTouch.pressed ? "#4b4b4b" : "#686868")
                 Text {
-                    id: msg
+                    id: tmsg
+                    text: itemTMsg
+                    font.pointSize: textSize2
                     anchors.centerIn: parent
-                    width: msgLength < perDelegate.limitLength? msgLength : perDelegate.limitLength
-                    text: getMsg
-                    wrapMode: Text.WrapAnywhere
-                    font.pixelSize: 50
+                    width: tmsgLength < talkDelegate.msgLimitLength ?
+                               tmsgLength : talkDelegate.msgLimitLength
+                    wrapMode: Text.Wrap
                 }
                 MouseArea {
                     id: textTouch
                     anchors.fill: parent
-                    onClicked: {
+                    onPressAndHold: {
+                        talkDelegate.showOriginalMsg();
                     }
                 }
             }
-        }
-        currentIndex: count - 1
-    }
 
-    Rectangle {
-        id: separationLine
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-        anchors.right: parent.right
-        anchors.rightMargin: 20
-        anchors.bottom: messageBackground.top
-        anchors.bottomMargin: 5
-        height: 1
-        color: "gray"
-    }
+            Rectangle {
+                id: originalItem
+                x: isSelf ? parent.width - headImage.width - 2*edge - width : headImage.width + 2*edge
+                y: edge + msgBackground.height
+                width: msg.width + 2 * edge
+                height: 0
+                /*
+                height: msg.height + 2 * edge > headImage.height ?
+                            msg.height + 2 * edge : headImage.height
+                            */
+                color: isSelf ? (originalTouch.pressed ? "#808080" : "#969696")
+                           :(originalTouch.pressed ? "#c0c0c0" : "#dddddd")
+                radius: 6
+                Text {
+                    id: msg
+                    font.pointSize: textSize2
+                    anchors.centerIn: parent
+                    width: msgLength < talkDelegate.msgLimitLength ?
+                               msgLength : talkDelegate.msgLimitLength
+                    wrapMode: Text.Wrap
+                }
+                MouseArea {
+                    id: originalTouch
+                    anchors.fill: parent
+                    onPressAndHold: {
+                        talkDelegate.hideOriginalMsg();
+                    }
+                }
+            }
 
-    Item {
-        id: tag
-        width: parent.width * 0.17
-        height: messageBackground.height
-        anchors.right: messageBackground.left
-        anchors.verticalCenter: messageBackground.verticalCenter
-        Text {
-            text: "消息:"
-            color: "white"
-            font.pixelSize: 50
-            anchors.centerIn: parent
-        }
-    }
+            function showOriginalMsg(){
+                if(originalItem.height === 0){
+                    msg.text = itemMsg;
+                    originalItem.height =  msg.height + 2 * edge > headImage.height ?
+                                msg.height + 2 * edge : headImage.height
+                }else{
+                    hideOriginalMsg();
+                }
+            }
 
-    Item {
-        id: messageBackground
-        width: parent.width * 0.6
-        height: parent.height * 0.09
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        InputLine {
-            id: inputMessage
-            width: parent.width
-            height: parent.height
-            font.pixelSize: 50
-            anchors.centerIn: parent
-        }
-    }
-
-    GrayButton {
-        id: sendButton
-        width: parent.width * 0.15
-        height: messageBackground.height * 0.5
-        text: "发 送"
-        textSize: 45
-        anchors.right: separationLine.right
-        anchors.verticalCenter: messageBackground.verticalCenter
-        onClicked: {
-            if(inputMessage.length > 0){
-                root.appendMsg(inputMessage.text, 0);
-                inputMessage.remove(0, inputMessage.length);
+            function hideOriginalMsg(){
+                originalItem.height = 0;
+                msg.text = "";
             }
         }
     }
 
-    Text {
-        id: msgDont
-        visible: false
-        font.pixelSize: 50
-    }
-
-    function addBox(h, flag, msgStr){
-        msgDont.text = msgStr;
-        var len = msgDont.width;
-        words.model.insert(h, {"who" : flag, "isBox" : true,
-                                         "canClick" : true,
-                                         "getMsg" : msgStr, "msgLength" : len});
-    }
-
-    function appendMsg(msgStr, flag){
-        msgDont.text = msgStr;
-        var len = msgDont.width;
-        words.model.append({"who" : flag,
-                               "isBox" : false,
-                               "getMsg" : msgStr,
-                               "canClick" : true,
-                               "msgLength" : len});
-        if(flag === 0){
-            var language = qmlInterface.clientLanguage;
-            var message = root.clientName + "#" + language.toString() + "#" + msgStr;
-            qmlInterface.qmlSendData(QmlInterface.TRANSPOND, message);
+    Item {
+        property int h: sayOrInput.height + downRect.height
+        id: inputBackground
+        width: parent.width
+        height: h > inputMsg.height ? h : inputMsg.height
+        anchors.bottom: downRect.top
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: "#424246"
+        }
+        Rectangle {
+            id: sayOrInput
+            width: topView.height * 0.7
+            height: width
+            color: "transparent"
+            border.color: "#3399ff"
+            border.width: 1
+            anchors.left: parent.left
+            anchors.leftMargin: topView.height * 0.2
+            anchors.bottom: parent.bottom
+        }
+        Item {
+            id: inputBox
+            height: sayOrInput.height
+            anchors.left: sayOrInput.right
+            anchors.leftMargin: topView.height * 0.15
+            anchors.right: sendButton.left
+            anchors.rightMargin: topView.height * 0.15
+            anchors.bottom: parent.bottom
+            TextInput {
+                id: inputMsg
+                color: "white"
+                font.pointSize: textSize2
+                maximumLength: 200
+                wrapMode: TextInput.WrapAnywhere
+                anchors.left: parent.left
+                anchors.leftMargin: topView.height * 0.15
+                anchors.right: parent.right
+                anchors.rightMargin: topView.height * 0.15
+                anchors.bottom: downLine.top
+                onAccepted: {
+                    sendButtonClicked();
+                }
+            }
+            Rectangle {
+                id: downLine
+                height: 2
+                color: "#3399ff"
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+            }
+        }
+        GrayButton {
+            id: sendButton
+            width: root.width * 0.16
+            height: sayOrInput.height
+            text: qsTr("发送");
+            textSize: textSize1
+            anchors.right: parent.right
+            anchors.rightMargin: topView.height * 0.2
+            anchors.bottom: parent.bottom
+            onClicked: {
+                sendButtonClicked();
+            }
         }
     }
 
-    function removeBox(h){
-        words.model.remove(h);
-        words.model.setProperty(h-1, "canClick", true);
+    Item {
+        id : downRect
+        width: parent.width
+        height: topView.height * 0.25
+        anchors.bottom: parent.bottom
     }
 
-    function addMessageFromFriend(message){
-        appendMsg(message, 1);
+    Text { // 用来测量消息长度
+        id: msgDont
+        visible: false
+        font.pointSize: textSize2
     }
+
+    function sendButtonClicked(){
+        if(inputMsg.length){
+            var userInfo = {};
+            userInfo.name = qmlInterface.clientName;
+            userInfo.language = qmlInterface.clientLanguage;
+            userInfo.sex = qmlInterface.sex;
+            appendMsg(userInfo, inputMsg.text, inputMsg.text, true, false);
+            sendMessage(userInfo, root.clientName, inputMsg.text);
+
+            var oppUserInfo = {};
+            oppUserInfo.name = root.clientName;
+            oppUserInfo.language = root.language;
+            oppUserInfo.sex = root.sex;
+            var userInfoStr = JSON.stringify(oppUserInfo);
+            signalManager.sendMessage(userInfoStr, inputMsg.text);
+
+            inputMsg.text = "";
+        }
+    }
+
+    function sendMessage(userInfo, oppName, msg){
+        var data = {};
+        data.mtype = "SYN";
+        data.dtype = "TRANSPOND";
+        data.oppName = oppName;
+        data.msg = msg;
+        data.userInfo = userInfo;
+        var strOut = JSON.stringify(data);
+        cacheManager.addData(strOut);
+    }
+
+    function appendMsg(userInfo, msg, tmsg, isItemBusy, isItemError){
+        msg = qsTr("原文: ") + msg;
+        msgDont.text = msg;
+        var len = msgDont.width;
+        msgDont.text = tmsg;
+        var tlen = msgDont.width;
+        msgList.model.append({"itemName" : userInfo.name,
+                              "itemLanguage" : userInfo.language,
+                              "itemMsg" : msg,
+                              "itemTMsg" : tmsg,
+                              "msgLength" : len,
+                              "tmsgLength" : tlen,
+                              "isItemBusy" : isItemBusy,
+                              "isItemError" : isItemError,
+                              "itemSex" : userInfo.sex});
+    }
+
+    function findFirstBusyIndex(){
+        var i;
+        var currentItem;
+        for(i = msgList.count-1; i >= 0; i--){
+            currentItem = msgList.model.get(i);
+            if(currentItem.itemName === qmlInterface.clientName && (!currentItem.isItemBusy)){
+                break; // 找到第一个己方的非发送状态的消息
+            }
+        }
+        var j;
+        for(j = i+1; j < msgList.count; j++){
+            currentItem = msgList.model.get(j);
+            if(currentItem.itemName === qmlInterface.clientName && currentItem.isItemBusy){
+                break;
+            } // 找到己方的第一个处于正在发送状态的消息
+        }
+        return j;
+    }
+
+    function killBusy(index){
+        msgList.model.setProperty(index, "isItemBusy", false);
+    }
+
+    function setError(index){
+        msgList.model.setProperty(index, "isItemError", true);
+    }
+
 }

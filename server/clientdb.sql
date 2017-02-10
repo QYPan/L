@@ -1,13 +1,13 @@
 CREATE TABLE clients (
 	cname VARCHAR(16) NOT NULL PRIMARY KEY,
 	password VARCHAR(16) NOT NULL,
-	language INT NOT NULL
+	language VARCHAR(16) NOT NULL,
+	sex INT NOT NULL
 );
 
 CREATE TABLE friends (
 	cname VARCHAR(16) NOT NULL,
 	fname VARCHAR(16) NOT NULL,
-	language INT NOT NULL,
 	PRIMARY KEY(cname, fname),
 	FOREIGN KEY(cname) REFERENCES clients(cname)
 		ON DELETE CASCADE

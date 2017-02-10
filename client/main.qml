@@ -1,52 +1,39 @@
 import QtQuick 2.5
-import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
+import QtQuick.Window 2.2
 import "content"
 
 ApplicationWindow {
-    objectName: "rootObject"
-    visible: true
-    width: 900
-    height: 690
-    title: qsTr("L")
     id: root
-
-    Loader {
-        id: loadLoginPage
-        anchors.fill: parent
-        source: "/content/LoginPage.qml"
-    }
-
-    Connections {
-        target: loadLoginPage.item
-        onLoginSuccessed: {
-            loadLoginPage.source = "";
-            cacheText.loadToCache(qmlInterface.clientName);
-            stackView.push(Qt.resolvedUrl("/content/MainTab.qml"));
-            stackView.get(0).cancellation.connect(root.cancellation);
-        }
-    }
+    visible: true
+    width: 360
+    height: 670
+    title: qsTr("L")
 
     StackView {
         id: stackView // 实现翻页
         anchors.fill: parent
-        // Implements back key navigation
         focus: true
-        /*
-        Keys.onReleased: if (event.key === Qt.Key_Back) {
-                             //stackView.pop();
-                             if(stackView.depth)
-                                 event.accepted = true;
-                         }
-                         */
+        Keys.onReleased: {
+            if (event.key === Qt.Key_Back) {
+                var top = stackView.depth - 1;
+                var topPage = stackView.get(top);
+                if(stackView.depth > 1){
+                    if(topPage.pageName === "talkPage"){
+                        signalManager.stackPop();
+                    }else{
+                        stackView.pop();
+                    }
+                    event.accepted = true;
+                }else if(topPage.pageName === "mainTabPage"){
+                    stackView.get(top).quit();
+                    event.accepted = true;
+                }
+            }
+        }
     }
 
-    function cancellation(){
-        stackView.clear();
-        qmlInterface.tryDisconnect();
-        loadLoginPage.source = "/content/LoginPage.qml";
-    }
-
-    function tryToLoadClient(){
+    Component.onCompleted: {
+        stackView.push(Qt.resolvedUrl("/content/InitPage.qml"));
     }
 }
