@@ -22,4 +22,7 @@ L
 * 调用有道翻译 API 接口实现中英互译
 
 ##功能演示
-* 登录、注册、添加好友<br>![image]（https://github.com/QYPan/L/tree/master/example_pictures/register_login_add.gif）
+* 登录、注册、添加好友<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/register_login_add.gif)
+* 聊天<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/talk.gif)
+* 模拟网络断开<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/bad_network.gif)
+* 删除好友<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/remove_linkman.gif)
