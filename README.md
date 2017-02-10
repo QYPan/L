@@ -1,6 +1,8 @@
 L
 =
 即时通信 —— 实现中英同步聊天翻译
+-----------------------------
+
 ##服务器
 * 使用 C++ 开发
 * 调用 Linux 系统 API 实现网络功能
@@ -18,3 +20,6 @@ L
 
 ##第三方
 * 调用有道翻译 API 接口实现中英互译
+
+##功能演示
+* 登录、注册、添加好友<br>![image]（https://github.com/QYPan/L/tree/master/example_pictures/register_login_add.gif）
