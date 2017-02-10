@@ -26,3 +26,7 @@ L
 * 聊天<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/talk.gif)
 * 模拟网络断开<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/bad_network.gif)
 * 删除好友<br>![image](https://github.com/QYPan/L/tree/master/example_pictures/remove_linkman.gif)
+
+![image](https://github.com/QYPan/L/tree/master/example_pictures/remove_linkman.gif)
+
+![image](https://github.com/QYPan/L/blob/master/example_pictures/remove_linkman.gif)
