@@ -37,7 +37,7 @@ void HttpRequest::getRequest(const QString &msg, QString &tmsg){
     QByteArray bytes = pReplay->readAll();
     QString ans = QString(bytes);
 
-    qDebug() << "ans: " << ans;
+    //qDebug() << "ans: " << ans;
 
     QJsonParseError jsonError;
     QJsonDocument document = QJsonDocument::fromJson(ans.toUtf8(), &jsonError);
@@ -47,7 +47,7 @@ void HttpRequest::getRequest(const QString &msg, QString &tmsg){
         if(!errorCode){
             QJsonArray tarray = obj.value("translation").toArray();
             tmsg = tarray.at(0).toString();
-            qDebug() << "translation: " << tmsg;
+            //qDebug() << "translation: " << tmsg;
             return;
         }
     }
@@ -106,20 +106,20 @@ void CacheManager::createTranslateThread(){
 void CacheManager::hadReceiveACK(bool flag){
     if(!dataList.isEmpty()){
         if(flag){ // 收到消息 ACK
-            qDebug() << "received ack";
+            //qDebug() << "received ack";
             dataList.pop_front();
             if(!dataList.isEmpty()){
                 emit sendData(dataList.first());
             }
         }else{ // 需要重新发送该消息
-            qDebug() << "do not receive ack";
+            //qDebug() << "do not receive ack";
             emit sendData(dataList.first());
         }
     }
 }
 
 void CacheManager::addTranslateData(const QString &udata){
-    qDebug() << "add translate data: " << udata;
+    //qDebug() << "add translate data: " << udata;
     translateList.append(udata);
     if(translateList.length() == 1){
         emit sendToTranslate(udata);
@@ -137,7 +137,7 @@ void CacheManager::onFinishTranslate(){
 }
 
 void CacheManager::addData(const QString &data){
-    qDebug() << "add data: " << data;
+    //qDebug() << "add data: " << data;
     dataList.append(data);
     if(dataList.length() == 1){
         emit sendData(data);

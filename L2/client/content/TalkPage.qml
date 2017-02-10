@@ -63,7 +63,7 @@ Rectangle {
                         id: languageItem
                         text: itemLanguage
                         color: "black"
-                        font.pointSize: textSize2
+                        font.pointSize: textSize1
                         anchors.centerIn: parent
                     }
                 }

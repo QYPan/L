@@ -73,7 +73,7 @@ Rectangle {
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: textSize2
+                anchors.bottom: parent.bottom
                 height: 1
                 color: "#424246"
             }

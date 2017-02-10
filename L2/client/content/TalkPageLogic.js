@@ -33,7 +33,7 @@ function removePage(name){
         msgPages[i].destroy();
         msgPages.splice(i, 1);
     }
-    console.log("pages lenght: " + msgPages.length);
+    //console.log("pages lenght: " + msgPages.length);
 }
 
 function findTalkPage(name){

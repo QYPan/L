@@ -296,7 +296,6 @@ Rectangle {
             height: width * 0.17
             buttonPressed: true
             onClicked: {
-                console.log("register clicked");
                 sendRegisterData();
                 registerTagText.text = qsTr("正在注册...");
                 lockAll(true);
@@ -308,7 +307,6 @@ Rectangle {
             width: user.width
             height: width * 0.17
             onClicked: {
-                console.log("back clicked");
                 stackView.pop();
             }
         }

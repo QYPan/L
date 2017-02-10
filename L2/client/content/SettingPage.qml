@@ -67,6 +67,13 @@ Item {
                 source: "../images/quit.png"
                 fillMode: Image.PreserveAspectFit
             }
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+                color: "#424246"
+            }
             MouseArea {
                 id: mouse
                 anchors.fill: parent
@@ -85,6 +92,7 @@ Item {
         width: parent.width * 0.5
         height: textHeight + Screen.height * 0.07 * 1.4
         visible: false
+        z: 30
         onButtonClicked: {
             lockAll(false);
             visible = false;

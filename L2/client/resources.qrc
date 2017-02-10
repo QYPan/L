@@ -55,5 +55,6 @@
         <file>images/man_or_woman_image.png</file>
         <file>content/SystemList.qml</file>
         <file>content/SettingPage.qml</file>
+        <file>content/AboutPage.qml</file>
     </qresource>
 </RCC>

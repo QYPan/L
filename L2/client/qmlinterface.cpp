@@ -33,7 +33,7 @@ void QmlInterface::readData(const QString &data){
 }
 
 void QmlInterface::reconnect(){
-    qDebug() << "thread death!";
+    //qDebug() << "thread death!";
     QTest::qWait(3000);
     thread->tryConnect();
 }

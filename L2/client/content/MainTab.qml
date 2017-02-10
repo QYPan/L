@@ -8,6 +8,8 @@ import "TalkPageLogic.js" as TALK_PAGE_LOGIC
 Rectangle {
     id: root
     color: "#212126"
+    property string pageName: "mainTabPage"
+
     property int textSize1: 13
     property int textSize2: choseTextSize.sizeD
     property int textSize3: choseTextSize.sizeG
@@ -55,7 +57,7 @@ Rectangle {
                         addButton.visible = false;
                     }else{
                         addButton.visible = true;
-                        fillScreenMouse.enabled = true;
+                        lockAll(true);
                     }
                 }
             }
@@ -79,7 +81,7 @@ Rectangle {
             textSize: textSize2
             onClicked: {
                 addButton.visible = false;
-                fillScreenMouse.enabled = false;
+                lockAll(false);
                 stackView.push(Qt.resolvedUrl("SearchClientPage.qml"));
             }
         }
@@ -91,7 +93,12 @@ Rectangle {
         enabled: false
         z: 25
         onClicked: {
-            addButton.visible = false;
+            if(addButton.visible){
+                addButton.visible = false;
+            }
+            if(checkDialog.visible){
+                checkDialog.visible = false;
+            }
             enabled = false;
         }
     }
@@ -247,6 +254,24 @@ Rectangle {
         }
         onUpdateNewMessageCount: {
             root.newMessageCount = count;
+        }
+    }
+
+    GrayCheckDialog {
+        id: checkDialog
+        anchors.centerIn: parent
+        width: parent.width * 0.5
+        height: textHeight + Screen.height * 0.07 * 1.4
+        visible: false
+        z: 30
+        onButtonClicked: {
+            lockAll(false);
+            visible = false;
+        }
+        onYesClicked: {
+            Qt.quit();
+        }
+        onNoClicked: {
         }
     }
 
@@ -423,5 +448,20 @@ Rectangle {
         data.clientName = qmlInterface.clientName;
         var strOut = JSON.stringify(data);
         cacheManager.addData(strOut);
+    }
+
+    function lockAll(flag){
+        fillScreenMouse.enabled = flag;
+    }
+
+    function quit(){
+        if(checkDialog.visible){
+            checkDialog.visible = false;
+            lockAll(false);
+        }else{
+            checkDialog.setMessageText(qsTr("退出系统后将不保存任何聊天记录"));
+            checkDialog.visible = true;
+            lockAll(true);
+        }
     }
 }

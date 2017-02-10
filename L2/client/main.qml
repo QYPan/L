@@ -16,14 +16,17 @@ ApplicationWindow {
         focus: true
         Keys.onReleased: {
             if (event.key === Qt.Key_Back) {
+                var top = stackView.depth - 1;
+                var topPage = stackView.get(top);
                 if(stackView.depth > 1){
-                    var top = stackView.depth - 1;
-                    var topPage = stackView.get(top);
                     if(topPage.pageName === "talkPage"){
                         signalManager.stackPop();
                     }else{
                         stackView.pop();
                     }
+                    event.accepted = true;
+                }else if(topPage.pageName === "mainTabPage"){
+                    stackView.get(top).quit();
                     event.accepted = true;
                 }
             }

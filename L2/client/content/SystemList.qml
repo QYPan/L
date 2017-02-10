@@ -18,10 +18,14 @@ Item {
         anchors.fill: parent
         model: ListModel {
             ListElement {
+                systemTitle: qsTr("关于")
+            }
+            ListElement {
                 systemTitle: qsTr("设置")
             }
         }
         delegate: Item {
+            id: itemDelegate
             width: parent.width
             height: Screen.height * 0.08
             property real edge: Screen.height * 0.07 * 0.3
@@ -51,11 +55,18 @@ Item {
                 source: "../images/navigation_next_item.png"
                 fillMode: Image.PreserveAspectFit
             }
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+                color: "#424246"
+            }
             MouseArea {
                 id: mouse
                 anchors.fill: parent
                 onClicked: {
-                    root.touchSystemItem(nameItem.text);
+                    root.touchSystemItem(nameItem.text, index);
                 }
                 onDoubleClicked: {
                 }
@@ -63,10 +74,16 @@ Item {
         }
     }
 
-    function touchSystemItem(name){
-        stackView.push(Qt.resolvedUrl("SettingPage.qml"));
-        var top = stackView.depth - 1;
-        stackView.get(top).itemName = name;
+    function touchSystemItem(name, index){
+        if(index === 0){
+            stackView.push(Qt.resolvedUrl("AboutPage.qml"));
+            var top = stackView.depth - 1;
+            stackView.get(top).itemName = name;
+        }else if(index === 1){
+            stackView.push(Qt.resolvedUrl("SettingPage.qml"));
+            top = stackView.depth - 1;
+            stackView.get(top).itemName = name;
+        }
     }
 
 }

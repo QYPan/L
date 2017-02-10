@@ -19,7 +19,7 @@ SocketThread::SocketThread(QObject *parent)
 bool SocketThread::tryConnect(){
     if(!isRunning()){
         start();
-        qDebug() << "new thread start!";
+        //qDebug() << "new thread start!";
         return true;
     }
     return false;
@@ -37,7 +37,7 @@ void SocketThread::run(){
         emit error(socket.error(), socket.errorString());
         return;
     }
-    qDebug() << "connect successed!";
+    //qDebug() << "connect successed!";
     connect(&socket, SIGNAL(getError(int,QString)), m_receiver.data(), SIGNAL(displayError(int,QString)));
     connect(&socket, SIGNAL(readData(QString)), m_receiver.data(), SLOT(readData(QString)));
     connect(&socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
