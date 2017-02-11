@@ -26,7 +26,13 @@ L
 ##应用说明
 * 功能
   * 支持私聊
-
+  * 支持发送文本消息
+  * 支持消息缓存
+  * 支持消息提醒
+  * 支持离线消息推送
+  * 支持断线后自动重连
+  * 支持中英互译
+ * 注意
 ##功能演示
 * 登录、注册、添加好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/register_login_add.gif)
 * 聊天<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/talk.gif)
