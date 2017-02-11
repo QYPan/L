@@ -39,12 +39,16 @@ L
  * 退出应用后聊天记录会清除
  
 ##功能演示
-* 登录、注册、添加好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/register_login_add.gif)
-* 聊天<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/talk.gif)
-* 模拟网络断开<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/bad_network.gif)
-* 删除好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/remove_linkman.gif)
+* 登录、注册、添加好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/register_login_add_win7.gif)
+* 聊天<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/talk_win7.gif)
+* 模拟网络断开<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/bad_network_win7.gif)
+* 删除好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/remove_linkman_win7.gif)
 
 ##后期计划
 * 添加语音聊天功能，并尝试语音翻译
 * 使用 libevent 网络库重新编写服务器，使用 redis 数据库作为离线消息缓存数据库
 * 完善消息推送功能，尽可能做到消息的可靠传输，必达性，实时性，不重复
+
+##作品链接
+* 安卓客户端（android7.0 以下测试通过）：http://pan.baidu.com/s/1dEHLfwd
+* windows 客户端（在 win7 系统下测试通过，免安装，解压后直接运行）：http://pan.baidu.com/s/1mhUyaMW
