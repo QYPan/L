@@ -23,6 +23,10 @@ L
 ##第三方
 * 调用有道翻译 API 接口实现中英互译
 
+##应用说明
+* 功能
+  * 支持私聊
+
 ##功能演示
 * 登录、注册、添加好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/register_login_add.gif)
 * 聊天<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/talk.gif)
