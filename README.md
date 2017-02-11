@@ -43,3 +43,8 @@ L
 * 聊天<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/talk.gif)
 * 模拟网络断开<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/bad_network.gif)
 * 删除好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/remove_linkman.gif)
+
+##后期计划
+* 添加语音聊天功能，并尝试语音翻译
+* 使用 libevent 网络库重新编写服务器，使用 redis 数据库作为离线消息缓存数据库
+* 完善消息推送功能，尽可能做到消息的可靠传输，必达性，实时性，不重复
