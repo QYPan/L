@@ -39,10 +39,10 @@ L
  * 退出应用后聊天记录会清除
  
 ###功能演示
-* 登录、注册、添加好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/register_login_add_win7.gif)
-* 聊天<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/talk_win7.gif)
-* 模拟网络断开<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/bad_network_win7.gif)
-* 删除好友<br>![image](https://github.com/QYPan/L/blob/master/example_pictures/remove_linkman_win7.gif)
+* 登录、注册、添加好友<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/register_login_add_win7.gif)
+* 聊天<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/talk_win7.gif)
+* 模拟网络断开<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/bad_network_win7.gif)
+* 删除好友<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/remove_linkman_win7.gif)
 
 ###后期计划
 * 添加语音聊天功能，并尝试语音翻译
