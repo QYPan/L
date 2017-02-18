@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QWidget>
+#include <QTimer>
 #include <QAbstractSocket>
 #include "socketthread.h"
 
@@ -40,10 +41,13 @@ public slots:
     void getSocketState(QAbstractSocket::SocketState socketState);
     void socketDisconnected(); // socket 断开
     void reconnect(); // 断线重连
+    void tryReconnect();
     void connectSuccessed();
 private:
     void createSocketThread();
+    void initReconnectTimer();
     SocketThread *thread;
+    QTimer *reconnectTimer;
     QString m_name;
     QString m_password;
     QString m_language;

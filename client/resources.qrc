@@ -1,13 +1,43 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>content/AboutPage.qml</file>
+        <file>content/ChoseBox.qml</file>
+        <file>content/GrayButton.qml</file>
+        <file>content/GrayCheckDialog.qml</file>
+        <file>content/GrayDialog.qml</file>
+        <file>content/HandleVerifyLogic.js</file>
+        <file>content/HandleVerifyPage.qml</file>
+        <file>content/InitPage.qml</file>
+        <file>content/LinkmanItemDelegate.qml</file>
+        <file>content/LinkmanList.qml</file>
+        <file>content/MainTab.qml</file>
+        <file>content/MessageList.qml</file>
+        <file>content/PersonalDataPage.qml</file>
+        <file>content/RegisterPage.qml</file>
+        <file>content/SearchClientPage.qml</file>
+        <file>content/SettingPage.qml</file>
+        <file>content/SystemList.qml</file>
+        <file>content/TalkPage.qml</file>
+        <file>content/TalkPageLogic.js</file>
+        <file>content/TopBar.qml</file>
+        <file>content/VerifyPage.qml</file>
+        <file>content/WordButton.qml</file>
         <file>images/add.png</file>
+        <file>images/busy.png</file>
         <file>images/button_default.png</file>
         <file>images/button_pressed.png</file>
         <file>images/downline.png</file>
-        <file>images/headleft.png</file>
-        <file>images/headright.png</file>
+        <file>images/error.png</file>
+        <file>images/linkman_tab_item.png</file>
+        <file>images/linkman_tab_item_default.png</file>
         <file>images/LLogo.png</file>
+        <file>images/man_image.png</file>
+        <file>images/man_or_woman_image.png</file>
+        <file>images/message_tab_image.png</file>
+        <file>images/message_tab_image_default.png</file>
+        <file>images/message_tab_item.png</file>
+        <file>images/message_tab_item_default.png</file>
         <file>images/messageBox.png</file>
         <file>images/navigation_next_item.png</file>
         <file>images/navigation_previous_item.png</file>
@@ -16,6 +46,8 @@
         <file>images/passworddown.png</file>
         <file>images/quit.png</file>
         <file>images/slash.png</file>
+        <file>images/system_tab_item.png</file>
+        <file>images/system_tab_item_default.png</file>
         <file>images/tabs_standard.png</file>
         <file>images/textinput.png</file>
         <file>images/title.png</file>
@@ -23,38 +55,7 @@
         <file>images/user.png</file>
         <file>images/userall.png</file>
         <file>images/userdown.png</file>
-        <file>content/GrayButton.qml</file>
-        <file>content/InitPage.qml</file>
-        <file>content/WordButton.qml</file>
-        <file>content/RegisterPage.qml</file>
-        <file>content/ChoseBox.qml</file>
-        <file>content/MainTab.qml</file>
-        <file>content/TopBar.qml</file>
-        <file>content/GrayDialog.qml</file>
-        <file>content/LinkmanList.qml</file>
-        <file>content/LinkmanItemDelegate.qml</file>
-        <file>content/SearchClientPage.qml</file>
-        <file>content/PersonalDataPage.qml</file>
-        <file>content/VerifyPage.qml</file>
-        <file>content/HandleVerifyPage.qml</file>
-        <file>content/HandleVerifyLogic.js</file>
-        <file>content/GrayCheckDialog.qml</file>
-        <file>content/TalkPage.qml</file>
-        <file>content/TalkPageLogic.js</file>
-        <file>content/MessageList.qml</file>
-        <file>images/error.png</file>
-        <file>images/busy.png</file>
-        <file>images/message_tab_item.png</file>
-        <file>images/message_tab_item_default.png</file>
-        <file>images/linkman_tab_item.png</file>
-        <file>images/linkman_tab_item_default.png</file>
-        <file>images/system_tab_item.png</file>
-        <file>images/system_tab_item_default.png</file>
-        <file>images/man_image.png</file>
         <file>images/woman_image.png</file>
-        <file>images/man_or_woman_image.png</file>
-        <file>content/SystemList.qml</file>
-        <file>content/SettingPage.qml</file>
-        <file>content/AboutPage.qml</file>
+        <file>images/title.ico</file>
     </qresource>
 </RCC>

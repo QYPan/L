@@ -1,5 +1,5 @@
 #include "qmlinterface.h"
-#include <QTest>
+//#include <QTest>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonParseError>
@@ -9,11 +9,17 @@ QmlInterface::QmlInterface(QObject *parent)
     , thread(NULL)
 {
     createSocketThread();
+    initReconnectTimer();
+}
+
+void QmlInterface::initReconnectTimer(){
+    reconnectTimer = new QTimer(this);
+    connect(reconnectTimer, &QTimer::timeout, this, &QmlInterface::reconnect);
 }
 
 void QmlInterface::createSocketThread(){
     thread = new SocketThread(this);
-    connect(thread, &SocketThread::finished, this, &QmlInterface::reconnect);
+    connect(thread, &SocketThread::finished, this, &QmlInterface::tryReconnect);
     connect(thread, &SocketThread::error, this, &QmlInterface::displayError);
     connect(thread, &SocketThread::connectSuccessed, this, &QmlInterface::connectSuccessed);
     connect(this, &QmlInterface::tryDisconnect, thread, &SocketThread::quit);
@@ -32,9 +38,14 @@ void QmlInterface::readData(const QString &data){
     }
 }
 
+void QmlInterface::tryReconnect(){
+    qDebug() << "thread death!";
+    reconnectTimer->stop();
+    reconnectTimer->start(3000);
+}
+
 void QmlInterface::reconnect(){
-    //qDebug() << "thread death!";
-    QTest::qWait(3000);
+    //QTest::qWait(3000);
     thread->tryConnect();
 }
 
