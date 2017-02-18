@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += core qml quick network testlib
+QT += core qml quick network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -14,7 +14,6 @@ SOURCES += main.cpp \
     signalmanager.cpp
 
 RESOURCES += resources.qrc \
-    resources.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
