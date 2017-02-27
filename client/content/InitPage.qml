@@ -221,9 +221,11 @@ Rectangle {
         console.log(userInfo.sex);
         */
         qmlInterface.clientName = userInfo.name;
+        recordManager.userName = userInfo.name;
         qmlInterface.clientPassword = userInfo.password;
         qmlInterface.clientLanguage = userInfo.language;
         qmlInterface.sex = userInfo.sex;
+        recordManager.initRecord();
     }
 
     function tryLogin(){

@@ -10,10 +10,12 @@ Rectangle {
     property string clientName
     property string language
     property int sex
+    property real recordLimitTime: 15.0
 
     property int textSize1: 15
     property int textSize2: 17
     property int textSize3: 20
+    property int textSize4: 11
 
     TopBar {
         id: topView
@@ -232,7 +234,7 @@ Rectangle {
     }
 
     Item {
-        property int h: sayOrInput.height + downRect.height
+        property int h: sayOrWrite.height + downRect.height
         id: inputBackground
         width: parent.width
         height: h > inputMsg.height ? h : inputMsg.height
@@ -243,21 +245,76 @@ Rectangle {
             height: 1
             color: "#424246"
         }
-        Rectangle {
-            id: sayOrInput
+        Image {
+            id: sayOrWrite
+            property var talkImageDefault: ["../images/voice_default.png",
+                                    "../images/write_default.png",]
+            property var talkImagePressed: ["../images/voice_pressed.png",
+                                    "../images/write_pressed.png",]
+            property int isSay: 0
             width: topView.height * 0.7
             height: width
-            color: "transparent"
-            border.color: "#3399ff"
-            border.width: 1
             anchors.left: parent.left
             anchors.leftMargin: topView.height * 0.2
             anchors.bottom: parent.bottom
+            source: talkMouse.pressed ?
+                    talkImagePressed[isSay] : talkImageDefault[isSay];
+            MouseArea {
+                id: talkMouse
+                anchors.fill: parent
+                onClicked: {
+                    sayOrWrite.talkModelClicked();
+                }
+            }
+            function talkModelClicked(){
+                if(isSay){
+                    isSay = 0;
+                    sayButton.visible = false;
+                    inputBox.visible = true;
+                    sendButton.buttonPressed = false;
+                }else{
+                    isSay = 1;
+                    inputBox.visible = false;
+                    sayButton.visible = true;
+                    sendButton.buttonPressed = true;
+                }
+            }
         }
+        GrayButton {
+            id: sayButton
+            visible: false
+            height: sayOrWrite.height
+            anchors.left: sayOrWrite.right
+            anchors.leftMargin: topView.height * 0.15
+            anchors.right: sendButton.left
+            anchors.rightMargin: topView.height * 0.15
+            anchors.bottom: parent.bottom
+            text: qsTr("按住说话");
+            textSize: textSize1
+            property bool isRecordOk
+            onPressedChanged: {
+                if(pressed){ // 按下
+                    console.log("pressed");
+                    isRecordOk = recordManager.recordReady();
+                    if(isRecordOk){
+                        recordManager.startRecord();
+                        showRecordBar();
+                    }
+                }else{ // 松开
+                    console.log("release");
+                    if(isRecordOk){
+                        recordManager.stopRecord();
+                        hideRecordBar();
+                    }
+                }
+            }
+        }
+
         Item {
             id: inputBox
-            height: sayOrInput.height
-            anchors.left: sayOrInput.right
+            visible: true
+            height: sayOrWrite.height
+            anchors.left: sayOrWrite.right
             anchors.leftMargin: topView.height * 0.15
             anchors.right: sendButton.left
             anchors.rightMargin: topView.height * 0.15
@@ -289,7 +346,7 @@ Rectangle {
         GrayButton {
             id: sendButton
             width: root.width * 0.16
-            height: sayOrInput.height
+            height: sayOrWrite.height
             text: qsTr("发送");
             textSize: textSize1
             anchors.right: parent.right
@@ -297,6 +354,50 @@ Rectangle {
             anchors.bottom: parent.bottom
             onClicked: {
                 sendButtonClicked();
+            }
+        }
+    }
+
+    Loader {
+        id: recordBarLoader
+        width: parent.width * 0.4
+        height: width * 1.7
+        anchors.centerIn: parent
+    }
+
+    Component {
+        id: recordBarComponent
+        Rectangle {
+            id: remainRecordTimeBox
+            visible: true
+            z: 10
+            color: "#b2242424"
+            radius: 4
+            Rectangle {
+                id: warnningBar
+                color: "#c0c0c0"
+                width: parent.width * 0.07
+                height: parent.height * 0.7
+                anchors.bottom: recordWarnText.top
+                anchors.bottomMargin: 15
+                anchors.horizontalCenter: parent.horizontalCenter
+                NumberAnimation {
+                    id: animationBar
+                    target: warnningBar
+                    property: "height"
+                    to: 0
+                    duration: root.recordLimitTime * 1000
+                    running: true
+                }
+            }
+            Text {
+                id: recordWarnText
+                color: "#c0c0c0"
+                text: qsTr("可录音长度")
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 15
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: textSize4
             }
         }
     }
@@ -312,6 +413,30 @@ Rectangle {
         id: msgDont
         visible: false
         font.pointSize: textSize2
+    }
+
+    Connections {
+        target: recordManager
+        onStopped: {
+            hideRecordBar();
+        }
+        onRecordError: {
+            console.log("录音出错");
+        }
+        onRecordTimeout: {
+            console.log("达到录音时长限制");
+            hideRecordBar();
+            sayButton.buttonPressed = true;
+            sayButton.buttonPressed = false;
+        }
+    }
+
+    function showRecordBar(){
+        recordBarLoader.sourceComponent = recordBarComponent;
+    }
+
+    function hideRecordBar(){
+        recordBarLoader.sourceComponent = undefined;
     }
 
     function sendButtonClicked(){

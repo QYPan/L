@@ -35,6 +35,7 @@ void HttpRequest::getRequest(const QString &msg, QString &tmsg){
 
     // 获取响应信息
     QByteArray bytes = pReplay->readAll();
+    pReplay->deleteLater();
     QString ans = QString(bytes);
 
     //qDebug() << "ans: " << ans;

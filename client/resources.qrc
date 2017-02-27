@@ -57,5 +57,9 @@
         <file>images/userdown.png</file>
         <file>images/woman_image.png</file>
         <file>images/title.ico</file>
+        <file>images/voice_default.png</file>
+        <file>images/voice_pressed.png</file>
+        <file>images/write_default.png</file>
+        <file>images/write_pressed.png</file>
     </qresource>
 </RCC>
