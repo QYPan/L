@@ -119,7 +119,6 @@ Rectangle {
                 //signalManager.acceptVerify(nameItem.text, languageItem.text, itemDelegate.sex);
                 sendAcceptVerify(nameItem.text, languageItem.text, itemDelegate.sex);
             }
-
             function sendAcceptVerify(name, language, sex){
                 var data = {};
                 var userInfo = {};

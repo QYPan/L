@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
+import QtMultimedia 5.5
 import QtQuick.Window 2.0
 
 Rectangle {
@@ -11,11 +12,15 @@ Rectangle {
     property string language
     property int sex
     property real recordLimitTime: 15.0
+    property bool ifRecordOk: true
 
     property int textSize1: 15
     property int textSize2: 17
     property int textSize3: 20
-    property int textSize4: 11
+    property int textSize4: 13
+
+    signal startRecord()
+    signal stopRecord()
 
     TopBar {
         id: topView
@@ -26,6 +31,12 @@ Rectangle {
         onBacked: {
             signalManager.stackPop();
         }
+    }
+
+    MediaPlayer {
+        id: voicePlayer
+        autoPlay: false
+        source: "nothing"
     }
 
     ListView {
@@ -40,6 +51,22 @@ Rectangle {
         clip: true
         spacing: topView.height * 0.3
         model: ListModel {}
+        /*
+        Loader {
+            id: voiceLoader
+            sourceComponent: {
+                if(isVoice) return voicePlayerComponent;
+                else return undefined;
+            }
+        }
+        Component {
+            id: voicePlayerComponent
+            MediaPlayer {
+                id: voicePlayer
+                autoPlay: false
+            }
+        }
+        */
         delegate: Item {
             id: talkDelegate
             property bool isSelf: itemName == qmlInterface.clientName
@@ -157,7 +184,6 @@ Rectangle {
                 x: isSelf ? msgBackground.x - width - edge :
                             msgBackground.x + msgBackground.width + edge
             }
-
             Rectangle {
                 id: msgBackground
                 x: isSelf ? parent.width - headImage.width - 2*edge - width : headImage.width + 2*edge
@@ -180,6 +206,30 @@ Rectangle {
                 MouseArea {
                     id: textTouch
                     anchors.fill: parent
+                    onClicked: {
+                        if(isVoice){
+                            console.log("in talk appendVoice: " + itemVoiceUrl);
+                            recordManager.playRecord(itemVoiceUrl);
+                            /*
+                            if(voicePlayer.source != itemVoiceUrl)
+                                voicePlayer.source = itemVoiceUrl;
+                            if(voicePlayer.playbackState === MediaPlayer.StoppedState){
+                                voicePlayer.play();
+                            }else{
+                                voicePlayer.stop();
+                            }
+                            */
+                            /*
+                            if(voiceLoader.item.source !== itemVoiceUrl)
+                                voiceLoader.item.source = itemVoiceUrl;
+                            if(voiceLoader.item.playbackState === MediaPlayer.StoppedState){
+                                voiceLoader.item.play();
+                            }else{
+                                voiceLoader.item.stop();
+                            }
+                            */
+                        }
+                    }
                     onPressAndHold: {
                         talkDelegate.showOriginalMsg();
                     }
@@ -192,10 +242,6 @@ Rectangle {
                 y: edge + msgBackground.height
                 width: msg.width + 2 * edge
                 height: 0
-                /*
-                height: msg.height + 2 * edge > headImage.height ?
-                            msg.height + 2 * edge : headImage.height
-                            */
                 color: isSelf ? (originalTouch.pressed ? "#808080" : "#969696")
                            :(originalTouch.pressed ? "#c0c0c0" : "#dddddd")
                 radius: 6
@@ -210,6 +256,30 @@ Rectangle {
                 MouseArea {
                     id: originalTouch
                     anchors.fill: parent
+                    property bool isPlaying: false
+                    onClicked: {
+                        if(isVoice){
+                            recordManager.playRecord(oItemVoiceUrl);
+                            /*
+                            if(voicePlayer.source != oItemVoiceUrl)
+                                voicePlayer.source = oItemVoiceUrl;
+                            if(voicePlayer.playbackState === MediaPlayer.StoppedState){
+                                voicePlayer.play();
+                            }else{
+                                voicePlayer.stop();
+                            }
+                            */
+                            /*
+                            if(voiceLoader.item.source !== oItemVoiceUrl)
+                                voiceLoader.item.source = oItemVoiceUrl;
+                            if(voiceLoader.item.playbackState === MediaPlayer.StoppedState){
+                                voiceLoader.item.play();
+                            }else{
+                                voiceLoader.item.stop();
+                            }
+                            */
+                        }
+                    }
                     onPressAndHold: {
                         talkDelegate.hideOriginalMsg();
                     }
@@ -295,17 +365,10 @@ Rectangle {
             onPressedChanged: {
                 if(pressed){ // 按下
                     console.log("pressed");
-                    isRecordOk = recordManager.recordReady();
-                    if(isRecordOk){
-                        recordManager.startRecord();
-                        showRecordBar();
-                    }
+                    startRecord();
                 }else{ // 松开
                     console.log("release");
-                    if(isRecordOk){
-                        recordManager.stopRecord();
-                        hideRecordBar();
-                    }
+                    stopRecord();
                 }
             }
         }
@@ -363,6 +426,7 @@ Rectangle {
         width: parent.width * 0.4
         height: width * 1.7
         anchors.centerIn: parent
+        sourceComponent: undefined
     }
 
     Component {
@@ -393,7 +457,7 @@ Rectangle {
             Text {
                 id: recordWarnText
                 color: "#c0c0c0"
-                text: qsTr("可录音长度")
+                text: qsTr("正在录音...")
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 15
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -417,26 +481,76 @@ Rectangle {
 
     Connections {
         target: recordManager
-        onStopped: {
-            hideRecordBar();
-        }
         onRecordError: {
+            ifRecordOk = false;
             console.log("录音出错");
         }
         onRecordTimeout: {
             console.log("达到录音时长限制");
-            hideRecordBar();
             sayButton.buttonPressed = true;
             sayButton.buttonPressed = false;
         }
     }
 
+    Connections {
+        target: root
+        onStartRecord: {
+            showRecordBar();
+        }
+        onStopRecord: {
+            hideRecordBar();
+        }
+    }
+
     function showRecordBar(){
-        recordBarLoader.sourceComponent = recordBarComponent;
+        var isRecordOk = recordManager.recordReady();
+        if(isRecordOk){
+            recordManager.startRecord();
+            recordBarLoader.sourceComponent = recordBarComponent;
+        }
     }
 
     function hideRecordBar(){
-        recordBarLoader.sourceComponent = undefined;
+        var isRecordOk = recordManager.recordReady();
+        if(isRecordOk){
+            var voicePath = recordManager.stopRecord();
+            recordBarLoader.sourceComponent = undefined;
+            sayButtonRelease(voicePath);
+        }
+    }
+
+    function sayButtonRelease(voicePath){
+        var userInfo = {};
+        userInfo.name = qmlInterface.clientName;
+        userInfo.language = qmlInterface.clientLanguage;
+        userInfo.sex = qmlInterface.sex;
+        var msg, tmsg;
+        var oppUserInfo = {};
+        oppUserInfo.name = root.clientName;
+        oppUserInfo.language = root.language;
+        oppUserInfo.sex = root.sex;
+        var userInfoStr = JSON.stringify(oppUserInfo);
+        if(ifRecordOk){
+            msg = qsTr("语音消息");
+            tmsg = qsTr("语音消息");
+            appendVoice(userInfo, msg, tmsg, true, false, voicePath, voicePath);
+            signalManager.sendMessage(userInfoStr, qsTr("[语音消息]"));
+            uploadVoice(root.clientName, voicePath);
+        }else{
+            msg = qsTr("录音出错");
+            tmsg = qsTr("录音出错");
+            appendMsg(userInfo, msg, tmsg, false, false);
+            signalManager.sendMessage(userInfoStr, qsTr("[录音出错]"));
+            ifRecordOk = true;
+        }
+    }
+
+    function uploadVoice(name, voicePath){
+        var udata = {};
+        udata.userName = name;
+        udata.voicePath = voicePath;
+        var udataStr = JSON.stringify(udata);
+        voiceMsgManager.addUploadVoiceData(udataStr);
     }
 
     function sendButtonClicked(){
@@ -461,13 +575,36 @@ Rectangle {
 
     function sendMessage(userInfo, oppName, msg){
         var data = {};
+        var msgInfo = {};
         data.mtype = "SYN";
         data.dtype = "TRANSPOND";
         data.oppName = oppName;
-        data.msg = msg;
+        msgInfo.type = "TEXT";
+        msgInfo.msg = msg;
         data.userInfo = userInfo;
+        data.msgInfo = msgInfo;
         var strOut = JSON.stringify(data);
         cacheManager.addData(strOut);
+    }
+
+    function appendVoice(userInfo, msg, tmsg, isItemBusy, isItemError, voiceUrl, oVoiceUrl){
+        msg = qsTr("原文: ") + msg;
+        msgDont.text = msg;
+        var len = msgDont.width;
+        msgDont.text = tmsg;
+        var tlen = msgDont.width;
+        msgList.model.append({"itemName" : userInfo.name,
+                              "itemLanguage" : userInfo.language,
+                              "itemMsg" : msg,
+                              "itemTMsg" : tmsg,
+                              "msgLength" : len,
+                              "tmsgLength" : tlen,
+                              "isItemBusy" : isItemBusy,
+                              "isItemError" : isItemError,
+                              "isVoice" : true,
+                              "itemVoiceUrl" : voiceUrl,
+                              "oItemVoiceUrl" : oVoiceUrl,
+                              "itemSex" : userInfo.sex});
     }
 
     function appendMsg(userInfo, msg, tmsg, isItemBusy, isItemError){
@@ -484,6 +621,9 @@ Rectangle {
                               "tmsgLength" : tlen,
                               "isItemBusy" : isItemBusy,
                               "isItemError" : isItemError,
+                              "isVoice" : false,
+                              "itemVoiceUrl" : "",
+                              "oItemVoiceUrl" : "",
                               "itemSex" : userInfo.sex});
     }
 

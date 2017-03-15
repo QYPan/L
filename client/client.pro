@@ -12,7 +12,9 @@ SOURCES += main.cpp \
     socketthread.cpp \
     textsize.cpp \
     recordmanager.cpp \
-    recorder.cpp
+    recorder.cpp \
+    voicemsgmanager.cpp \
+    ftpmanager.cpp
 
 RESOURCES += resources.qrc
 
@@ -32,7 +34,9 @@ HEADERS += \
     socketthread.h \
     textsize.h \
     recordmanager.h \
-    recorder.h
+    recorder.h \
+    voicemsgmanager.h \
+    ftpmanager.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

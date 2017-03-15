@@ -29,7 +29,12 @@ void RecordManager::startRecord(){
     m_recorder.start();
 }
 
-void RecordManager::stopRecord(){
-    m_recorder.stop();
+void RecordManager::playRecord(const QString &voicePath){
+    m_recorder.play(voicePath);
+}
+
+QString RecordManager::stopRecord(){
+    QString fileName = m_recorder.stop();
     m_recorder.stopTimer();
+    return fileName;
 }

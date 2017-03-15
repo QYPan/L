@@ -11,11 +11,12 @@ Recorder::Recorder(QObject *parent)
     , m_bRecorderValid(true)
     , m_bRecordSuccess(true)
 {
+    setupAudioPlayer();
     connect(&m_recordTimer, &QTimer::timeout, this, &Recorder::timeoutKillRecord);
 }
 
 void Recorder::timeoutKillRecord(){
-    m_recorder.stop();
+    //m_recorder.stop();
     stopTimer();
     emit recordTimeout();
 }
@@ -33,11 +34,16 @@ bool Recorder::init(const QString &userName){
     return true;
 }
 
+void Recorder::play(const QString &voicePath){
+    m_player->setMedia(QMediaContent(QUrl::fromLocalFile(voicePath)));
+    m_player->play();
+}
+
 void Recorder::start(){
     if(m_bRecorderValid && m_recorder.state() == QMediaRecorder::StoppedState){
         qDebug() << "start record";
         m_bRecordSuccess = true;
-        QString path = QString("%1/%2%3.%4").arg(QDir::currentPath())
+        QString path = QString("%1%2%3.%4").arg(QDir::currentPath()+"/voice/")
                 .arg(m_userName)
                 .arg(QDateTime::currentDateTime().toString("yyMMdd-hhmmss"))
                 //.arg(m_recorder.containerFormat());
@@ -60,13 +66,18 @@ int Recorder::getFileSize(const QString &fName){
     return s;
 }
 
-void Recorder::stop(){
+QString Recorder::stop(){
     m_recorder.stop();
     int s = getFileSize(m_filePath);
     qDebug() << "fileSize: " << s / 1000 << " KB";
     QFile::setPermissions(m_filePath, QFile::ReadOwner |
                           QFile::WriteOwner | QFile::ReadOther |
                           QFile::ReadUser | QFile::ReadGroup);
+    return m_filePath;
+}
+
+void Recorder::setupAudioPlayer(){
+    m_player = new QMediaPlayer(this);
 }
 
 bool Recorder::setupAudioRecorder(){

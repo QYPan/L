@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QMediaPlayer>
 #include <QTimer>
 #include <QAudioRecorder>
 #include <QAudioEncoderSettings>
@@ -14,8 +15,9 @@ public:
     Recorder(QObject *parent = 0);
     bool init(const QString &userName);
     void start();
-    void stop();
+    void play(const QString &voicePath);
     void stopTimer();
+    QString stop();
 signals:
     void recordError(QMediaRecorder::Error);
     void recordTimeout();
@@ -24,8 +26,10 @@ protected slots:
 private:
     void timeoutKillRecord();
     bool setupAudioRecorder();
+    void setupAudioPlayer();
     int getFileSize(const QString &fName);
 private:
+    QMediaPlayer *m_player;
     QAudioRecorder m_recorder;
     QAudioEncoderSettings m_settings;
     QString m_filePath;

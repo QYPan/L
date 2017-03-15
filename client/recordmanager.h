@@ -10,15 +10,15 @@ class RecordManager : public QObject
     Q_OBJECT
     Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
 public:
+    Q_INVOKABLE void playRecord(const QString &voicePath);
     Q_INVOKABLE void startRecord();
-    Q_INVOKABLE void stopRecord();
     Q_INVOKABLE bool recordReady();
     Q_INVOKABLE void initRecord();
+    Q_INVOKABLE QString stopRecord();
     RecordManager(QObject *parent = 0);
     QString userName() const;
     void setUserName(const QString &name);
 signals:
-    void stopped();
     void recordError(QMediaRecorder::Error);
     void userNameChanged(const QString &name);
     void recordTimeout();

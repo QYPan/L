@@ -257,6 +257,23 @@ Rectangle {
         }
     }
 
+    Connections {
+        target: voiceMsgManager
+        onFinishUpload: {
+            console.log("oppName: " + oppName);
+            console.log("ftpPath: " + ftpPath);
+            handleFtpVoice(oppName, ftpPath);
+        }
+        onFinishDownload: {
+            var uVoiceInfo = JSON.parse(uVoicePath);
+            console.log("name: " + uVoiceInfo.userInfo.name);
+            console.log("language: " + uVoiceInfo.userInfo.language);
+            console.log("sex: " + uVoiceInfo.userInfo.sex);
+            console.log("voicePath: " + uVoiceInfo.voicePath);
+            TALK_PAGE_LOGIC.appendVoice(uVoiceInfo.userInfo, uVoiceInfo.voicePath);
+        }
+    }
+
     GrayCheckDialog {
         id: checkDialog
         anchors.centerIn: parent
@@ -278,6 +295,24 @@ Rectangle {
     Component.onCompleted: {
         requestLinkmans();
         HANDLE_VERIFY_LOGIC.initVerifyPage(); // 初始化接受好友请求页面
+    }
+
+    function handleFtpVoice(oppName, ftpPath){
+        var data = {};
+        var msgInfo = {};
+        var userInfo = {};
+        userInfo.name = qmlInterface.clientName;
+        userInfo.language = qmlInterface.clientLanguage;
+        userInfo.sex = qmlInterface.sex;
+        data.mtype = "SYN";
+        data.dtype = "TRANSPOND";
+        data.oppName = oppName;
+        msgInfo.type = "VOICE";
+        msgInfo.msg = ftpPath;
+        data.userInfo = userInfo;
+        data.msgInfo = msgInfo;
+        var strOut = JSON.stringify(data);
+        cacheManager.addData(strOut);
     }
 
     function reLogin(){
@@ -335,15 +370,23 @@ Rectangle {
     }
 
     function handleTranspondSyn(data){
+        var udataStr;
         var udata = {};
+        var msgInfo = {};
         var newData = JSON.parse(data);
         udata.userInfo = newData.userInfo;
-        udata.msg = newData.msg;
-        if(udata.userInfo.language === qmlInterface.clientLanguage){
-            TALK_PAGE_LOGIC.appendMessage(udata.userInfo, udata.msg, udata.msg);
-        }else{
-            var udataStr = JSON.stringify(udata);
-            cacheManager.addTranslateData(udataStr);
+        msgInfo = newData.msgInfo;
+        udata.msg = msgInfo.msg;
+        if(msgInfo.type === "TEXT"){ // 文本消息
+            if(udata.userInfo.language === qmlInterface.clientLanguage){
+                TALK_PAGE_LOGIC.appendMessage(udata.userInfo, udata.msg, udata.msg);
+            }else{
+                udataStr = JSON.stringify(udata);
+                cacheManager.addTranslateData(udataStr);
+            }
+        }else if(msgInfo.type === "VOICE"){ // 语音消息
+            udataStr = JSON.stringify(udata);
+            voiceMsgManager.addDownloadVoiceData(udataStr);
         }
     }
 
