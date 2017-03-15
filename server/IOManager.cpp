@@ -40,16 +40,19 @@ void IOManager::send_syn(int fd, const string &name){
 	}
 }
 
-void IOManager::cache_syn_transpond(const Clientdb::UserInfo &userInfo, const string &name, const string &msg){
+void IOManager::cache_syn_transpond(const Clientdb::UserInfo &userInfo, const string &name, const MessageType &msgInfo){
 	Json::Value root;
 	root["mtype"] = "SYN";
 	root["dtype"] = "TRANSPOND";
 	Json::Value juserInfo;
+	Json::Value jmsgInfo;
 	juserInfo["name"] = userInfo.name;
 	juserInfo["language"] = userInfo.language;
 	juserInfo["sex"] = userInfo.sex;
 	root["userInfo"] = juserInfo;
-	root["msg"] = msg;
+	jmsgInfo["type"] = msgInfo.type;
+	jmsgInfo["msg"] = msgInfo.msg;
+	root["msgInfo"] = jmsgInfo;
 	Json::FastWriter writer;
 	string strOut = writer.write(root);
 	auto &msg_list = syn_caches[name];
