@@ -34,9 +34,26 @@ bool Recorder::init(const QString &userName){
     return true;
 }
 
-void Recorder::play(const QString &voicePath){
+void Recorder::stopPlay(){
+    if(m_player->state() == QMediaPlayer::PlayingState){
+        m_player->stop();
+    }
+}
+
+int Recorder::getVoiceTime(const QString &voicePath){
     m_player->setMedia(QMediaContent(QUrl::fromLocalFile(voicePath)));
-    m_player->play();
+    return m_player->duration() / 1000;
+}
+
+void Recorder::play(const QString &voicePath){
+    static QString perVoice = "";
+    if(m_player->state() == QMediaPlayer::PlayingState && perVoice == voicePath){
+        m_player->stop();
+    }else{
+        perVoice = voicePath;
+        m_player->setMedia(QMediaContent(QUrl::fromLocalFile(voicePath)));
+        m_player->play();
+    }
 }
 
 void Recorder::start(){
@@ -46,8 +63,8 @@ void Recorder::start(){
         QString path = QString("%1%2%3.%4").arg(QDir::currentPath()+"/voice/")
                 .arg(m_userName)
                 .arg(QDateTime::currentDateTime().toString("yyMMdd-hhmmss"))
-                //.arg(m_recorder.containerFormat());
-                .arg("wav");
+                .arg(m_recorder.containerFormat());
+                //.arg("wav");
         qDebug() << "filePath: " << path;
         m_filePath = path;
         m_recorder.setOutputLocation(QUrl::fromLocalFile(m_filePath));
@@ -91,9 +108,9 @@ bool Recorder::setupAudioRecorder(){
     QStringList codecs = m_recorder.supportedAudioCodecs();
     if(codecs.size() == 0) return false;
     qDebug() << "codecs: " << codecs;
-    int sampleRate = 16000;
-    if(codecs.contains("aac")){
-        m_settings.setCodec("aac");
+    int sampleRate = 8000;
+    if(codecs.contains("amr-nb")){
+        m_settings.setCodec("amr-nb");
     }else if(codecs.contains("amr-wb")){
         m_settings.setCodec("amr-wb");
     }else{
@@ -107,8 +124,8 @@ bool Recorder::setupAudioRecorder(){
     if(containers.size() == 0) return false;
     qDebug() << "contatiners: " << containers;
     QString container;
-    if(containers.contains("3gp")){
-        container = "3gp";
+    if(containers.contains("amr")){
+        container = "amr";
     }else if(containers.contains("mp4")){
         container = "mp4";
     }else{
@@ -122,7 +139,7 @@ bool Recorder::setupAudioRecorder(){
     if(sampleRates.size() && !sampleRates.contains(sampleRate)){
         sampleRate = sampleRates.at(0);
     }
-    m_settings.setChannelCount(2);
+    m_settings.setChannelCount(1);
     m_settings.setSampleRate(sampleRate);
     m_settings.setQuality(QMultimedia::NormalQuality);
     m_settings.setBitRate(64000);

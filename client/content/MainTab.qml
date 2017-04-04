@@ -264,13 +264,14 @@ Rectangle {
             console.log("ftpPath: " + ftpPath);
             handleFtpVoice(oppName, ftpPath);
         }
-        onFinishDownload: {
+        onFinishVoiceTranslate: {
             var uVoiceInfo = JSON.parse(uVoicePath);
             console.log("name: " + uVoiceInfo.userInfo.name);
             console.log("language: " + uVoiceInfo.userInfo.language);
             console.log("sex: " + uVoiceInfo.userInfo.sex);
             console.log("voicePath: " + uVoiceInfo.voicePath);
-            TALK_PAGE_LOGIC.appendVoice(uVoiceInfo.userInfo, uVoiceInfo.voicePath);
+            console.log("tvoicePath: " + uVoiceInfo.tvoicePath);
+            TALK_PAGE_LOGIC.appendVoice(uVoiceInfo.userInfo, uVoiceInfo.voicePath, uVoiceInfo.tvoicePath);
         }
     }
 

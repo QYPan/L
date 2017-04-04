@@ -29,8 +29,18 @@ void RecordManager::startRecord(){
     m_recorder.start();
 }
 
+int RecordManager::getRecordTime(const QString &voicePath){
+    int voiceTime = m_recorder.getVoiceTime(voicePath);
+    qDebug() << "voiceTime in widget: " << voiceTime;
+    return voiceTime;
+}
+
 void RecordManager::playRecord(const QString &voicePath){
     m_recorder.play(voicePath);
+}
+
+void RecordManager::stopPlayRecord(){
+    m_recorder.stopPlay();
 }
 
 QString RecordManager::stopRecord(){

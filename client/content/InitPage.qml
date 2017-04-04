@@ -224,6 +224,7 @@ Rectangle {
         recordManager.userName = userInfo.name;
         qmlInterface.clientPassword = userInfo.password;
         qmlInterface.clientLanguage = userInfo.language;
+        voiceMsgManager.userLanguage = userInfo.language;
         qmlInterface.sex = userInfo.sex;
         recordManager.initRecord();
     }

@@ -13,14 +13,14 @@ function openTalkPage(userInfo){
     }
 }
 
-function appendVoice(userInfo, voicePath){
+function appendVoice(userInfo, voicePath, tvoicePath){
     var userInfoStr = JSON.stringify(userInfo);
     signalManager.receiveMessage(userInfoStr, qsTr("[语音消息]"));
     var page = openTalkPage(userInfo);
     if(page !== undefined){
         var msg = qsTr("语音消息");
         var tmsg = qsTr("语音消息");
-        page.appendVoice(userInfo, msg, tmsg, false, false, voicePath, voicePath);
+        page.appendVoice(userInfo, msg, tmsg, false, false, voicePath, tvoicePath);
     }
 }
 

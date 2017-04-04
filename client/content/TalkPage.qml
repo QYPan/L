@@ -36,7 +36,6 @@ Rectangle {
     MediaPlayer {
         id: voicePlayer
         autoPlay: false
-        source: "nothing"
     }
 
     ListView {
@@ -172,7 +171,19 @@ Rectangle {
                     running: true
                 }
             }
-
+            /*
+            Text {
+                id: voiceTime
+                color: "white"
+                font.pointSize: textSize1
+                width: headImage.width * 0.5
+                height: width
+                visible: (isItemBusy == false) && isVoice  && (isItemError == false)
+                anchors.verticalCenter: headImage.verticalCenter
+                x: isSelf ? msgBackground.x - width - edge :
+                            msgBackground.x + msgBackground.width + edge
+            }
+            */
             Image {
                 id: errorNote
                 width: headImage.width * 0.5
@@ -210,15 +221,6 @@ Rectangle {
                         if(isVoice){
                             console.log("in talk appendVoice: " + itemVoiceUrl);
                             recordManager.playRecord(itemVoiceUrl);
-                            /*
-                            if(voicePlayer.source != itemVoiceUrl)
-                                voicePlayer.source = itemVoiceUrl;
-                            if(voicePlayer.playbackState === MediaPlayer.StoppedState){
-                                voicePlayer.play();
-                            }else{
-                                voicePlayer.stop();
-                            }
-                            */
                             /*
                             if(voiceLoader.item.source !== itemVoiceUrl)
                                 voiceLoader.item.source = itemVoiceUrl;
@@ -260,15 +262,6 @@ Rectangle {
                     onClicked: {
                         if(isVoice){
                             recordManager.playRecord(oItemVoiceUrl);
-                            /*
-                            if(voicePlayer.source != oItemVoiceUrl)
-                                voicePlayer.source = oItemVoiceUrl;
-                            if(voicePlayer.playbackState === MediaPlayer.StoppedState){
-                                voicePlayer.play();
-                            }else{
-                                voicePlayer.stop();
-                            }
-                            */
                             /*
                             if(voiceLoader.item.source !== oItemVoiceUrl)
                                 voiceLoader.item.source = oItemVoiceUrl;
@@ -587,8 +580,8 @@ Rectangle {
         cacheManager.addData(strOut);
     }
 
-    function appendVoice(userInfo, msg, tmsg, isItemBusy, isItemError, voiceUrl, oVoiceUrl){
-        msg = qsTr("原文: ") + msg;
+    function appendVoice(userInfo, msg, tmsg, isItemBusy, isItemError, oVoiceUrl, voiceUrl){
+        msg = qsTr("原声: ") + msg;
         msgDont.text = msg;
         var len = msgDont.width;
         msgDont.text = tmsg;

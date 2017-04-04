@@ -16,6 +16,8 @@ public:
     bool init(const QString &userName);
     void start();
     void play(const QString &voicePath);
+    int getVoiceTime(const QString &voicePath);
+    void stopPlay();
     void stopTimer();
     QString stop();
 signals:

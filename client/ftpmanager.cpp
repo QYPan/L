@@ -105,6 +105,7 @@ void FtpManager::downloadFinished()
 
     m_file.close();
     pReply->deleteLater();
+
     voiceInfoObj.insert("voicePath", m_file.fileName());
     QJsonDocument tdocument;
     tdocument.setObject(voiceInfoObj);

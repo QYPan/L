@@ -163,6 +163,7 @@ Item {
                 root.totalNewMsgCount -= curItem.itemNewMsgCount;
                 signalManager.updateNewMessageCount(root.totalNewMsgCount);
                 messageList.model.setProperty(index, "itemNewMsgCount", 0);
+                recordManager.stopPlayRecord();
             }
         }
         stackView.pop();

@@ -6,7 +6,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QEventLoop>
 #include <QUrl>
+#include <QUrlQuery>
 #include <QFile>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>

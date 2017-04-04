@@ -10,7 +10,9 @@ class RecordManager : public QObject
     Q_OBJECT
     Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
 public:
+    Q_INVOKABLE int getRecordTime(const QString &voicePath);
     Q_INVOKABLE void playRecord(const QString &voicePath);
+    Q_INVOKABLE void stopPlayRecord();
     Q_INVOKABLE void startRecord();
     Q_INVOKABLE bool recordReady();
     Q_INVOKABLE void initRecord();
