@@ -134,7 +134,9 @@ void Server::try_send_syn(const string &clientName){
 
 void Server::handle_syn_transpond(int fd, const Json::Value &value){
 	Clientdb::UserInfo userInfo;
+	IOManager::MessageType msgInfo;
 	Json::Value userInfoObj;
+	Json::Value msgInfoObj;
 
 	userInfoObj = value["userInfo"];
 	userInfo.name = userInfoObj["name"].asString();
@@ -142,12 +144,14 @@ void Server::handle_syn_transpond(int fd, const Json::Value &value){
 	userInfo.sex = userInfoObj["sex"].asInt();
 
 	string oppName = value["oppName"].asString();
-	string msg = value["msg"].asString();
+	msgInfoObj = value["msgInfo"];
+	msgInfo.type = msgInfoObj["type"].asString();
+	msgInfo.msg = msgInfoObj["msg"].asString();
 
 	bool isFriend = clientdb.findFriend(userInfo.name, oppName);
 	IOManager::ack_transpond(fd, isFriend, oppName);
 	if(isFriend && userInfo.name != oppName){
-		IOManager::cache_syn_transpond(userInfo, oppName, msg);
+		IOManager::cache_syn_transpond(userInfo, oppName, msgInfo);
 		try_send_syn(oppName);
 	}
 }

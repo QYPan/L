@@ -1,5 +1,5 @@
 obj = main.o Server.o TcpServer.o OnlineManager.o IOManager.o Clientdb.o
-link = -lpthread -ljson -I/usr/include/mysql -L/usr/lib/mysql -lmysqlclient -g
+link = -lpthread -ljson -I/usr/include/mysql -L/usr/lib64/mysql -lmysqlclient -g
 
 server : $(obj)
 	g++ -o server $(obj) $(link)
