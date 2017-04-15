@@ -126,8 +126,8 @@ bool Recorder::setupAudioRecorder(){
     QString container;
     if(containers.contains("amr")){
         container = "amr";
-    }else if(containers.contains("mp4")){
-        container = "mp4";
+    }else if(containers.contains("mp3")){
+        container = "mp3";
     }else{
         container = containers.at(0);
     }

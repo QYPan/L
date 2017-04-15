@@ -6,23 +6,29 @@
 #include <QThread>
 #include <QList>
 #include <QNetworkAccessManager>
+#include <time.h>
 
 class QByteArray;
 
-class VoiceHttpRequest : public QObject
+class TranslateHttpRequest : public QObject
 {
     Q_OBJECT
 public:
-    VoiceHttpRequest(QObject *parent = 0);
-signals:
-    void finishRequest(const QString &udata);
-public slots:
-    void sendRequest(const QString &udata);
-private:
-    void getRequest(const QString &language, const QString &voicePath, QString &tvoicePath);
+    TranslateHttpRequest(QObject *parent = 0);
+    void getVoiceTranslateRequest(int sex, const QString &language, const QString &voicePath, QString &tvoicePath);
     bool speech2text(const QString &language, const QString &voicePath, QString &text);
     bool textTranslate(const QString &msg, QString &tmsg);
-    bool text2speech(const QString &text, QString &voicePath);
+    bool text2speech(int sex, const QString &text, QString &voicePath);
+signals:
+    void finishVoiceRequest(const QString &udata);
+    void finishTextRequest(const QString &udata);
+public slots:
+    void sendVoiceRequest(const QString &udata);
+    void sendTextRequest(const QString &udata);
+private:
+    QString getHostMacAddress();
+    QString getRandID();
+    void initRand();
 
     QByteArray readFile(const QString &filePath);
     QNetworkAccessManager m_networkManager;

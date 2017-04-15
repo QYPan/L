@@ -9,6 +9,7 @@
 #include <QNetworkAccessManager>
 #include <QByteArray>
 
+/*
 HttpRequest::HttpRequest(QObject *parent)
     : QObject(parent)
 {
@@ -76,6 +77,7 @@ void HttpRequest::sendRequest(const QString &udata){
         emit finishRequest(tudata);
     }
 }
+*/
 
 TranslateThread::TranslateThread(QObject *receiver)
     : m_receiver(receiver)
@@ -83,13 +85,13 @@ TranslateThread::TranslateThread(QObject *receiver)
 }
 
 void TranslateThread::run(){
-    HttpRequest httpRequest;
+    TranslateHttpRequest httpRequest;
     //connect(m_receiver.data(), &CacheManager::sendToTranslate, &httpRequest, &HttpRequest::sendRequest);
     //connect(&httpRequest, &HttpRequest::finishRequest, m_receiver.data(), &CacheManager::finishTranslate);
     //connect(&httpRequest, &HttpRequest::finishRequest, m_receiver.data(), &CacheManager::onFinishTranslate);
-    connect(m_receiver.data(), SIGNAL(sendToTranslate(QString)), &httpRequest, SLOT(sendRequest(QString)));
-    connect(&httpRequest, SIGNAL(finishRequest(QString)), m_receiver.data(), SLOT(onFinishTranslate()));
-    connect(&httpRequest, SIGNAL(finishRequest(QString)), m_receiver.data(), SIGNAL(finishTranslate(QString)));
+    connect(m_receiver.data(), SIGNAL(sendToTranslate(QString)), &httpRequest, SLOT(sendTextRequest(QString)));
+    connect(&httpRequest, SIGNAL(finishTextRequest(QString)), m_receiver.data(), SLOT(onFinishTranslate()));
+    connect(&httpRequest, SIGNAL(finishTextRequest(QString)), m_receiver.data(), SIGNAL(finishTranslate(QString)));
     exec();
 }
 

@@ -7,7 +7,9 @@
 #include <QPointer>
 #include <QList>
 #include <QMap>
+#include "voicemsgmanager.h"
 
+/*
 class QNetworkAccessManager;
 
 class HttpRequest : public QObject
@@ -22,6 +24,7 @@ public slots:
 private:
     void getRequest(const QString &msg, QString &tmsg);
 };
+*/
 
 class TranslateThread : public QThread
 {

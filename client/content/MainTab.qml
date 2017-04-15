@@ -236,7 +236,15 @@ Rectangle {
         }
         onFinishTranslate: {
             var tudata = JSON.parse(udata);
-            TALK_PAGE_LOGIC.appendMessage(tudata.userInfo, tudata.msg, tudata.tmsg);
+            if(tudata.userInfo.name == qmlInterface.clientName){
+                var top = stackView.depth - 1;
+                var topPage = stackView.get(top);
+                if(topPage.pageName == "textTranslatePage"){
+                    stackView.get(top).setTranslateText(tudata.tmsg);
+                }
+            }else {
+                TALK_PAGE_LOGIC.appendMessage(tudata.userInfo, tudata.msg, tudata.tmsg);
+            }
         }
     }
 

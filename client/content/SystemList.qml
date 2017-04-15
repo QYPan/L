@@ -21,6 +21,9 @@ Item {
                 systemTitle: qsTr("关于")
             }
             ListElement {
+                systemTitle: qsTr("翻译")
+            }
+            ListElement {
                 systemTitle: qsTr("设置")
             }
         }
@@ -80,6 +83,10 @@ Item {
             var top = stackView.depth - 1;
             stackView.get(top).itemName = name;
         }else if(index === 1){
+            stackView.push(Qt.resolvedUrl("TranslatePage.qml"));
+            top = stackView.depth - 1;
+            stackView.get(top).itemName = name;
+        }else if(index === 2){
             stackView.push(Qt.resolvedUrl("SettingPage.qml"));
             top = stackView.depth - 1;
             stackView.get(top).itemName = name;

@@ -3,10 +3,31 @@
 #include "ftpmanager.h"
 #include <QByteArray>
 #include <QDataStream>
+#include <QNetworkInterface>
+#include <QList>
 
-VoiceHttpRequest::VoiceHttpRequest(QObject *parent)
+void TranslateHttpRequest::initRand(){
+    static bool flag = false;
+    if(flag == false){
+        srand((unsigned int)time(NULL));
+        flag = true;
+    }
+}
+
+TranslateHttpRequest::TranslateHttpRequest(QObject *parent)
     : QObject(parent)
 {
+    initRand();
+}
+
+QString TranslateHttpRequest::getRandID(){
+    static int id = 0;
+    if(id == 0){
+        id = rand() + 1;
+    }
+    char s_id[15] = {0};
+    sprintf(s_id, "%d", id);
+    return "id:" + QString(s_id);
 }
 
 VoiceMsgManager::VoiceMsgManager(QObject *parent)
@@ -22,7 +43,7 @@ VoiceTranslateThread::VoiceTranslateThread(QObject *receiver)
 {
 }
 
-QByteArray VoiceHttpRequest::readFile(const QString &filePath){
+QByteArray TranslateHttpRequest::readFile(const QString &filePath){
     qDebug() << "read: " << filePath;
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)){
@@ -35,7 +56,7 @@ QByteArray VoiceHttpRequest::readFile(const QString &filePath){
     return data;
 }
 
-bool VoiceHttpRequest::speech2text(const QString &language, const QString &voicePath, QString &text){
+bool TranslateHttpRequest::speech2text(const QString &language, const QString &voicePath, QString &text){
     QString baseUrl = "http://vop.baidu.com/server_api";
     QUrl url(baseUrl);
 
@@ -45,6 +66,8 @@ bool VoiceHttpRequest::speech2text(const QString &language, const QString &voice
     }
     bool ok = false;
     qDebug() << "voiceF size: " << voiceF.size();
+    QString cuidStr = "cuid=" + getRandID();
+    qDebug() << "cuid str: " << cuidStr;
 
     QJsonObject json;
     json.insert("format", "amr");
@@ -52,7 +75,7 @@ bool VoiceHttpRequest::speech2text(const QString &language, const QString &voice
     json.insert("channel", "1");
     json.insert("lan", language);
     json.insert("token", "24.dadd857936f104ecb9399b45cacf1a5d.2592000.1492495671.282335-9415054");
-    json.insert("cuid", "jusatextname");
+    json.insert("cuid", cuidStr);
     json.insert("speech", QString(voiceF.toBase64()));
     json.insert("len", voiceF.size());
 
@@ -94,7 +117,7 @@ bool VoiceHttpRequest::speech2text(const QString &language, const QString &voice
     return ok;
 }
 
-bool VoiceHttpRequest::textTranslate(const QString &msg, QString &tmsg){
+bool TranslateHttpRequest::textTranslate(const QString &msg, QString &tmsg){
     // URL
     QString subBaseUrl = "http://fanyi.youdao.com/openapi.do?keyfrom=english-2-chinese&key=1263917877&type=data&doctype=json&version=1.1&only=translate&q=";
     QString baseUrl = subBaseUrl + msg;
@@ -139,18 +162,43 @@ bool VoiceHttpRequest::textTranslate(const QString &msg, QString &tmsg){
     return ok;
 }
 
-bool VoiceHttpRequest::text2speech(const QString &text, QString &voicePath){
+QString TranslateHttpRequest::getHostMacAddress()
+{
+    QList<QNetworkInterface> nets = QNetworkInterface::allInterfaces();// 获取所有网络接口列表
+    int nCnt = nets.count();
+    QString strMacAddr = "";
+    for(int i = 0; i < nCnt; i ++)
+    {
+        // 如果此网络接口被激活并且正在运行并且不是回环地址，则就是我们需要找的Mac地址
+        if(nets[i].flags().testFlag(QNetworkInterface::IsUp) && nets[i].flags().testFlag(QNetworkInterface::IsRunning) && !nets[i].flags().testFlag(QNetworkInterface::IsLoopBack))
+        {
+            strMacAddr = nets[i].hardwareAddress();
+            break;
+        }
+    }
+    return strMacAddr;
+}
+
+bool TranslateHttpRequest::text2speech(int sex, const QString &text, QString &voicePath){
     QString baseUrl = "http://tsn.baidu.com/text2audio";
     QUrl url(baseUrl);
 
     QByteArray dataArray;
+    QString cuidStr = "cuid=" + getRandID() + "&";
+    qDebug() << "cuid str: " << cuidStr;
     QString ctex = "tex=" + QString(text.toUtf8()) + "&";
     //dataArray.append("tex=你好,你很漂亮&");
     dataArray.append(ctex);
     dataArray.append("lan=zh&");
     dataArray.append("tok=24.dadd857936f104ecb9399b45cacf1a5d.2592000.1492495671.282335-9415054&");
     dataArray.append("ctp=1&");
-    dataArray.append("cuid=justatextname");
+    dataArray.append(cuidStr);
+    qDebug() << "tts sex: " << sex;
+    if(sex == 0){
+        dataArray.append("per=1");
+    }else{
+        dataArray.append("per=0");
+    }
 
 #if 0
     QJsonObject json;
@@ -206,12 +254,14 @@ bool VoiceHttpRequest::text2speech(const QString &text, QString &voicePath){
     return true;
 }
 
-void VoiceHttpRequest::getRequest(const QString &language, const QString &voicePath, QString &tvoicePath){
+void TranslateHttpRequest::getVoiceTranslateRequest(int sex, const QString &language, const QString &voicePath, QString &tvoicePath){
+    qDebug() << "sex: " << sex;
+    qDebug() << "lan: " << language;
     QString msg, tmsg;
     bool ok = false;
     if(speech2text(language, voicePath, msg)){
         if(textTranslate(msg, tmsg)){
-            if(text2speech(tmsg, tvoicePath)){
+            if(text2speech(sex, tmsg, tvoicePath)){
                 ok = true;
             }
         }
@@ -221,7 +271,30 @@ void VoiceHttpRequest::getRequest(const QString &language, const QString &voiceP
     }
 }
 
-void VoiceHttpRequest::sendRequest(const QString &udata){
+void TranslateHttpRequest::sendTextRequest(const QString &udata){
+    QJsonParseError jsonError;
+    QJsonDocument document = QJsonDocument::fromJson(udata.toUtf8(), &jsonError);
+    if(!document.isNull() && (jsonError.error == QJsonParseError::NoError)){
+        QJsonObject obj = document.object();
+        QString msg = obj.value("msg").toString();
+        QString tmsg;
+
+        textTranslate(msg, tmsg); // 进行翻译
+
+        QJsonObject tobj;
+        tobj.insert("userInfo", obj.value("userInfo"));
+        tobj.insert("msg", msg);
+        tobj.insert("tmsg", tmsg);
+        QJsonDocument tdocument;
+        tdocument.setObject(tobj);
+        QByteArray bytes = tdocument.toJson(QJsonDocument::Compact);
+        QString tudata(bytes);
+
+        emit finishTextRequest(tudata);
+    }
+}
+
+void TranslateHttpRequest::sendVoiceRequest(const QString &udata){
     qDebug() << "in voice translate sendRequest: " << udata;
     QJsonParseError jsonError;
     QJsonDocument document = QJsonDocument::fromJson(udata.toUtf8(), &jsonError);
@@ -233,11 +306,12 @@ void VoiceHttpRequest::sendRequest(const QString &udata){
         QJsonValue val = obj.value("userInfo");
         QJsonObject subObj = val.toObject();
         QString language = subObj.value("language").toString();
+        int sex = subObj.value("sex").toInt();
         QString lan;
         if(language == "EN") lan = "en";
         else if(language == "CN") lan = "zh";
 
-        getRequest(lan, voicePath, tvoicePath); // 进行翻译
+        getVoiceTranslateRequest(sex, lan, voicePath, tvoicePath); // 进行翻译
         qDebug() << "voicePath: " << voicePath;
         qDebug() << "tvoicePath: " << tvoicePath;
 
@@ -251,7 +325,7 @@ void VoiceHttpRequest::sendRequest(const QString &udata){
         QByteArray bytes = tdocument.toJson(QJsonDocument::Compact);
         QString tudata(bytes);
 
-        emit finishRequest(tudata);
+        emit finishVoiceRequest(tudata);
     }
 }
 
@@ -277,9 +351,9 @@ void VoiceMsgManager::createftpThread(){
 }
 
 void VoiceTranslateThread::run(){
-    VoiceHttpRequest translateRequest;
-    connect(m_receiver.data(), SIGNAL(translateVoice(QString)), &translateRequest, SLOT(sendRequest(QString)));
-    connect(&translateRequest, SIGNAL(finishRequest(QString)), m_receiver.data(), SLOT(onFinishTranslate(QString)));
+    TranslateHttpRequest translateRequest;
+    connect(m_receiver.data(), SIGNAL(translateVoice(QString)), &translateRequest, SLOT(sendVoiceRequest(QString)));
+    connect(&translateRequest, SIGNAL(finishVoiceRequest(QString)), m_receiver.data(), SLOT(onFinishTranslate(QString)));
     exec();
 }
 

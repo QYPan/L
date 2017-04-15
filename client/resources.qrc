@@ -61,5 +61,9 @@
         <file>images/voice_pressed.png</file>
         <file>images/write_default.png</file>
         <file>images/write_pressed.png</file>
+        <file>content/TranslatePage.qml</file>
+        <file>content/TextTranslatePage.qml</file>
+        <file>content/voiceTranslatePage.qml</file>
+        <file>images/transparent.png</file>
     </qresource>
 </RCC>
