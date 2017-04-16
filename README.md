@@ -1,4 +1,4 @@
-L
+﻿L
 =
 即时通信 —— 实现中英同步聊天翻译
 -----------------------------
@@ -22,6 +22,7 @@ L
 
 ###第三方
 * 调用有道翻译 API 接口实现中英互译
+* 调用百度语音 API 接口实现语音识别，语音合成
 
 ###应用说明
 * 功能
@@ -37,12 +38,15 @@ L
  * 若译文跟原文相同，则表示无需翻译或翻译失败
  * 消息发送与接收接口，消息推送，以及其他一些细节尚未完善，可能会出现程序运行异常
  * 退出应用后聊天记录会清除
- 
+
 ###功能演示
 * 登录、注册、添加好友<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/register_login_add_win7.gif)
 * 聊天<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/talk_win7.gif)
 * 模拟网络断开<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/bad_network_win7.gif)
 * 删除好友<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/remove_linkman_win7.gif)
+* 语音翻译聊天<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/voice_talk.gif)
+* 翻译<br>![image]
+(https://github.com/QYPan/dynamic_gif/blob/master/L/single_translate.gif)
 
 ###后期计划
 * 添加语音聊天功能，并尝试语音翻译
