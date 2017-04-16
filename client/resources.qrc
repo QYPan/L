@@ -54,16 +54,19 @@
         <file>images/toolbar.png</file>
         <file>images/user.png</file>
         <file>images/userall.png</file>
+        <file>images/round_default.png</file>
+        <file>images/round_clicked.png</file>
         <file>images/userdown.png</file>
         <file>images/woman_image.png</file>
         <file>images/title.ico</file>
-        <file>images/voice_default.png</file>
-        <file>images/voice_pressed.png</file>
         <file>images/write_default.png</file>
         <file>images/write_pressed.png</file>
         <file>content/TranslatePage.qml</file>
         <file>content/TextTranslatePage.qml</file>
         <file>content/voiceTranslatePage.qml</file>
         <file>images/transparent.png</file>
+        <file>images/translate_logo.png</file>
+        <file>images/round_clicked.png</file>
+        <file>images/round_default.png</file>
     </qresource>
 </RCC>

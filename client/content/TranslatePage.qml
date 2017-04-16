@@ -31,6 +31,16 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        Image {
+            id: translateLogo
+            source: "../images/translate_logo.png"
+            fillMode: Image.PreserveAspectFit
+            width: topView.height * 1.5
+            height: width
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: buttonsColumn.top
+            anchors.bottomMargin: topView.height
+        }
         Column {
             id: buttonsColumn
             anchors.centerIn: parent

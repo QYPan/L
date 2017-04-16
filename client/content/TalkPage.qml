@@ -498,6 +498,7 @@ Rectangle {
     function showRecordBar(){
         var isRecordOk = recordManager.recordReady();
         if(isRecordOk){
+            isRecordOk = true;
             recordManager.startRecord();
             recordBarLoader.sourceComponent = recordBarComponent;
         }

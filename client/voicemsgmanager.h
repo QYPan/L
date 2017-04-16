@@ -64,6 +64,7 @@ public:
     VoiceMsgManager(QObject *parent = 0);
     Q_INVOKABLE void addUploadVoiceData(const QString &uVoicePath);
     Q_INVOKABLE void addDownloadVoiceData(const QString &uVoicePath);
+    Q_INVOKABLE void addTranslateVoiceData(const QString &uVoicePath);
     QString userLanguage() const;
     void setUserLanguage(const QString &language);
 signals:
@@ -82,7 +83,6 @@ private:
     void createftpThread();
     void createVoiceTranslateThread();
     void createVoiceDir();
-    void addTranslateVoiceData(const QString &uVoicePath);
     void judgeLanguage(const QString &uVoicePath);
     QList<QString> ftpUploadList; // 待上传的语音消息(含用户信息，JSON 字符串)
     QList<QString> ftpDownloadList; // 待下载的语音消息(含用户信息，JSON 字符串)

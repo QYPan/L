@@ -11,6 +11,7 @@ Item {
     property int textSize1: 17
     property int textSize2: 20
     property int textSize3: 15
+    property int textSize4: 13
 
     Rectangle {
         color: "#212126"
@@ -59,6 +60,58 @@ Item {
                     selectionColor: "steelblue"
                     selectedTextColor: "#eee"
                 }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        textEdit.focus = true;
+                        holdPress.visible = false;
+                    }
+                    onPressAndHold: {
+                        holdPress.y = mouseY;
+                        holdPress.visible = true;
+                    }
+                }
+            }
+        }
+        Rectangle {
+            id: holdPress
+            width: parent.width * 0.5
+            height: topView.height * 0.5
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "transparent"
+            visible: false
+            GrayButton {
+                id: selectAllButton
+                width: parent.width / 3
+                height: parent.height
+                text: qsTr("全选");
+                textSize: textSize4;
+                anchors.left: parent.left
+                onClicked: {
+                    holdPressClicked(0);
+                }
+            }
+            GrayButton {
+                id: copyButton
+                width: parent.width / 3
+                height: parent.height
+                text: qsTr("复制");
+                textSize: textSize4;
+                anchors.left: selectAllButton.right
+                onClicked: {
+                    holdPressClicked(1);
+                }
+            }
+            GrayButton {
+                id: pasteButton
+                width: parent.width / 3
+                height: parent.height
+                text: qsTr("粘贴");
+                textSize: textSize4;
+                anchors.left: copyButton.right
+                onClicked: {
+                    holdPressClicked(2);
+                }
             }
         }
         GrayButton {
@@ -80,7 +133,7 @@ Item {
         }
         Image {
             id: busyState
-            width: translateButton.height * 0.8
+            width: translateButton.height * 0.5
             height: width
             source: "../images/busy.png"
             fillMode: Image.PreserveAspectFit
@@ -126,6 +179,29 @@ Item {
                     selectedTextColor: "#eee"
                 }
             }
+        }
+    }
+
+    Text {
+        id: flagAPI
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: topView.height * 0.2
+        anchors.left: parent.left
+        anchors.leftMargin: topView.height * 0.2
+        text: qsTr("有道词典")
+        color: "#c0c0c0"
+        font.pointSize: textSize3
+    }
+
+    function holdPressClicked(flag){
+        if(flag == 0){
+            textEdit.selectAll();
+        }else if(flag == 1){
+            textEdit.copy();
+            holdPress.visible = false;
+        }else if(flag == 2){
+            textEdit.paste();
+            holdPress.visible = false;
         }
     }
 

@@ -279,7 +279,15 @@ Rectangle {
             console.log("sex: " + uVoiceInfo.userInfo.sex);
             console.log("voicePath: " + uVoiceInfo.voicePath);
             console.log("tvoicePath: " + uVoiceInfo.tvoicePath);
-            TALK_PAGE_LOGIC.appendVoice(uVoiceInfo.userInfo, uVoiceInfo.voicePath, uVoiceInfo.tvoicePath);
+            if(uVoiceInfo.userInfo.name == qmlInterface.clientName){
+                var top = stackView.depth - 1;
+                var topPage = stackView.get(top);
+                if(topPage.pageName == "voiceTranslatePage"){
+                    stackView.get(top).setTranslateVoice(uVoiceInfo.tvoicePath);
+                }
+            }else {
+                TALK_PAGE_LOGIC.appendVoice(uVoiceInfo.userInfo, uVoiceInfo.voicePath, uVoiceInfo.tvoicePath);
+            }
         }
     }
 
