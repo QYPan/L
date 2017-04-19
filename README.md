@@ -52,8 +52,10 @@
 * 翻译<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/single_translate.gif)
 
 ### 后期计划
-* 添加语音聊天功能，并尝试语音翻译
 * 使用 libevent 网络库重新编写服务器，使用 redis 数据库作为离线消息缓存数据库
 * 完善消息推送功能，尽可能做到消息的可靠传输，必达性，实时性，不重复
 * 为客户端添加本地数据库，存储聊天记录等信息
 * 为客户端添加上传头像功能
+
+### 作品链接
+* 安卓客户端（android7.0 以下测试通过）：http://pan.baidu.com/s/1i5BlxVB
