@@ -58,4 +58,4 @@
 * 为客户端添加上传头像功能
 
 ### 作品链接
-* 安卓客户端（android7.0 以下测试通过）：http://pan.baidu.com/s/1i5BlxVB
+* 安卓客户端（android7.0 以下测试通过）：http://pan.baidu.com/s/1jI7fC5g
