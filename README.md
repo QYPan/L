@@ -42,6 +42,7 @@
   * 若译文跟原文相同，则表示无需翻译或翻译失败
   * 消息发送与接收接口，消息推送，以及其他一些细节尚未完善，可能会出现程序运行异常
   * 退出应用后聊天记录会清除
+  * 百度语音 token 会过期导致翻译失败，但客户端会持续更新获取新的 token
 
 ### 功能演示
 * 登录、注册、添加好友<br>![image](https://github.com/QYPan/dynamic_gif/blob/master/L/register_login_add_win7.gif)
