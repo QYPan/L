@@ -299,7 +299,9 @@ Rectangle {
         visible: false
         z: 30
         onButtonClicked: {
-            lockAll(false);
+            if(!addButton.visible){
+                lockAll(false);
+            }
             visible = false;
         }
         onYesClicked: {

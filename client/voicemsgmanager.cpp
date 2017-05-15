@@ -74,7 +74,7 @@ bool TranslateHttpRequest::speech2text(const QString &language, const QString &v
     json.insert("rate", "8000");
     json.insert("channel", "1");
     json.insert("lan", language);
-    json.insert("token", "24.dadd857936f104ecb9399b45cacf1a5d.2592000.1492495671.282335-9415054");
+    json.insert("token", "24.f8cbe9df5d65eb4931678d97996b2cdc.2592000.1497445816.282335-9415054");
     json.insert("cuid", cuidStr);
     json.insert("speech", QString(voiceF.toBase64()));
     json.insert("len", voiceF.size());
@@ -190,7 +190,7 @@ bool TranslateHttpRequest::text2speech(int sex, const QString &text, QString &vo
     //dataArray.append("tex=你好,你很漂亮&");
     dataArray.append(ctex);
     dataArray.append("lan=zh&");
-    dataArray.append("tok=24.dadd857936f104ecb9399b45cacf1a5d.2592000.1492495671.282335-9415054&");
+    dataArray.append("tok=24.f27efcab8b6319c7a0e6ac849812a8f1.2592000.1495292056.282335-9415054&");
     dataArray.append("ctp=1&");
     dataArray.append(cuidStr);
     qDebug() << "tts sex: " << sex;

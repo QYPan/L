@@ -190,6 +190,12 @@ Rectangle {
                     anchors.left: cnChose.right
                     anchors.leftMargin: cnChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            setChose(0);
+                        }
+                    }
                 }
             }
             Item {
@@ -216,6 +222,12 @@ Rectangle {
                     anchors.left: enChose.right
                     anchors.leftMargin: enChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            setChose(1);
+                        }
+                    }
                 }
             }
         }
@@ -259,6 +271,12 @@ Rectangle {
                     anchors.left: manChose.right
                     anchors.leftMargin: manChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            setChose(2);
+                        }
+                    }
                 }
             }
             Item {
@@ -285,6 +303,12 @@ Rectangle {
                     anchors.left: womanChose.right
                     anchors.leftMargin: womanChose.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            setChose(3);
+                        }
+                    }
                 }
             }
 
